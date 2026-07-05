@@ -1,0 +1,3 @@
+Mode Switch hilft dir, dein Zuhause anhand klarer Modi wie Zuhause, Abwesend, Schlafen und Urlaub zu automatisieren. Du wählst aus, welche Geräte zu welchem Modus gehören, und die App schaltet sie automatisch, sodass dein Zuhause konsistent reagiert, ohne dass du jeden Flow manuell erstellen musst.
+
+Die App bietet außerdem praktische Widgets für Modussteuerung, Überwachung und Gerätemonitoring. Für ausgewählte Geräte kannst du sehen, wann sie aktiv sind, wie lange sie laufen und wie viel Energie sie verbraucht haben. Diese Informationen können auch in Flows verwendet werden.

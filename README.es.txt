@@ -1,0 +1,3 @@
+Mode Switch te ayuda a automatizar tu hogar mediante modos claros como Casa, Ausente, Dormir y Vacaciones. Tú eliges qué dispositivos pertenecen a cada modo y la aplicación los controla automáticamente para que tu hogar responda de forma coherente sin tener que crear cada Flow manualmente.
+
+La aplicación también incluye prácticos widgets para el control de modos, monitorización y seguimiento de dispositivos. Para los dispositivos seleccionados puedes ver cuándo están en funcionamiento, cuánto tiempo llevan activos y cuánta energía han consumido. Esta información también puede utilizarse en los Flows.

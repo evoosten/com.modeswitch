@@ -1,0 +1,125 @@
+{
+  "mode": {
+    "home": "Zuhause",
+    "away": "Abwesend",
+    "sleep": "Schlafen",
+    "vacation": "Urlaub",
+    "home_tv": "Fernsehen",
+    "home_romantic": "Romantisch",
+    "home_game": "Gaming",
+    "home_movie": "Film ansehen"
+  },
+  "driver": {
+    "mode_controller": {
+      "default_name": "Modus-Controller"
+    }
+  },
+  "settings": {
+    "__lang": "de",
+    "hero": {
+      "description": "Modi, Zonenregeln, Tür-/Fensterkontakte, Zeitpläne, Sonnenaufgang/-untergang, Lux und automatischer Modus."
+    },
+    "current_mode": {
+      "loading": "Aktueller Modus: wird geladen..."
+    },
+    "submodes": {
+      "title": "Untermodi",
+      "description": "Erstelle zusätzliche Auswahlmöglichkeiten unter einem Hauptmodus, zum Beispiel Fernsehen unter Zuhause.",
+      "add": "Neuer Untermodus"
+    },
+    "zones": {
+      "title": "Zonenregeln",
+      "description": "Bewegung, Tür-/Fensterkontakte, Unterzonen, Lichter, Dimmen und Bedingungen.",
+      "add": "Neue Zonenregel"
+    },
+    "temperature": {
+      "title": "Temperatur pro Modus und Zone",
+      "description": "Lege die gewünschte Temperatur pro Modus und Zone fest. Geräte mit target_temperature werden bei einem Moduswechsel automatisch angepasst.",
+      "add": "Neue Temperaturregel"
+    },
+    "appliances": {
+      "title": "Gerätebenachrichtigungen",
+      "description": "Erkenne Start und Fertigstatus über den Stromverbrauch einer smarten Steckdose oder eines Geräts mit measure_power.",
+      "add": "Neues Gerät"
+    },
+    "schedule": {
+      "title": "Zeitplan",
+      "description": "Schalte Lichter/Geräte zu einer festen Zeit, zufällig, bei Sonnenaufgang oder Sonnenuntergang ein oder aus. Optional Lux pro Zone verwenden.",
+      "add": "Neuer Zeitplan"
+    },
+    "import_export": {
+      "title": "Import / Export",
+      "description": "Erstelle ein Backup von allem oder wähle aus, welche Bereiche enthalten sein sollen."
+    },
+    "export": {
+      "title": "Export",
+      "description": "Wähle Bereiche aus und kopiere ein JSON-Backup.",
+      "copy_json": "JSON kopieren"
+    },
+    "import": {
+      "title": "Import",
+      "description": "Wähle ein zuvor erstelltes JSON-Backup. Danach kannst du auswählen, welche Bereiche wiederhergestellt werden.",
+      "placeholder": "Füge hier den JSON-Export ein, wenn die Dateiauswahl nicht funktioniert",
+      "load_from_text": "JSON aus Textfeld laden",
+      "no_file": "Noch keine Datei ausgewählt.",
+      "apply": "Import anwenden"
+    },
+    "activities": {
+      "title": "Aktivitätsüberwachung",
+      "add": "Neue Aktivität"
+    }
+  },
+  "common": {
+    "refresh": "Aktualisieren",
+    "save_all": "Alles speichern",
+    "expand_all": "Alle aufklappen",
+    "collapse_all": "Alle zuklappen",
+    "select_all": "Alle auswählen"
+  },
+  "tabs": {
+    "modes": "Modi",
+    "zones": "Zonen & Sensoren",
+    "temperature": "Temperatur",
+    "monitoring": "Überwachung",
+    "schedule": "Zeitplan",
+    "import_export": "Import/Export",
+    "automatic_mode": "Automatischer Modus"
+  },
+  "widgets": {
+    "common": {
+      "current_mode": "Aktueller Modus",
+      "refresh": "Aktualisieren",
+      "running": "Läuft",
+      "ready": "Fertig",
+      "standby": "Bereitschaft",
+      "duration": "Dauer",
+      "appliances": "Geräte",
+      "no_appliances": "Keine Geräte",
+      "no_appliances_configured": "Keine Geräte eingerichtet.",
+      "appliance": "Gerät",
+      "could_not_load_widget_data": "Widgetdaten konnten nicht geladen werden.",
+      "could_not_load_status": "Status konnte nicht geladen werden.",
+      "could_not_change_mode": "Modus konnte nicht geändert werden.",
+      "monitoring": "Überwachung",
+      "mode": "Modus",
+      "appliance_monitoring": "Geräteüberwachung",
+      "no_sub_mode": "Kein Untermodus",
+      "activities": "Aktivitäten",
+      "activity": "Aktivität",
+      "activity_monitoring": "Aktivitätsüberwachung",
+      "active": "Aktiv",
+      "history": "Verlauf",
+      "no_history": "Kein Verlauf"
+    },
+    "modes": {
+      "home": "Zuhause",
+      "away": "Abwesend",
+      "sleep": "Schlafen",
+      "vacation": "Urlaub",
+      "home_tv": "Fernsehen",
+      "home_movie": "Film ansehen",
+      "home_game": "Gaming",
+      "home_romantic": "Romantisch"
+    }
+  }
+}

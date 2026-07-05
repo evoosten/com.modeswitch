@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="nl"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+*{box-sizing:border-box}html,body{margin:0;padding:0;width:100%;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:transparent;color:#fff}body{padding:10px}.widget{width:100%;height:calc(var(--widget-height,260px) - 20px);min-height:200px;background:linear-gradient(145deg,#172033,#111827);border-radius:22px;padding:16px;box-shadow:0 16px 42px rgba(0,0,0,.35);overflow:hidden;display:flex;flex-direction:column}.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.title{font-size:19px;font-weight:800;letter-spacing:-.02em}.sync{width:34px;height:34px;border:0;border-radius:12px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;padding:0}.current{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:13px;margin-bottom:12px}.label{color:#aeb8c7;font-size:12px;margin-bottom:3px}.mode{font-size:26px;font-weight:850;line-height:1.1}.mode-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}button.mode-btn{border:0;border-radius:14px;padding:10px 8px;background:#263244;color:#fff;cursor:pointer;font-size:14px;font-weight:650}button.mode-btn.active{background:#fff;color:#111827}button.mode-btn:disabled{opacity:.55;cursor:wait}.section-line{display:flex;align-items:center;justify-content:space-between;margin:6px 0 8px}.section-title{color:#d5dce8;font-size:13px;font-weight:800}.count{color:#9ca3af;font-size:11px}.devices{flex:1 1 auto;min-height:0;overflow:auto;padding-right:2px}.device{display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.05);border-radius:15px;padding:9px 11px;margin-bottom:7px}.device-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:650}.meta{color:#9ca3af;font-size:11px;margin-top:2px}.device-left{min-width:0}.state{flex:0 0 auto;font-size:12px;border-radius:999px;padding:4px 8px;font-weight:800}.running{background:rgba(245,158,11,.18);color:#fbbf24}.ready{background:rgba(34,197,94,.18);color:#86efac}.idle{background:rgba(148,163,184,.18);color:#cbd5e1}.empty,.error{color:#aeb8c7;background:rgba(255,255,255,.06);border-radius:15px;padding:12px;font-size:13px;line-height:1.35}.error{color:#fecaca}.section-line,.devices{display:none!important;} .widget{justify-content:flex-start;}
+
+
+  
+/* 2.6.30 modern widget layout */
+:root{
+  --accent:#60a5fa;
+  --accent-soft:rgba(96,165,250,.22);
+  --hero-image:none;
+}
+body{padding:8px!important}
+.widget{
+  position:relative!important;
+  background:
+    linear-gradient(145deg,rgba(15,23,42,.82),rgba(2,6,23,.94)),
+    var(--hero-image)!important;
+  background-size:cover!important;
+  background-position:center!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:24px!important;
+  padding:12px!important;
+  box-shadow:0 18px 50px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08)!important;
+  backdrop-filter:blur(18px)!important;
+}
+.widget::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:24px;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 20% 0%, var(--accent-soft), transparent 38%),
+    linear-gradient(180deg,rgba(255,255,255,.06),transparent 45%);
+}
+.widget>*{position:relative;z-index:1}
+.header{display:none!important}
+.current{
+  min-height:84px!important;
+  border-radius:20px!important;
+  padding:14px!important;
+  margin-bottom:10px!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.055))!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+.label{
+  font-size:8px!important;
+  text-transform:uppercase!important;
+  letter-spacing:.06em!important;
+  color:rgba(226,232,240,.72)!important;
+  margin-bottom:5px!important;
+}
+.mode{
+  font-size:23px!important;
+  font-weight:900!important;
+  line-height:1.05!important;
+  letter-spacing:-.04em!important;
+  text-shadow:0 2px 16px rgba(0,0,0,.32)!important;
+}
+
+.current{position:relative!important;}
+.mode{padding-right:76px!important;}
+.temp-badge{
+  position:absolute!important;
+  top:10px!important;
+  right:10px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:26px!important;
+  padding:4px 8px!important;
+  border-radius:999px!important;
+  background:rgba(255,255,255,.14)!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  color:#fff!important;
+  font-size:11px!important;
+  font-weight:850!important;
+  letter-spacing:-.02em!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important;
+  backdrop-filter:blur(10px)!important;
+}
+.mode-buttons{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:4px!important;
+  margin-bottom:8px!important;
+}
+button.mode-btn{
+  min-height:44px!important;
+  border-radius:14px!important;
+  padding:7px 8px!important;
+  background:rgba(255,255,255,.085)!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  color:#e5e7eb!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+button.mode-btn.active{
+  background:linear-gradient(145deg,var(--accent),rgba(255,255,255,.78))!important;
+  color:#06111f!important;
+  border-color:rgba(255,255,255,.34)!important;
+  box-shadow:0 8px 20px var(--accent-soft), inset 0 1px 0 rgba(255,255,255,.35)!important;
+}
+
+.submode-wrap{
+  margin-top:0!important;
+  margin-bottom:2px!important;
+}
+.submode-buttons{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:3px!important;
+}
+.submode-btn{
+  flex:0 0 auto!important;
+  width:auto!important;
+  border:1px solid rgba(255,255,255,.05)!important;
+  border-radius:10px!important;
+  padding:1px 7px!important;
+  height:22px!important;
+  min-height:22px!important;
+  max-height:22px!important;
+  line-height:22px!important;
+  background:rgba(255,255,255,.045)!important;
+  color:#dbe4f0!important;
+  font-size:9px!important;
+  font-weight:600!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  opacity:.82!important;
+}
+.submode-btn::before{
+  content:attr(data-icon);
+  font-size:9px!important;
+  opacity:.75!important;
+}
+.submode-btn.active{
+  background:var(--accent)!important;
+  color:#06111f!important;
+  border-color:rgba(255,255,255,.15)!important;
+}
+
+.section-line{
+  margin-top:8px!important;
+  padding-top:8px!important;
+  border-top:1px solid rgba(255,255,255,.10)!important;
+}
+.devices{
+  display:grid!important;
+  gap:6px!important;
+  margin-top:7px!important;
+  overflow:auto!important;
+}
+.device{
+  border-radius:14px!important;
+  padding:7px 9px!important;
+  background:rgba(255,255,255,.075)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  backdrop-filter:blur(10px)!important;
+}
+.device-name{font-size:12px!important}
+.state{font-size:10px!important}
+
+.mode-btn{position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;overflow:hidden!important;}
+.mode-btn .mode-btn-main{position:relative!important;z-index:2!important;display:block!important;width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+
+.widget{position:relative;overflow:hidden!important;isolation:isolate;}
+.widget.weather-bg::after,
+.widget.weather-bg::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:30px;
+  pointer-events:none;
+  z-index:0;
+  opacity:var(--weather-opacity,.92);
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position:center;
+  transform:translate3d(0,0,0) scale(1.015);
+  will-change:opacity,filter,transform;
+}
+.widget.weather-bg::after{
+  filter:saturate(1.05) contrast(1.04) brightness(.95);
+  transition:opacity .65s ease,filter .65s ease;
+}
+.widget.weather-bg::before{
+  opacity:.94;
+  background:
+    linear-gradient(90deg,rgba(2,6,23,.58),rgba(2,6,23,.20) 48%,rgba(2,6,23,.42)),
+    radial-gradient(circle at 18% 20%,rgba(255,255,255,.12),transparent 28%),
+    radial-gradient(circle at 80% 85%,rgba(0,0,0,.34),transparent 42%);
+  backdrop-filter:saturate(1.05);
+}
+.widget.weather-bg.weather-day.weather-clear::after{background-image:url("./assets/weather/clear-day.jpg");}
+.widget.weather-bg.weather-night.weather-clear::after{background-image:url("./assets/weather/clear-night.jpg");}
+.widget.weather-bg.weather-cloudy::after{background-image:url("./assets/weather/cloudy.jpg");}
+.widget.weather-bg.weather-rain::after{background-image:url("./assets/weather/rain.jpg");}
+.widget.weather-bg.weather-snow::after{background-image:url("./assets/weather/snow.jpg");}
+.widget.weather-bg.weather-fog::after{background-image:url("./assets/weather/fog.jpg");}
+.widget.weather-bg.weather-storm::after{background-image:url("./assets/weather/storm.jpg");}
+.widget.weather-bg.weather-rain::before{
+  background:
+    linear-gradient(90deg,rgba(2,6,23,.62),rgba(2,6,23,.24) 48%,rgba(2,6,23,.48)),
+    linear-gradient(180deg,rgba(15,23,42,.08),rgba(15,23,42,.50));
+}
+.widget.weather-bg.weather-snow::before{
+  background:
+    linear-gradient(90deg,rgba(15,23,42,.50),rgba(15,23,42,.18) 48%,rgba(15,23,42,.40)),
+    linear-gradient(180deg,rgba(255,255,255,.04),rgba(15,23,42,.44));
+}
+.widget.weather-bg.weather-storm::before{
+  background:
+    linear-gradient(90deg,rgba(2,6,23,.70),rgba(2,6,23,.28) 48%,rgba(2,6,23,.56)),
+    radial-gradient(circle at 56% 28%,rgba(180,150,255,.16),transparent 30%);
+}
+.widget.weather-bg>*{position:relative;z-index:1}
+
+</style></head><body><div class="widget"><div class="header"><div class="title">Modus</div><span style="font-size:10px;opacity:.35">2.7.4</span><button class="sync" id="refresh" title="Vernieuwen">↻</button></div><div class="current"><div class="label">Huidige modus</div><div class="mode" id="currentMode">...</div></div><div class="mode-buttons" id="modeButtons"></div><div class="submode-wrap" id="subModeWrap" style="display:none"><div class="submode-buttons" id="subModeButtons"></div></div><div class="section-line"><div class="section-title">Apparaten</div><div class="count" id="deviceCount"></div></div><div class="devices" id="devices"></div></div>
+<script>var api=null,currentMode=null,busy=false,statusTimer=null,configuredHeight=260,SHOW_MODES=true,SHOW_APPLIANCES=false;var WIDGET_LANG='nl';
+function detectWidgetLang(Homey){
+  var candidates=[];
+  try{ if(Homey){ candidates.push(Homey.language, Homey.lang, Homey.locale); } }catch(e){}
+  try{ candidates.push(document.documentElement.lang); }catch(e){}
+  try{ candidates.push(navigator.language, (navigator.languages&&navigator.languages[0])); }catch(e){}
+  for(var i=0;i<candidates.length;i++){
+    var v=String(candidates[i]||'').toLowerCase();
+    if(v.indexOf('de')===0)return 'de';
+    if(v.indexOf('fr')===0)return 'fr';
+    if(v.indexOf('es')===0)return 'es';
+    if(v.indexOf('en')===0)return 'en';
+    if(v.indexOf('nl')===0)return 'nl';
+  }
+  return 'nl';
+}
+function tr(nl,en,de,fr,es){
+  var keyMap={
+    'Current mode':'widgets.common.current_mode','Huidige modus':'widgets.common.current_mode',
+    'Refresh':'widgets.common.refresh','Vernieuwen':'widgets.common.refresh',
+    'Running':'widgets.common.running','Bezig':'widgets.common.running','running':'widgets.common.running','bezig':'widgets.common.running',
+    'Ready':'widgets.common.ready','Klaar':'widgets.common.ready','ready':'widgets.common.ready','klaar':'widgets.common.ready',
+    'Standby':'widgets.common.standby','Stand-by':'widgets.common.standby',
+    'Duration':'widgets.common.duration','Duur':'widgets.common.duration',
+    'Appliances':'widgets.common.appliances','Apparaten':'widgets.common.appliances',
+    'No appliances':'widgets.common.no_appliances','Geen apparaten':'widgets.common.no_appliances',
+    'No appliances configured.':'widgets.common.no_appliances_configured','Geen apparaten ingesteld.':'widgets.common.no_appliances_configured',
+    'Appliance':'widgets.common.appliance','Apparaat':'widgets.common.appliance',
+    'Could not load widget data.':'widgets.common.could_not_load_widget_data','Kan widgetdata niet laden.':'widgets.common.could_not_load_widget_data',
+    'Could not load status.':'widgets.common.could_not_load_status','Kan status niet laden.':'widgets.common.could_not_load_status',
+    'Could not change mode.':'widgets.common.could_not_change_mode','Kan modus niet wijzigen.':'widgets.common.could_not_change_mode',
+    'Monitoring':'widgets.common.monitoring',
+    'Mode':'widgets.common.mode','Modus':'widgets.common.mode',
+    'Appliance monitoring':'widgets.common.appliance_monitoring','Apparaat monitoring':'widgets.common.appliance_monitoring',
+    'No sub mode':'widgets.common.no_sub_mode','Geen submodus':'widgets.common.no_sub_mode',
+    'Home':'widgets.modes.home','Thuis':'widgets.modes.home',
+    'Away':'widgets.modes.away','Afwezig':'widgets.modes.away',
+    'Sleep':'widgets.modes.sleep','Slapen':'widgets.modes.sleep',
+    'Vacation':'widgets.modes.vacation','Vakantie':'widgets.modes.vacation',
+    'Watch TV':'widgets.modes.home_tv','TV kijken':'widgets.modes.home_tv',
+    'Watch movie':'widgets.modes.home_movie','Film kijken':'widgets.modes.home_movie',
+    'Game':'widgets.modes.home_game',
+    'Romantic':'widgets.modes.home_romantic','Romantisch':'widgets.modes.home_romantic'
+  };
+  var key=keyMap[en]||keyMap[nl];
+  try{
+    var H=window.Homey;
+    if(H&&typeof H.__==='function'&&key){
+      var translated=H.__(key);
+      if(translated&&translated!==key)return translated;
+    }
+  }catch(e){}
+  var map={nl:nl,en:en,de:de||en,fr:fr||en,es:es||en};
+  return map[WIDGET_LANG]||en||nl;
+}
+function applyWidgetTranslations(){
+  var title=document.querySelector('.title');
+  if(title){
+    if(SHOW_MODES&&SHOW_APPLIANCES)title.textContent=tr('Monitoring','Monitoring','Überwachung','Surveillance','Monitorización');
+    else if(SHOW_MODES)title.textContent=tr('Modus','Mode','Modus','Mode','Modo');
+    else title.textContent=tr('Apparaat monitoring','Appliance monitoring','Geräteüberwachung','Surveillance des appareils','Monitorización de dispositivos');
+  }
+  var label=document.querySelector('.current .label');
+  if(label)label.textContent=tr('Huidige modus','Current mode','Aktueller Modus','Mode actuel','Modo actual');
+  var section=document.querySelector('.section-title');
+  if(section)section.textContent=tr('Apparaten','Appliances','Geräte','Appareils','Dispositivos');
+  var refresh=document.getElementById('refresh');
+  if(refresh)refresh.setAttribute('title',tr('Vernieuwen','Refresh','Aktualisieren','Actualiser','Actualizar'));
+}
+function clampNumber(v,min,max,f){var n=Number(v);if(!Number.isFinite(n))return f;return Math.max(min,Math.min(max,Math.round(n)))}function readConfiguredHeight(Homey){var s={};try{s=Homey&&typeof Homey.getSettings==='function'?(Homey.getSettings()||{}):{}}catch(e){s={}}return clampNumber(s.widgetHeight,220,900,260)}function applyConfiguredHeight(Homey){configuredHeight=readConfiguredHeight(Homey);document.documentElement.style.setProperty('--widget-height',configuredHeight+'px');if(Homey&&typeof Homey.setHeight==='function')Homey.setHeight(configuredHeight)}function formatEnergyKwh(v){var n=Number(v);if(!Number.isFinite(n)||n<=0)return '';return n.toLocaleString(WIDGET_LANG==='nl'?'nl-NL':(WIDGET_LANG==='de'?'de-DE':(WIDGET_LANG==='fr'?'fr-FR':(WIDGET_LANG==='es'?'es-ES':'en-US'))),{minimumFractionDigits:2,maximumFractionDigits:3})+' kWh'}function statusLabel(s){if(s==='running')return tr('Bezig','Running','Läuft','En cours','En marcha');if(s==='ready')return tr('Klaar','Ready','Fertig','Terminé','Listo');return tr('Stand-by','Standby','Bereitschaft','Veille','En espera')}function formatDurationMs(ms){var n=Number(ms);if(!Number.isFinite(n)||n<=0)return '';var total=Math.max(0,Math.round(n/1000));var h=Math.floor(total/3600);var m=Math.floor((total%3600)/60);var sec=total%60;return h>0?(h+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')):(m+':'+String(sec).padStart(2,'0'))}function durationText(device){if(!device)return '';var ms=(device.status==='ready'&&typeof device.finalDurationMs==='number')?device.finalDurationMs:device.durationMs;if((!Number.isFinite(Number(ms))||Number(ms)<=0)&&typeof device.durationSeconds==='number')ms=device.durationSeconds*1000;var text=formatDurationMs(ms);return text?tr('Duur','Duration','Dauer','Durée','Duración')+': '+text:''}function modeText(m){if(m==='home')return tr('Thuis','Home','Zuhause','Maison','Casa');if(m==='sleep')return tr('Slapen','Sleep','Schlafen','Sommeil','Dormir');if(m==='away')return tr('Afwezig','Away','Abwesend','Absent','Fuera');if(m==='vacation')return tr('Vakantie','Vacation','Urlaub','Vacances','Vacaciones');return m}
+function translatedModeLabel(item){
+  var id=String((item&&item.id)||'').toLowerCase();
+  var raw=String((item&&(item.label||item.title||item.name))||'');
+  var key=raw.toLowerCase().trim();
+  if(id==='home'||key==='home'||key==='thuis')return tr('Thuis','Home','Zuhause','Maison','Casa');
+  if(id==='away'||key==='away'||key==='afwezig')return tr('Afwezig','Away','Abwesend','Absent','Fuera');
+  if(id==='sleep'||key==='sleep'||key==='slapen')return tr('Slapen','Sleep','Schlafen','Sommeil','Dormir');
+  if(id==='vacation'||key==='vacation'||key==='vakantie')return tr('Vakantie','Vacation','Urlaub','Vacances','Vacaciones');
+  if(id==='none'||key==='none'||key==='geen submodus'||key==='no sub mode')return tr('Geen submodus','No sub mode','Kein Untermodus','Aucun sous-mode','Sin submodo');
+  if(id.indexOf('home_tv')===0||key==='watch tv'||key==='tv kijken')return tr('TV kijken','Watch TV','Fernsehen','Regarder la TV','Ver TV');
+  if(id.indexOf('home_movie')===0||key==='watch movie'||key==='film kijken')return tr('Film kijken','Watch movie','Film ansehen','Regarder un film','Ver película');
+  if(id.indexOf('home_game')===0||key==='game'||key==='gamen')return tr('Game','Game','Gaming','Jeu','Juego');
+  if(id.indexOf('home_romantic')===0||key==='romantic'||key==='romantisch')return tr('Romantisch','Romantic','Romantisch','Romantique','Romántico');
+  return raw||modeText(id);
+}
+function modeIcon(m){if(m==='home')return '🏠';if(m==='sleep')return '🌙';if(m==='away')return '🚶';if(m==='vacation')return '🏖️';return '•'}
+function getWidgetLocalSettings(){try{return window.Homey&&typeof window.Homey.getSettings==='function'?(window.Homey.getSettings()||{}):{}}catch(e){return {}}}
+function getWidgetSelectedTemperatureDeviceId(data){
+  var ids=[];
+  try{ids=window.Homey&&typeof window.Homey.getDeviceIds==='function'?(window.Homey.getDeviceIds()||[]):[]}catch(e){ids=[]}
+  if(ids&&ids.length)return String(ids[0]||'');
+  var s=getWidgetLocalSettings();
+  if(s.temperatureSensor&&typeof s.temperatureSensor==='object')return String(s.temperatureSensor.id||(s.temperatureSensor.data&&s.temperatureSensor.data.id)||'');
+  if(typeof s.temperatureDeviceId==='string'&&s.temperatureDeviceId)return s.temperatureDeviceId;
+  return data&&data.displaySettings?String(data.displaySettings.temperatureDeviceId||''):'';
+}
+function getWidgetShowTemperature(){var s=getWidgetLocalSettings();return s.showTemperature!==false}
+function getWidgetLiveWeatherBackground(data){var s=getWidgetLocalSettings();if(typeof s.liveWeatherBackground==='boolean')return s.liveWeatherBackground;return !!(data&&data.displaySettings&&data.displaySettings.liveContextEnabled===true)}
+function applyWeatherIntensity(){var s=getWidgetLocalSettings();var n=Number(s.weatherBackgroundIntensity);if(!Number.isFinite(n))n=80;n=Math.max(0,Math.min(100,Math.round(n)));document.documentElement.style.setProperty('--weather-opacity',(0.18+(n/100)*0.74).toFixed(2));}
+
+function readTempValue(data){if(!getWidgetShowTemperature())return null;var tempId=getWidgetSelectedTemperatureDeviceId(data);var tempDevices=data&&data.environment&&Array.isArray(data.environment.temperatureSensorDevices)?data.environment.temperatureSensorDevices:[];var tempDevice=tempDevices.find(function(d){return String(d.id)===String(tempId)});var tempRaw=tempDevice&&(tempDevice.capabilityValues&&tempDevice.capabilityValues.measure_temperature!=null?tempDevice.capabilityValues.measure_temperature:(tempDevice.measureTemperature!=null?tempDevice.measureTemperature:tempDevice.temperature));var tempNum=Number(tempRaw);return Number.isFinite(tempNum)?tempNum:null}
+function formatTempShort(n){return (Math.round(n*10)/10).toFixed(n%1===0?0:1)+'°'}
+function normalizeWeatherCondition(w){var c=String((w&&w.condition)||'').toLowerCase();var raw=String((w&&(w.rawCondition||w.icon||w.code||w.weatherCode||w.description||w.summary))||'').toLowerCase();var text=(c+' '+raw).trim();if(['cloudy','rain','snow','fog','storm','clear'].indexOf(c)>=0)return c;if(/thunder|storm|onweer|bliksem|^11/.test(text))return 'storm';if(/snow|sneeuw|hail|hagel|^13/.test(text))return 'snow';if(/rain|drizzle|regen|bui|shower|^09|^10/.test(text))return 'rain';if(/fog|mist|nevel|haze|^50/.test(text))return 'fog';if(/cloud|bewolkt|wolken|overcast|zwaar|^02|^03|^04/.test(text))return 'cloudy';return 'cloudy'}
+function getWeatherInfo(data){var w=data&&data.environment?data.environment.weather:null;var condition=normalizeWeatherCondition(w);var isDay=w&&typeof w.isDay==='boolean'?w.isDay:(new Date().getHours()>=7&&new Date().getHours()<18);return {condition:condition,isDay:isDay};}
+function applyWeatherWidgetBackground(data){var widget=document.querySelector('.widget');if(!widget)return;widget.className=widget.className.replace(/\bweather-bg\b|\bweather-(clear|cloudy|rain|snow|fog|storm|day|night)\b/g,'').replace(/\s+/g,' ').trim();applyWeatherIntensity();if(!getWidgetLiveWeatherBackground(data))return;var info=getWeatherInfo(data);widget.className+=' weather-bg weather-'+(info.isDay?'day':'night')+' weather-'+info.condition;}function setBusy(b){busy=b;document.querySelectorAll('.mode-btn').forEach(function(btn){btn.disabled=busy})}function showError(m){document.getElementById('devices').innerHTML='<div class="error">'+m+'</div>'}
+function applyWidgetTheme(data,parentMode,currentMode,subModes){
+  var active=(subModes||[]).find(function(s){return s.id===currentMode}) || {};
+  var accent=(active&&typeof active.accentColor==='string'&&active.accentColor)||active.color||active.accent||'#60a5fa';
+  var img=(active&&typeof active.imageUrl==='string'&&active.imageUrl)||active.backgroundImage||active.image||'';
+  document.documentElement.style.setProperty('--accent',accent);
+  document.documentElement.style.setProperty('--accent-soft',accentToSoft(accent));
+  document.documentElement.style.setProperty('--hero-image',img?'url("'+String(img).replace(/"/g,'%22')+'")':'none');
+}
+function accentToSoft(hex){
+  var h=String(hex||'').trim();
+  if(/^#[0-9a-f]{6}$/i.test(h)){
+    var r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+    return 'rgba('+r+','+g+','+b+',.24)';
+  }
+  return 'rgba(96,165,250,.24)';
+}
+
+function subModeIcon(label,id){
+  var t=String(label||id||'').toLowerCase();
+  if(t.indexOf('tv')>-1)return '▣';
+  if(t.indexOf('film')>-1)return '▶';
+  if(t.indexOf('game')>-1||t.indexOf('gamen')>-1)return '🎮';
+  if(t.indexOf('romant')>-1)return '♥';
+  if(t.indexOf('koken')>-1)return '♨';
+  return '•';
+}
+function normalizeSubModes(data,modes){
+  var subModes=Array.isArray(data.subModes)?data.subModes:[];
+  if(!subModes.length){subModes=modes.filter(function(m){return !!m.parentMode})}
+  return subModes.map(function(s){return {id:s.id,label:s.label||s.title||s.name||s.id,parentMode:s.parentMode||s.parent||s.mainMode||'home',icon:s.icon||'',accentColor:s.accentColor||s.color||s.accent||'#60a5fa',imageUrl:s.imageUrl||s.backgroundImage||s.image||''}}).filter(function(s){return !!s.id})
+}
+function findParentMode(current,subModes){
+  var sub=subModes.find(function(s){return s.id===current});
+  return sub&&sub.parentMode?sub.parentMode:current
+}
+function render(data){if(data&&data.language){var dl=String(data.language).toLowerCase();WIDGET_LANG=dl.indexOf('de')===0?'de':dl.indexOf('fr')===0?'fr':dl.indexOf('es')===0?'es':dl.indexOf('en')===0?'en':dl.indexOf('nl')===0?'nl':WIDGET_LANG;document.documentElement.lang=WIDGET_LANG;applyWidgetTranslations();}if(!data||typeof data!=='object'||Array.isArray(data)){showError(tr('Kan widgetdata niet laden.','Could not load widget data.','Widgetdaten konnten nicht geladen werden.','Impossible de charger les données du widget.','No se pudieron cargar los datos del widget.'));return}
+var modes=Array.isArray(data.modes)?data.modes:[];
+var subModes=normalizeSubModes(data,modes);
+currentMode=data.currentMode||'home';
+var parentMode=findParentMode(currentMode,subModes);
+applyWidgetTheme(data,parentMode,currentMode,subModes);
+applyWeatherWidgetBackground(data);
+var allModes=modes.concat(subModes);
+var mode=allModes.find(function(i){return i.id===currentMode})||modes.find(function(i){return i.id===parentMode});
+var currentText=(modeIcon(currentMode)+' '+(mode?translatedModeLabel(mode):modeText(currentMode))).trim();
+if(currentMode!==parentMode){
+  var parent=modes.find(function(i){return i.id===parentMode});
+  currentText=(modeIcon(parentMode)+' '+(parent?translatedModeLabel(parent):modeText(parentMode))).trim()+' / '+currentText
+}
+var currentNode=document.getElementById('currentMode');
+currentNode.textContent='';
+var textSpan=document.createElement('span');
+textSpan.textContent=currentText;
+currentNode.appendChild(textSpan);
+var tempNum=readTempValue(data);
+if(Number.isFinite(tempNum)){
+ var badge=document.createElement('span');
+ badge.className='temp-badge';
+ badge.textContent='🌡️ '+(Math.round(tempNum*10)/10).toFixed(tempNum%1===0?0:1)+'°C';
+ currentNode.appendChild(badge);
+}
+
+var buttons=document.getElementById('modeButtons');
+buttons.innerHTML='';
+if(SHOW_MODES){
+  modes.filter(function(item){return !item.parentMode}).forEach(function(item){
+    var btn=document.createElement('button');
+    btn.className='mode-btn'+(item.id===parentMode?' active':'');
+    btn.setAttribute('data-icon',modeIcon(item.id));
+    var main=document.createElement('span');
+    main.className='mode-btn-main';
+    main.textContent=translatedModeLabel(item);
+    btn.appendChild(main);
+    btn.disabled=busy;
+    btn.addEventListener('click',function(){changeMode(item.id)});
+    buttons.appendChild(btn)
+  })
+}
+
+var subWrap=document.getElementById('subModeWrap');
+var subButtons=document.getElementById('subModeButtons');
+if(subWrap&&subButtons){
+  var relevant=subModes.filter(function(s){return s.parentMode===parentMode});
+  subButtons.innerHTML='';
+  if(relevant.length){
+    subWrap.style.display='';
+    relevant.forEach(function(sub){
+      var btn=document.createElement('button');
+      btn.className='submode-btn'+(sub.id===currentMode?' active':'');
+      btn.setAttribute('data-icon',sub.icon||subModeIcon(sub.label,sub.id));
+      btn.textContent=translatedModeLabel(sub);
+      btn.disabled=busy;
+      btn.addEventListener('click',function(){changeMode(sub.id)});
+      subButtons.appendChild(btn)
+    })
+  }else{
+    subWrap.style.display='none'
+  }
+}
+
+var devices=Array.isArray(data.appliances)?data.appliances:[];
+var running=devices.filter(function(i){return i.status==='running'}).length;
+var ready=devices.filter(function(i){return i.status==='ready'}).length;
+document.getElementById('deviceCount').textContent=devices.length?(running+' '+tr('bezig','running','läuft','en cours','en marcha')+' · '+ready+' '+tr('klaar','ready','fertig','terminé','listo')):tr('Geen apparaten','No appliances','Keine Geräte','Aucun appareil','Sin dispositivos');
+var c=document.getElementById('devices');c.innerHTML='';
+if(!SHOW_APPLIANCES)return;
+if(!devices.length){c.innerHTML='<div class="empty">'+tr('Geen apparaten ingesteld.','No appliances configured.','Keine Geräte konfiguriert.','Aucun appareil configuré.','No hay dispositivos configurados.')+'</div>';return}
+devices.forEach(function(device){
+  var row=document.createElement('div');row.className='device';
+  var left=document.createElement('div');
+  var name=document.createElement('div');name.className='device-name';name.textContent=device.name||tr('Apparaat','Appliance','Gerät','Appareil','Dispositivo');left.appendChild(name);
+  var metaParts=[];if(typeof device.lastPower==='number')metaParts.push(device.lastPower+' W');var energyText=formatEnergyKwh(device.energyKwh);if(energyText)metaParts.push(energyText);var durText=durationText(device);if(durText)metaParts.push(durText);if(metaParts.length){var meta=document.createElement('div');meta.className='meta';meta.textContent=metaParts.join(' · ');left.appendChild(meta)}
+  var state=document.createElement('div');state.className='state '+(device.status==='running'?'running':device.status==='ready'?'ready':'idle');state.textContent=statusLabel(device.status);
+  row.appendChild(left);row.appendChild(state);c.appendChild(row)
+})}
+function loadStatus(){if(!api)return;api('GET','/',{}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan status niet laden.','Could not load status.','Status konnte nicht geladen werden.','Impossible de charger l’état.','No se pudo cargar el estado.'))})}function changeMode(mode){if(!api||mode===currentMode||busy)return;setBusy(true);if(window.Homey&&typeof window.Homey.hapticFeedback==='function')window.Homey.hapticFeedback();api('POST','/mode',{mode:mode}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan modus niet wijzigen.','Could not change mode.','Modus konnte nicht geändert werden.','Impossible de modifier le mode.','No se pudo cambiar el modo.'))}).finally(function(){setBusy(false)})}function onHomeyReady(Homey){window.Homey=Homey;WIDGET_LANG=detectWidgetLang(Homey);document.documentElement.lang=WIDGET_LANG;api=Homey.api.bind(Homey);applyWidgetTranslations();applyConfiguredHeight(Homey);document.getElementById('refresh').addEventListener('click',loadStatus);Homey.ready({height:configuredHeight});loadStatus();statusTimer=setInterval(loadStatus,10000)}document.addEventListener('DOMContentLoaded',function(){WIDGET_LANG=detectWidgetLang(window.Homey);document.documentElement.lang=WIDGET_LANG;applyWidgetTranslations();});</script></body></html>

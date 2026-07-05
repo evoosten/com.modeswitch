@@ -1,0 +1,115 @@
+{
+  "name": {
+    "en": "Mode Controller",
+    "nl": "Modus Controller",
+    "de": "Modus-Controller",
+    "fr": "Contrôleur de mode",
+    "es": "Controlador de modo"
+  },
+  "class": "other",
+  "capabilities": [
+    "mode_selector",
+    "sub_mode_selector",
+    "main_mode_selector"
+  ],
+  "capabilitiesOptions": {
+    "mode_selector": {
+      "title": {
+        "en": "Active mode",
+        "nl": "Actieve modus",
+        "de": "Aktiver Modus",
+        "fr": "Mode actif",
+        "es": "Modo activo"
+      }
+    },
+    "main_mode_selector": {
+      "title": {
+        "en": "Main mode",
+        "nl": "Hoofdmodus",
+        "de": "Hauptmodus",
+        "fr": "Mode principal",
+        "es": "Modo principal"
+      }
+    },
+    "sub_mode_selector": {
+      "title": {
+        "en": "Sub mode",
+        "nl": "Submodus",
+        "de": "Untermodus",
+        "fr": "Sous-mode",
+        "es": "Submodo"
+      }
+    }
+  },
+  "images": {
+    "small": "/drivers/mode_controller/assets/images/small.png",
+    "large": "/drivers/mode_controller/assets/images/large.png"
+  },
+  "icon": "/drivers/mode_controller/assets/icon.svg",
+  "pair": [
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "navigation": {
+        "next": "add_devices"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ],
+  "settings": [
+    {
+      "id": "default_list",
+      "type": "dropdown",
+      "label": {
+        "en": "Default list",
+        "nl": "Standaard lijst",
+        "de": "Standardliste",
+        "fr": "Liste par défaut",
+        "es": "Lista predeterminada"
+      },
+      "hint": {
+        "en": "Choose which mode list should be shown/updated as default.",
+        "nl": "Kies welke moduslijst standaard gebruikt moet worden.",
+        "de": "Wähle, welche Modusliste standardmäßig angezeigt/aktualisiert werden soll.",
+        "fr": "Choisissez quelle liste de modes doit être affichée/mise à jour par défaut.",
+        "es": "Elige qué lista de modos se debe mostrar/actualizar de forma predeterminada."
+      },
+      "values": [
+        {
+          "id": "mode_selector",
+          "label": {
+            "en": "All modes",
+            "nl": "Alle modi",
+            "de": "Alle Modi",
+            "fr": "Tous les modes",
+            "es": "Todos los modos"
+          }
+        },
+        {
+          "id": "main_mode_selector",
+          "label": {
+            "en": "Main modes",
+            "nl": "Hoofdmodi",
+            "de": "Hauptmodi",
+            "fr": "Modes principaux",
+            "es": "Modos principales"
+          }
+        },
+        {
+          "id": "sub_mode_selector",
+          "label": {
+            "en": "Sub modes",
+            "nl": "Submodi",
+            "de": "Untermodi",
+            "fr": "Sous-modes",
+            "es": "Submodos"
+          }
+        }
+      ],
+      "value": "main_mode_selector"
+    }
+  ]
+}

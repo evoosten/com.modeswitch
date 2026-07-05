@@ -1,0 +1,2 @@
+Clarification for homey:manager:api permission:
+Mode Switch uses the Homey Web API to read the user's available devices, zones and sensor capability values for the settings panel, widgets and monitoring logic. The permission is needed so users can select devices for modes and appliance monitoring, show live widget status, calculate running time and energy usage from power measurements, and switch configured devices when a mode is activated. The app does not use this permission for external data collection.

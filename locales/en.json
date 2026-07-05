@@ -1,0 +1,125 @@
+{
+  "mode": {
+    "home": "Home",
+    "away": "Away",
+    "sleep": "Sleep",
+    "vacation": "Vacation",
+    "home_tv": "Watch TV",
+    "home_romantic": "Romantic",
+    "home_game": "Game",
+    "home_movie": "Watch movie"
+  },
+  "driver": {
+    "mode_controller": {
+      "default_name": "Mode Controller"
+    }
+  },
+  "settings": {
+    "__lang": "en",
+    "hero": {
+      "description": "Modes, zone rules, door/window contacts, schedules, sunrise/sunset, lux and automatic mode."
+    },
+    "current_mode": {
+      "loading": "Current mode: loading..."
+    },
+    "submodes": {
+      "title": "Sub modes",
+      "description": "Create extra choices under a main mode, for example Watch TV under Home.",
+      "add": "New sub mode"
+    },
+    "zones": {
+      "title": "Zone rules",
+      "description": "Motion, door/window contacts, subzones, lights, dimming and conditions.",
+      "add": "New zone rule"
+    },
+    "temperature": {
+      "title": "Temperature per mode and zone",
+      "description": "Set the desired temperature per mode and zone. Devices with target_temperature are updated automatically when the mode changes.",
+      "add": "New temperature rule"
+    },
+    "appliances": {
+      "title": "Appliance notifications",
+      "description": "Detect start and ready status using power consumption from a smart plug or device with measure_power.",
+      "add": "New appliance"
+    },
+    "schedule": {
+      "title": "Schedule",
+      "description": "Switch lights/devices on or off at a fixed time, random time, sunrise or sunset. Optionally use lux per zone.",
+      "add": "New schedule"
+    },
+    "import_export": {
+      "title": "Import / export",
+      "description": "Create a backup of everything or choose which sections to include."
+    },
+    "export": {
+      "title": "Export",
+      "description": "Choose sections and copy a JSON backup.",
+      "copy_json": "Copy JSON"
+    },
+    "import": {
+      "title": "Import",
+      "description": "Choose a previously created JSON backup. You can then select which sections to restore.",
+      "placeholder": "Paste the JSON export here if choosing a file does not work",
+      "load_from_text": "Load JSON from text field",
+      "no_file": "No file selected yet.",
+      "apply": "Apply import"
+    },
+    "activities": {
+      "title": "Activity monitoring",
+      "add": "New activity"
+    }
+  },
+  "common": {
+    "refresh": "Refresh",
+    "save_all": "Save all",
+    "expand_all": "Expand all",
+    "collapse_all": "Collapse all",
+    "select_all": "Select all"
+  },
+  "tabs": {
+    "modes": "Modes",
+    "zones": "Zones & sensors",
+    "temperature": "Temperature",
+    "monitoring": "Monitoring",
+    "schedule": "Schedule",
+    "import_export": "Import/Export",
+    "automatic_mode": "Automatic mode"
+  },
+  "widgets": {
+    "common": {
+      "current_mode": "Current mode",
+      "refresh": "Refresh",
+      "running": "Running",
+      "ready": "Ready",
+      "standby": "Standby",
+      "duration": "Duration",
+      "appliances": "Appliances",
+      "no_appliances": "No appliances",
+      "no_appliances_configured": "No appliances configured.",
+      "appliance": "Appliance",
+      "could_not_load_widget_data": "Could not load widget data.",
+      "could_not_load_status": "Could not load status.",
+      "could_not_change_mode": "Could not change mode.",
+      "monitoring": "Monitoring",
+      "mode": "Mode",
+      "appliance_monitoring": "Appliance monitoring",
+      "no_sub_mode": "No sub mode",
+      "activities": "Activities",
+      "activity": "Activity",
+      "activity_monitoring": "Activity monitoring",
+      "active": "Active",
+      "history": "History",
+      "no_history": "No history"
+    },
+    "modes": {
+      "home": "Home",
+      "away": "Away",
+      "sleep": "Sleep",
+      "vacation": "Vacation",
+      "home_tv": "Watch TV",
+      "home_movie": "Watch movie",
+      "home_game": "Game",
+      "home_romantic": "Romantic"
+    }
+  }
+}

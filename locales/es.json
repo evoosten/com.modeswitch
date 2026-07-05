@@ -1,0 +1,125 @@
+{
+  "mode": {
+    "home": "Casa",
+    "away": "Ausente",
+    "sleep": "Dormir",
+    "vacation": "Vacaciones",
+    "home_tv": "Ver TV",
+    "home_romantic": "Romántico",
+    "home_game": "Juego",
+    "home_movie": "Ver película"
+  },
+  "driver": {
+    "mode_controller": {
+      "default_name": "Controlador de modo"
+    }
+  },
+  "settings": {
+    "__lang": "es",
+    "hero": {
+      "description": "Modos, reglas de zona, contactos de puertas/ventanas, horarios, amanecer/atardecer, lux y modo automático."
+    },
+    "current_mode": {
+      "loading": "Modo actual: cargando..."
+    },
+    "submodes": {
+      "title": "Submodos",
+      "description": "Crea opciones adicionales bajo un modo principal, por ejemplo Ver TV bajo Casa.",
+      "add": "Nuevo submodo"
+    },
+    "zones": {
+      "title": "Reglas de zona",
+      "description": "Movimiento, contactos de puertas/ventanas, subzonas, luces, atenuación y condiciones.",
+      "add": "Nueva regla de zona"
+    },
+    "temperature": {
+      "title": "Temperatura por modo y zona",
+      "description": "Configura la temperatura deseada por modo y zona. Los dispositivos con target_temperature se actualizan automáticamente cuando cambia el modo.",
+      "add": "Nueva regla de temperatura"
+    },
+    "appliances": {
+      "title": "Notificaciones de dispositivos",
+      "description": "Detecta inicio y estado listo usando el consumo de un enchufe inteligente o dispositivo con measure_power.",
+      "add": "Nuevo dispositivo"
+    },
+    "schedule": {
+      "title": "Horario",
+      "description": "Enciende o apaga luces/dispositivos a una hora fija, aleatoria, al amanecer o al atardecer. Opcionalmente usa lux por zona.",
+      "add": "Nuevo horario"
+    },
+    "import_export": {
+      "title": "Importar / exportar",
+      "description": "Crea una copia de seguridad de todo o elige qué secciones incluir."
+    },
+    "export": {
+      "title": "Exportar",
+      "description": "Elige secciones y copia una copia de seguridad JSON.",
+      "copy_json": "Copiar JSON"
+    },
+    "import": {
+      "title": "Importar",
+      "description": "Elige una copia de seguridad JSON creada anteriormente. Después puedes seleccionar qué secciones restaurar.",
+      "placeholder": "Pega aquí la exportación JSON si elegir un archivo no funciona",
+      "load_from_text": "Cargar JSON desde campo de texto",
+      "no_file": "Aún no se ha seleccionado ningún archivo.",
+      "apply": "Aplicar importación"
+    },
+    "activities": {
+      "title": "Monitorización de actividades",
+      "add": "Nueva actividad"
+    }
+  },
+  "common": {
+    "refresh": "Actualizar",
+    "save_all": "Guardar todo",
+    "expand_all": "Expandir todo",
+    "collapse_all": "Contraer todo",
+    "select_all": "Seleccionar todo"
+  },
+  "tabs": {
+    "modes": "Modos",
+    "zones": "Zonas y sensores",
+    "temperature": "Temperatura",
+    "monitoring": "Monitorización",
+    "schedule": "Horario",
+    "import_export": "Importar/Exportar",
+    "automatic_mode": "Modo automático"
+  },
+  "widgets": {
+    "common": {
+      "current_mode": "Modo actual",
+      "refresh": "Actualizar",
+      "running": "En marcha",
+      "ready": "Listo",
+      "standby": "En espera",
+      "duration": "Duración",
+      "appliances": "Dispositivos",
+      "no_appliances": "Sin dispositivos",
+      "no_appliances_configured": "No hay dispositivos configurados.",
+      "appliance": "Dispositivo",
+      "could_not_load_widget_data": "No se pudieron cargar los datos del widget.",
+      "could_not_load_status": "No se pudo cargar el estado.",
+      "could_not_change_mode": "No se pudo cambiar el modo.",
+      "monitoring": "Monitorización",
+      "mode": "Modo",
+      "appliance_monitoring": "Monitorización de dispositivos",
+      "no_sub_mode": "Sin submodo",
+      "activities": "Actividades",
+      "activity": "Actividad",
+      "activity_monitoring": "Monitorización de actividades",
+      "active": "Activa",
+      "history": "Historial",
+      "no_history": "Sin historial"
+    },
+    "modes": {
+      "home": "Casa",
+      "away": "Fuera",
+      "sleep": "Dormir",
+      "vacation": "Vacaciones",
+      "home_tv": "Ver TV",
+      "home_movie": "Ver película",
+      "home_game": "Juego",
+      "home_romantic": "Romántico"
+    }
+  }
+}

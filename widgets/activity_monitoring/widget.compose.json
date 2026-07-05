@@ -1,0 +1,35 @@
+{
+  "name": {
+    "en": "Activity monitoring",
+    "nl": "Activiteit monitoring",
+    "de": "Aktivitätsüberwachung",
+    "fr": "Surveillance des activités",
+    "es": "Monitorización de actividades"
+  },
+  "height": 360,
+  "transparent": true,
+  "id": "activity_monitoring",
+  "settings": [
+    {
+      "id": "widgetHeight",
+      "type": "number",
+      "title": {
+        "en": "Widget height",
+        "nl": "Widget hoogte",
+        "de": "Widget-Höhe",
+        "fr": "Hauteur du widget",
+        "es": "Altura del widget"
+      },
+      "hint": {
+        "en": "Height in pixels (220-900).",
+        "nl": "Hoogte in pixels (220-900).",
+        "de": "Höhe in Pixeln (220-900).",
+        "fr": "Hauteur en pixels (220-900).",
+        "es": "Altura en píxeles (220-900)."
+      },
+      "value": 360,
+      "min": 220,
+      "max": 900
+    }
+  ]
+}

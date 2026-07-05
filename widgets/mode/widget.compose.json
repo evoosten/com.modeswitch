@@ -1,0 +1,101 @@
+{
+  "name": {
+    "en": "Mode",
+    "nl": "Modus",
+    "de": "Modus",
+    "fr": "Mode",
+    "es": "Modo"
+  },
+  "height": 260,
+  "transparent": true,
+  "id": "mode",
+  "settings": [
+    {
+      "id": "widgetHeight",
+      "type": "number",
+      "title": {
+        "en": "Widget height",
+        "nl": "Widget hoogte",
+        "de": "Widget-Höhe",
+        "fr": "Hauteur du widget",
+        "es": "Altura del widget"
+      },
+      "hint": {
+        "en": "Height in pixels (220-900).",
+        "nl": "Hoogte in pixels (220-900).",
+        "de": "Höhe in Pixeln (220-900).",
+        "fr": "Hauteur en pixels (220-900).",
+        "es": "Altura en píxeles (220-900)."
+      },
+      "value": 260,
+      "min": 220,
+      "max": 900
+    },
+    {
+      "id": "showTemperature",
+      "type": "checkbox",
+      "title": {
+        "en": "Show temperature",
+        "nl": "Temperatuur tonen",
+        "de": "Temperatur anzeigen",
+        "fr": "Afficher la température",
+        "es": "Mostrar temperatura"
+      },
+      "hint": {
+        "en": "Show the selected temperature sensor in the top-right corner.",
+        "nl": "Toon de gekozen temperatuursensor rechtsboven in de widget.",
+        "de": "Show the selected temperature sensor in the top-right corner.",
+        "fr": "Show the selected temperature sensor in the top-right corner.",
+        "es": "Show the selected temperature sensor in the top-right corner."
+      },
+      "value": true
+    },
+    {
+      "id": "liveWeatherBackground",
+      "type": "checkbox",
+      "title": {
+        "en": "Live weather background",
+        "nl": "Live weerachtergrond",
+        "de": "Live-Wetterhintergrund",
+        "fr": "Arrière-plan météo en direct",
+        "es": "Fondo meteorológico en vivo"
+      },
+      "hint": {
+        "en": "Use Homey's location/weather data as the widget background.",
+        "nl": "Gebruik de Homey-locatie/weerdata als achtergrond van de widget.",
+        "de": "Use Homey's location/weather data as the widget background.",
+        "fr": "Use Homey's location/weather data as the widget background.",
+        "es": "Use Homey's location/weather data as the widget background."
+      },
+      "value": true
+    },
+    {
+      "id": "weatherBackgroundIntensity",
+      "type": "number",
+      "title": {
+        "en": "Weather background intensity",
+        "nl": "Intensiteit weerachtergrond",
+        "de": "Intensität des Wetterhintergrunds",
+        "fr": "Intensité de l’arrière-plan météo",
+        "es": "Intensidad del fondo meteorológico"
+      },
+      "hint": {
+        "en": "0 = subtle, 100 = strong.",
+        "nl": "0 = subtiel, 100 = sterk.",
+        "de": "0 = subtle, 100 = strong.",
+        "fr": "0 = subtle, 100 = strong.",
+        "es": "0 = subtle, 100 = strong."
+      },
+      "value": 80,
+      "min": 0,
+      "max": 100
+    }
+  ],
+  "devices": {
+    "type": "global",
+    "singular": true,
+    "filter": {
+      "capabilities": "measure_temperature"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": {
+    "en": "Monitoring",
+    "nl": "Monitoring",
+    "de": "Überwachung",
+    "fr": "Surveillance",
+    "es": "Monitorización"
+  },
+  "height": 360,
+  "transparent": true,
+  "id": "monitoring",
+  "settings": [
+    {
+      "id": "widgetHeight",
+      "type": "number",
+      "title": {
+        "en": "Widget height",
+        "nl": "Widget hoogte",
+        "de": "Widget-Höhe",
+        "fr": "Hauteur du widget",
+        "es": "Altura del widget"
+      },
+      "hint": {
+        "en": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height.",
+        "nl": "Hoogte in pixels (220-900). Voeg de widget opnieuw toe of bewerk hem als Homey een oude hoogte vasthoudt.",
+        "de": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height.",
+        "fr": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height.",
+        "es": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height."
+      },
+      "value": 360,
+      "min": 220,
+      "max": 900
+    }
+  ]
+}

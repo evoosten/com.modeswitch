@@ -1,0 +1,1801 @@
+{
+  "id": "com.modeswitch",
+  "version": "2.9.0",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Mode Switch",
+    "nl": "Modus Schakelaar",
+    "de": "Modusschalter",
+    "fr": "Commutateur de mode",
+    "es": "Selector de modo"
+  },
+  "description": {
+    "en": "Smart home modes for lights, climate and devices — fully automated.",
+    "nl": "Slimme huis modi voor verlichting, klimaat en apparaten — volledig geautomatiseerd.",
+    "de": "Smart-Home-Modi für Licht, Klima und Geräte — vollständig automatisiert.",
+    "fr": "Modes maison intelligente pour l’éclairage, le climat et les appareils — entièrement automatisés.",
+    "es": "Modos de hogar inteligente para luces, clima y dispositivos — totalmente automatizados."
+  },
+  "brandColor": "#0B5FFF",
+  "homeyCommunityTopicId": 154885,
+  "support": "https://community.homey.app/t/app-pro-mode-switch/154885",
+  "category": [
+    "tools"
+  ],
+  "permissions": [
+    "homey:manager:api"
+  ],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png"
+  },
+  "author": {
+    "name": "Erik van Oosten",
+    "email": "eevoosten@gmail.com"
+  },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "erikvoosten"
+      }
+    }
+  },
+  "api": {
+    "get_config": {
+      "method": "GET",
+      "path": "/config"
+    },
+    "get_devices": {
+      "method": "GET",
+      "path": "/devices"
+    },
+    "get_environment": {
+      "method": "GET",
+      "path": "/environment"
+    },
+    "put_rules": {
+      "method": "PUT",
+      "path": "/rules"
+    },
+    "put_zone_rules": {
+      "method": "PUT",
+      "path": "/zone_rules"
+    },
+    "post_mode": {
+      "method": "POST",
+      "path": "/mode"
+    },
+    "post_run_zone": {
+      "method": "POST",
+      "path": "/run_zone"
+    },
+    "put_schedule_rules": {
+      "method": "PUT",
+      "path": "/schedule_rules"
+    },
+    "put_auto_mode": {
+      "method": "PUT",
+      "path": "/auto_mode"
+    },
+    "put_display_settings": {
+      "method": "PUT",
+      "path": "/display_settings"
+    },
+    "put_temperature_rules": {
+      "method": "PUT",
+      "path": "/temperature_rules"
+    },
+    "put_appliance_rules": {
+      "method": "PUT",
+      "path": "/appliance_rules"
+    },
+    "web_export": {
+      "method": "GET",
+      "path": "/export",
+      "public": true
+    },
+    "post_prepare_export": {
+      "method": "POST",
+      "path": "/prepare_export"
+    },
+    "post_import": {
+      "method": "POST",
+      "path": "/import"
+    },
+    "get_time": {
+      "method": "GET",
+      "path": "/time"
+    },
+    "put_sub_modes": {
+      "method": "PUT",
+      "path": "/sub_modes"
+    },
+    "get_activity_rules": {
+      "method": "GET",
+      "path": "/activity_rules"
+    },
+    "put_activity_rules": {
+      "method": "PUT",
+      "path": "/activity_rules"
+    },
+    "get_activity_state": {
+      "method": "GET",
+      "path": "/activity_state"
+    },
+    "get_activity_history": {
+      "method": "GET",
+      "path": "/activity_history"
+    },
+    "get_crash_log": {
+      "method": "GET",
+      "path": "/crash_log"
+    },
+    "post_clear_crash_log": {
+      "method": "POST",
+      "path": "/crash_log/clear"
+    }
+  },
+  "flow": {
+    "triggers": [
+      {
+        "title": {
+          "en": "Mode changed",
+          "nl": "Modus gewijzigd",
+          "de": "Modus geändert",
+          "fr": "Mode modifié",
+          "es": "Modo cambiado"
+        },
+        "tokens": [
+          {
+            "name": "mode",
+            "type": "string",
+            "title": {
+              "en": "Mode",
+              "nl": "Modus",
+              "de": "Modus",
+              "fr": "Mode",
+              "es": "Modo"
+            }
+          },
+          {
+            "name": "previous_mode",
+            "type": "string",
+            "title": {
+              "en": "Previous mode",
+              "nl": "Vorige modus",
+              "de": "Vorheriger Modus",
+              "fr": "Mode précédent",
+              "es": "Modo anterior"
+            }
+          },
+          {
+            "name": "source",
+            "type": "string",
+            "title": {
+              "en": "Source",
+              "nl": "Bron",
+              "de": "Quelle",
+              "fr": "Source",
+              "es": "Origen"
+            }
+          }
+        ],
+        "id": "mode_changed",
+        "titleFormatted": {
+          "en": "Mode changed",
+          "nl": "Modus gewijzigd",
+          "de": "Modus geändert",
+          "fr": "Mode modifié",
+          "es": "Modo cambiado"
+        }
+      },
+      {
+        "title": {
+          "en": "Motion started in a zone",
+          "nl": "Beweging gestart in een zone",
+          "de": "Bewegung in einer Zone erkannt",
+          "fr": "Mouvement détecté dans une zone",
+          "es": "Movimiento detectado en una zona"
+        },
+        "tokens": [
+          {
+            "name": "zone",
+            "type": "string",
+            "title": {
+              "en": "Zone",
+              "nl": "Zone",
+              "de": "Zone",
+              "fr": "Zone",
+              "es": "Zone"
+            }
+          },
+          {
+            "name": "mode",
+            "type": "string",
+            "title": {
+              "en": "Mode",
+              "nl": "Modus",
+              "de": "Modus",
+              "fr": "Mode",
+              "es": "Modo"
+            }
+          },
+          {
+            "name": "source",
+            "type": "string",
+            "title": {
+              "en": "Source",
+              "nl": "Bron",
+              "de": "Quelle",
+              "fr": "Source",
+              "es": "Origen"
+            }
+          }
+        ],
+        "id": "zone_motion_started",
+        "titleFormatted": {
+          "en": "Motion started in a zone",
+          "nl": "Beweging gestart in een zone",
+          "de": "Bewegung in einer Zone erkannt",
+          "fr": "Mouvement détecté dans une zone",
+          "es": "Movimiento detectado en una zona"
+        }
+      },
+      {
+        "title": {
+          "en": "No motion in a zone",
+          "nl": "Geen beweging meer in een zone",
+          "de": "Keine Bewegung in einer Zone",
+          "fr": "Aucun mouvement dans une zone",
+          "es": "Sin movimiento en una zona"
+        },
+        "tokens": [
+          {
+            "name": "zone",
+            "type": "string",
+            "title": {
+              "en": "Zone",
+              "nl": "Zone",
+              "de": "Zone",
+              "fr": "Zone",
+              "es": "Zone"
+            }
+          },
+          {
+            "name": "mode",
+            "type": "string",
+            "title": {
+              "en": "Mode",
+              "nl": "Modus",
+              "de": "Modus",
+              "fr": "Mode",
+              "es": "Modo"
+            }
+          },
+          {
+            "name": "minutes",
+            "type": "number",
+            "title": {
+              "en": "Minutes",
+              "nl": "Minuten",
+              "de": "Minuten",
+              "fr": "Minutes",
+              "es": "Minutos"
+            }
+          },
+          {
+            "name": "source",
+            "type": "string",
+            "title": {
+              "en": "Source",
+              "nl": "Bron",
+              "de": "Quelle",
+              "fr": "Source",
+              "es": "Origen"
+            }
+          }
+        ],
+        "id": "zone_no_motion",
+        "titleFormatted": {
+          "en": "No motion in a zone",
+          "nl": "Geen beweging meer in een zone",
+          "de": "Keine Bewegung in einer Zone",
+          "fr": "Aucun mouvement dans une zone",
+          "es": "Sin movimiento en una zona"
+        }
+      },
+      {
+        "id": "appliance_started",
+        "title": {
+          "en": "Appliance started",
+          "nl": "Apparaat gestart",
+          "de": "Gerät gestartet",
+          "fr": "Appareil démarré",
+          "es": "Dispositivo iniciado"
+        },
+        "titleFormatted": {
+          "en": "Appliance started",
+          "nl": "Apparaat gestart",
+          "de": "Gerät gestartet",
+          "fr": "Appareil démarré",
+          "es": "Dispositivo iniciado"
+        },
+        "tokens": [
+          {
+            "name": "name",
+            "type": "string",
+            "title": {
+              "en": "Name",
+              "nl": "Naam",
+              "de": "Name",
+              "fr": "Nom",
+              "es": "Nombre"
+            }
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "title": {
+              "en": "Type",
+              "nl": "Type",
+              "de": "Type",
+              "fr": "Type",
+              "es": "Type"
+            }
+          },
+          {
+            "name": "device",
+            "type": "string",
+            "title": {
+              "en": "Device",
+              "nl": "Apparaat",
+              "de": "Gerät",
+              "fr": "Appareil",
+              "es": "Dispositivo"
+            }
+          },
+          {
+            "name": "power",
+            "type": "number",
+            "title": {
+              "en": "Power",
+              "nl": "Vermogen",
+              "de": "Leistung",
+              "fr": "Puissance",
+              "es": "Potencia"
+            }
+          },
+          {
+            "name": "energy_kwh",
+            "type": "number",
+            "title": {
+              "en": "Energy used (kWh)",
+              "nl": "Verbruikt (kWh)",
+              "de": "Energieverbrauch (kWh)",
+              "fr": "Énergie consommée (kWh)",
+              "es": "Energía consumida (kWh)"
+            }
+          },
+          {
+            "name": "duration_seconds",
+            "type": "number",
+            "title": {
+              "en": "Duration (seconds)",
+              "nl": "Duur (seconden)",
+              "de": "Dauer (Sekunden)",
+              "fr": "Durée (secondes)",
+              "es": "Duración (segundos)"
+            }
+          },
+          {
+            "name": "duration",
+            "type": "string",
+            "title": {
+              "en": "Duration",
+              "nl": "Duur",
+              "de": "Dauer",
+              "fr": "Durée",
+              "es": "Duración"
+            }
+          }
+        ]
+      },
+      {
+        "id": "appliance_ready",
+        "title": {
+          "en": "Appliance is ready",
+          "nl": "Apparaat is klaar",
+          "de": "Gerät ist bereit",
+          "fr": "Appareil prêt",
+          "es": "Dispositivo listo"
+        },
+        "titleFormatted": {
+          "en": "Appliance is ready",
+          "nl": "Apparaat is klaar",
+          "de": "Gerät ist bereit",
+          "fr": "Appareil prêt",
+          "es": "Dispositivo listo"
+        },
+        "tokens": [
+          {
+            "name": "name",
+            "type": "string",
+            "title": {
+              "en": "Name",
+              "nl": "Naam",
+              "de": "Name",
+              "fr": "Nom",
+              "es": "Nombre"
+            }
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "title": {
+              "en": "Type",
+              "nl": "Type",
+              "de": "Type",
+              "fr": "Type",
+              "es": "Type"
+            }
+          },
+          {
+            "name": "device",
+            "type": "string",
+            "title": {
+              "en": "Device",
+              "nl": "Apparaat",
+              "de": "Gerät",
+              "fr": "Appareil",
+              "es": "Dispositivo"
+            }
+          },
+          {
+            "name": "power",
+            "type": "number",
+            "title": {
+              "en": "Power",
+              "nl": "Vermogen",
+              "de": "Leistung",
+              "fr": "Puissance",
+              "es": "Potencia"
+            }
+          },
+          {
+            "name": "energy_kwh",
+            "type": "number",
+            "title": {
+              "en": "Energy used (kWh)",
+              "nl": "Verbruikt (kWh)",
+              "de": "Energieverbrauch (kWh)",
+              "fr": "Énergie consommée (kWh)",
+              "es": "Energía consumida (kWh)"
+            }
+          },
+          {
+            "name": "duration_seconds",
+            "type": "number",
+            "title": {
+              "en": "Duration (seconds)",
+              "nl": "Duur (seconden)",
+              "de": "Dauer (Sekunden)",
+              "fr": "Durée (secondes)",
+              "es": "Duración (segundos)"
+            }
+          },
+          {
+            "name": "duration",
+            "type": "string",
+            "title": {
+              "en": "Duration",
+              "nl": "Duur",
+              "de": "Dauer",
+              "fr": "Durée",
+              "es": "Duración"
+            }
+          }
+        ]
+      },
+      {
+        "id": "appliance_ready_reminder",
+        "title": {
+          "en": "Appliance ready reminder",
+          "nl": "Herinnering apparaat klaar",
+          "de": "Erinnerung: Gerät fertig",
+          "fr": "Rappel appareil prêt",
+          "es": "Recordatorio dispositivo listo"
+        },
+        "titleFormatted": {
+          "en": "Appliance ready reminder",
+          "nl": "Herinnering apparaat klaar",
+          "de": "Erinnerung: Gerät fertig",
+          "fr": "Rappel appareil prêt",
+          "es": "Recordatorio dispositivo listo"
+        },
+        "tokens": [
+          {
+            "name": "name",
+            "type": "string",
+            "title": {
+              "en": "Name",
+              "nl": "Naam",
+              "de": "Name",
+              "fr": "Nom",
+              "es": "Nombre"
+            }
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "title": {
+              "en": "Type",
+              "nl": "Type",
+              "de": "Type",
+              "fr": "Type",
+              "es": "Type"
+            }
+          },
+          {
+            "name": "device",
+            "type": "string",
+            "title": {
+              "en": "Device",
+              "nl": "Apparaat",
+              "de": "Gerät",
+              "fr": "Appareil",
+              "es": "Dispositivo"
+            }
+          },
+          {
+            "name": "power",
+            "type": "number",
+            "title": {
+              "en": "Power",
+              "nl": "Vermogen",
+              "de": "Leistung",
+              "fr": "Puissance",
+              "es": "Potencia"
+            }
+          },
+          {
+            "name": "energy_kwh",
+            "type": "number",
+            "title": {
+              "en": "Energy used (kWh)",
+              "nl": "Verbruikt (kWh)",
+              "de": "Energieverbrauch (kWh)",
+              "fr": "Énergie consommée (kWh)",
+              "es": "Energía consumida (kWh)"
+            }
+          },
+          {
+            "name": "duration_seconds",
+            "type": "number",
+            "title": {
+              "en": "Duration (seconds)",
+              "nl": "Duur (seconden)",
+              "de": "Dauer (Sekunden)",
+              "fr": "Durée (secondes)",
+              "es": "Duración (segundos)"
+            }
+          },
+          {
+            "name": "duration",
+            "type": "string",
+            "title": {
+              "en": "Duration",
+              "nl": "Duur",
+              "de": "Dauer",
+              "fr": "Durée",
+              "es": "Duración"
+            }
+          }
+        ]
+      },
+      {
+        "id": "activity_started",
+        "title": {
+          "en": "Activity started",
+          "nl": "Activiteit gestart",
+          "de": "Aktivität gestartet",
+          "fr": "Activité démarrée",
+          "es": "Actividad iniciada"
+        },
+        "tokens": [
+          {
+            "name": "activity_name",
+            "title": {
+              "en": "Activity",
+              "nl": "Activiteit",
+              "de": "Aktivität",
+              "fr": "Activité",
+              "es": "Actividad"
+            },
+            "type": "string"
+          },
+          {
+            "name": "duration",
+            "title": {
+              "en": "Duration",
+              "nl": "Duur",
+              "de": "Dauer",
+              "fr": "Durée",
+              "es": "Duración"
+            },
+            "type": "string"
+          },
+          {
+            "name": "water_used",
+            "title": {
+              "en": "Water used",
+              "nl": "Water gebruikt",
+              "de": "Wasserverbrauch",
+              "fr": "Eau utilisée",
+              "es": "Agua usada"
+            },
+            "type": "number"
+          },
+          {
+            "name": "kwh_used",
+            "title": {
+              "en": "kWh used",
+              "nl": "kWh gebruikt",
+              "de": "kWh verbraucht",
+              "fr": "kWh utilisés",
+              "es": "kWh usados"
+            },
+            "type": "number"
+          },
+          {
+            "name": "gas_used",
+            "title": {
+              "en": "Gas used",
+              "nl": "Gas gebruikt",
+              "de": "Gasverbrauch",
+              "fr": "Gaz utilisé",
+              "es": "Gas usado"
+            },
+            "type": "number"
+          },
+          {
+            "name": "start_time",
+            "title": {
+              "en": "Start time",
+              "nl": "Starttijd",
+              "de": "Startzeit",
+              "fr": "Heure de début",
+              "es": "Hora de inicio"
+            },
+            "type": "string"
+          },
+          {
+            "name": "end_time",
+            "title": {
+              "en": "End time",
+              "nl": "Eindtijd",
+              "de": "Endzeit",
+              "fr": "Heure de fin",
+              "es": "Hora de fin"
+            },
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "activity_stopped",
+        "title": {
+          "en": "Activity stopped",
+          "nl": "Activiteit gestopt",
+          "de": "Aktivität beendet",
+          "fr": "Activité arrêtée",
+          "es": "Actividad detenida"
+        },
+        "tokens": [
+          {
+            "name": "activity_name",
+            "title": {
+              "en": "Activity",
+              "nl": "Activiteit",
+              "de": "Aktivität",
+              "fr": "Activité",
+              "es": "Actividad"
+            },
+            "type": "string"
+          },
+          {
+            "name": "duration",
+            "title": {
+              "en": "Duration",
+              "nl": "Duur",
+              "de": "Dauer",
+              "fr": "Durée",
+              "es": "Duración"
+            },
+            "type": "string"
+          },
+          {
+            "name": "water_used",
+            "title": {
+              "en": "Water used",
+              "nl": "Water gebruikt",
+              "de": "Wasserverbrauch",
+              "fr": "Eau utilisée",
+              "es": "Agua usada"
+            },
+            "type": "number"
+          },
+          {
+            "name": "kwh_used",
+            "title": {
+              "en": "kWh used",
+              "nl": "kWh gebruikt",
+              "de": "kWh verbraucht",
+              "fr": "kWh utilisés",
+              "es": "kWh usados"
+            },
+            "type": "number"
+          },
+          {
+            "name": "gas_used",
+            "title": {
+              "en": "Gas used",
+              "nl": "Gas gebruikt",
+              "de": "Gasverbrauch",
+              "fr": "Gaz utilisé",
+              "es": "Gas usado"
+            },
+            "type": "number"
+          },
+          {
+            "name": "start_time",
+            "title": {
+              "en": "Start time",
+              "nl": "Starttijd",
+              "de": "Startzeit",
+              "fr": "Heure de début",
+              "es": "Hora de inicio"
+            },
+            "type": "string"
+          },
+          {
+            "name": "end_time",
+            "title": {
+              "en": "End time",
+              "nl": "Eindtijd",
+              "de": "Endzeit",
+              "fr": "Heure de fin",
+              "es": "Hora de fin"
+            },
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "activity_updated",
+        "title": {
+          "en": "Activity updated",
+          "nl": "Activiteit bijgewerkt",
+          "de": "Aktivität aktualisiert",
+          "fr": "Activité mise à jour",
+          "es": "Actividad actualizada"
+        },
+        "tokens": [
+          {
+            "name": "activity_name",
+            "title": {
+              "en": "Activity",
+              "nl": "Activiteit",
+              "de": "Aktivität",
+              "fr": "Activité",
+              "es": "Actividad"
+            },
+            "type": "string"
+          },
+          {
+            "name": "duration",
+            "title": {
+              "en": "Duration",
+              "nl": "Duur",
+              "de": "Dauer",
+              "fr": "Durée",
+              "es": "Duración"
+            },
+            "type": "string"
+          },
+          {
+            "name": "water_used",
+            "title": {
+              "en": "Water used",
+              "nl": "Water gebruikt",
+              "de": "Wasserverbrauch",
+              "fr": "Eau utilisée",
+              "es": "Agua usada"
+            },
+            "type": "number"
+          },
+          {
+            "name": "kwh_used",
+            "title": {
+              "en": "kWh used",
+              "nl": "kWh gebruikt",
+              "de": "kWh verbraucht",
+              "fr": "kWh utilisés",
+              "es": "kWh usados"
+            },
+            "type": "number"
+          },
+          {
+            "name": "gas_used",
+            "title": {
+              "en": "Gas used",
+              "nl": "Gas gebruikt",
+              "de": "Gasverbrauch",
+              "fr": "Gaz utilisé",
+              "es": "Gas usado"
+            },
+            "type": "number"
+          },
+          {
+            "name": "start_time",
+            "title": {
+              "en": "Start time",
+              "nl": "Starttijd",
+              "de": "Startzeit",
+              "fr": "Heure de début",
+              "es": "Hora de inicio"
+            },
+            "type": "string"
+          },
+          {
+            "name": "end_time",
+            "title": {
+              "en": "End time",
+              "nl": "Eindtijd",
+              "de": "Endzeit",
+              "fr": "Heure de fin",
+              "es": "Hora de fin"
+            },
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "title": {
+          "en": "Current mode is !{{ |not }} [[mode]]",
+          "nl": "Huidige modus is !{{ |niet }} [[mode]]",
+          "de": "Aktueller Modus ist !{{ |nicht }} [[mode]]",
+          "fr": "Le mode actuel est !{{ |non }} [[mode]]",
+          "es": "El modo actual es !{{ |no }} [[mode]]"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "mode",
+            "title": {
+              "en": "Mode",
+              "nl": "Modus",
+              "de": "Modus",
+              "fr": "Mode",
+              "es": "Modo"
+            }
+          }
+        ],
+        "id": "is_mode",
+        "titleFormatted": {
+          "en": "Current mode is !{{ |not }} [[mode]]",
+          "nl": "Huidige modus is !{{ |niet }} [[mode]]",
+          "de": "Aktueller Modus ist !{{ |nicht }} [[mode]]",
+          "fr": "Le mode actuel est !{{ |non }} [[mode]]",
+          "es": "El modo actual es !{{ |no }} [[mode]]"
+        }
+      },
+      {
+        "title": {
+          "en": "Zone [[zone]] has !{{ |no }} motion",
+          "nl": "Zone [[zone]] heeft !{{ |geen }} beweging",
+          "de": "Zone [[zone]] hat !{{ |keine }} Bewegung",
+          "fr": "La zone [[zone]] a !{{ |pas de }} mouvement",
+          "es": "La zona [[zone]] tiene !{{ |ningún }} movimiento"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "zone",
+            "title": {
+              "en": "Zone",
+              "nl": "Zone",
+              "de": "Zone",
+              "fr": "Zone",
+              "es": "Zone"
+            }
+          }
+        ],
+        "id": "zone_has_motion",
+        "titleFormatted": {
+          "en": "Zone [[zone]] has !{{ |no }} motion",
+          "nl": "Zone [[zone]] heeft !{{ |geen }} beweging",
+          "de": "Zone [[zone]] hat !{{ |keine }} Bewegung",
+          "fr": "La zone [[zone]] a !{{ |pas de }} mouvement",
+          "es": "La zona [[zone]] tiene !{{ |ningún }} movimiento"
+        }
+      },
+      {
+        "id": "appliance_is_running",
+        "title": {
+          "en": "Appliance [[appliance]] is !{{ |not }} running",
+          "nl": "Apparaat [[appliance]] is !{{ |niet }} actief",
+          "de": "Gerät [[appliance]] ist !{{ |nicht }} aktiv",
+          "fr": "L’appareil [[appliance]] n’est !{{ |pas }} en fonctionnement",
+          "es": "El dispositivo [[appliance]] no está !{{ |no }} en funcionamiento"
+        },
+        "titleFormatted": {
+          "en": "Appliance [[appliance]] is !{{ |not }} running",
+          "nl": "Apparaat [[appliance]] is !{{ |niet }} actief",
+          "de": "Gerät [[appliance]] ist !{{ |nicht }} aktiv",
+          "fr": "L’appareil [[appliance]] n’est !{{ |pas }} en fonctionnement",
+          "es": "El dispositivo [[appliance]] no está !{{ |no }} en funcionamiento"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "appliance",
+            "title": {
+              "en": "Appliance",
+              "nl": "Apparaat",
+              "de": "Gerät",
+              "fr": "Appareil",
+              "es": "Dispositivo"
+            }
+          }
+        ]
+      },
+      {
+        "id": "appliance_is_ready",
+        "title": {
+          "en": "Appliance [[appliance]] is !{{ |not }} ready",
+          "nl": "Apparaat [[appliance]] is !{{ |niet }} klaar",
+          "de": "Gerät [[appliance]] ist !{{ |nicht }} bereit",
+          "fr": "L’appareil [[appliance]] n’est !{{ |pas }} prêt",
+          "es": "El dispositivo [[appliance]] no está !{{ |no }} listo"
+        },
+        "titleFormatted": {
+          "en": "Appliance [[appliance]] is !{{ |not }} ready",
+          "nl": "Apparaat [[appliance]] is !{{ |niet }} klaar",
+          "de": "Gerät [[appliance]] ist !{{ |nicht }} bereit",
+          "fr": "L’appareil [[appliance]] n’est !{{ |pas }} prêt",
+          "es": "El dispositivo [[appliance]] no está !{{ |no }} listo"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "appliance",
+            "title": {
+              "en": "Appliance",
+              "nl": "Apparaat",
+              "de": "Gerät",
+              "fr": "Appareil",
+              "es": "Dispositivo"
+            }
+          }
+        ]
+      },
+      {
+        "id": "appliance_waiting_reset",
+        "title": {
+          "en": "Appliance [[appliance]] is !{{ |not }} waiting for reset",
+          "nl": "Apparaat [[appliance]] wacht !{{ |niet }} op reset",
+          "de": "Gerät [[appliance]] wartet !{{ |nicht }} auf Zurücksetzung",
+          "fr": "L’appareil [[appliance]] n’attend !{{ |pas }} une réinitialisation",
+          "es": "El dispositivo [[appliance]] no está !{{ |no }} esperando reinicio"
+        },
+        "titleFormatted": {
+          "en": "Appliance [[appliance]] is !{{ |not }} waiting for reset",
+          "nl": "Apparaat [[appliance]] wacht !{{ |niet }} op reset",
+          "de": "Gerät [[appliance]] wartet !{{ |nicht }} auf Zurücksetzung",
+          "fr": "L’appareil [[appliance]] n’attend !{{ |pas }} une réinitialisation",
+          "es": "El dispositivo [[appliance]] no está !{{ |no }} esperando reinicio"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "appliance",
+            "title": {
+              "en": "Appliance",
+              "nl": "Apparaat",
+              "de": "Gerät",
+              "fr": "Appareil",
+              "es": "Dispositivo"
+            }
+          }
+        ]
+      },
+      {
+        "id": "activity_is_running",
+        "title": {
+          "en": "Activity [[activity]] is !{{ |not }} running",
+          "nl": "Activiteit [[activity]] is !{{ |niet }} actief",
+          "de": "Aktivität [[activity]] ist !{{ |nicht }} aktiv",
+          "fr": "L’activité [[activity]] n’est !{{ |pas }} active",
+          "es": "La actividad [[activity]] no está !{{ |no }} activa"
+        },
+        "titleFormatted": {
+          "en": "Activity [[activity]] is !{{ |not }} running",
+          "nl": "Activiteit [[activity]] is !{{ |niet }} actief",
+          "de": "Aktivität [[activity]] ist !{{ |nicht }} aktiv",
+          "fr": "L’activité [[activity]] n’est !{{ |pas }} active",
+          "es": "La actividad [[activity]] no está !{{ |no }} activa"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "activity",
+            "title": {
+              "en": "Activity",
+              "nl": "Activiteit",
+              "de": "Aktivität",
+              "fr": "Activité",
+              "es": "Actividad"
+            }
+          }
+        ]
+      },
+      {
+        "id": "activity_is_standby",
+        "title": {
+          "en": "Activity [[activity]] is !{{ |not }} standby",
+          "nl": "Activiteit [[activity]] is !{{ |niet }} standby",
+          "de": "Aktivität [[activity]] ist !{{ |nicht }} im Standby",
+          "fr": "L’activité [[activity]] n’est !{{ |pas }} en veille",
+          "es": "La actividad [[activity]] no está !{{ |no }} en espera"
+        },
+        "titleFormatted": {
+          "en": "Activity [[activity]] is !{{ |not }} standby",
+          "nl": "Activiteit [[activity]] is !{{ |niet }} standby",
+          "de": "Aktivität [[activity]] ist !{{ |nicht }} im Standby",
+          "fr": "L’activité [[activity]] n’est !{{ |pas }} en veille",
+          "es": "La actividad [[activity]] no está !{{ |no }} en espera"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "activity",
+            "title": {
+              "en": "Activity",
+              "nl": "Activiteit",
+              "de": "Aktivität",
+              "fr": "Activité",
+              "es": "Actividad"
+            }
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "title": {
+          "en": "Run zone rules for [[zone]]",
+          "nl": "Voer zoneregels uit voor [[zone]]",
+          "de": "Zonenregeln für [[zone]] ausführen",
+          "fr": "Exécuter les règles de zone pour [[zone]]",
+          "es": "Ejecutar reglas de zona para [[zone]]"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "zone",
+            "title": {
+              "en": "Zone",
+              "nl": "Zone",
+              "de": "Zone",
+              "fr": "Zone",
+              "es": "Zone"
+            }
+          }
+        ],
+        "id": "run_zone_rules",
+        "titleFormatted": {
+          "en": "Run zone rules for [[zone]]",
+          "nl": "Voer zoneregels uit voor [[zone]]",
+          "de": "Zonenregeln für [[zone]] ausführen",
+          "fr": "Exécuter les règles de zone pour [[zone]]",
+          "es": "Ejecutar reglas de zona para [[zone]]"
+        }
+      },
+      {
+        "title": {
+          "en": "Set mode to [[mode]]",
+          "nl": "Zet modus op [[mode]]",
+          "de": "Modus auf [[mode]] setzen",
+          "fr": "Définir le mode sur [[mode]]",
+          "es": "Establecer modo en [[mode]]"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "mode",
+            "title": {
+              "en": "Mode",
+              "nl": "Modus",
+              "de": "Modus",
+              "fr": "Mode",
+              "es": "Modo"
+            }
+          }
+        ],
+        "id": "set_mode",
+        "titleFormatted": {
+          "en": "Set mode to [[mode]]",
+          "nl": "Zet modus op [[mode]]",
+          "de": "Modus auf [[mode]] setzen",
+          "fr": "Définir le mode sur [[mode]]",
+          "es": "Establecer modo en [[mode]]"
+        }
+      },
+      {
+        "title": {
+          "en": "Turn off lights in zone [[zone]]",
+          "nl": "Zet lampen uit in zone [[zone]]",
+          "de": "Lichter in Zone [[zone]] ausschalten",
+          "fr": "Éteindre les lumières dans la zone [[zone]]",
+          "es": "Apagar luces en la zona [[zone]]"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "zone",
+            "title": {
+              "en": "Zone",
+              "nl": "Zone",
+              "de": "Zone",
+              "fr": "Zone",
+              "es": "Zone"
+            }
+          }
+        ],
+        "id": "zone_lights_off",
+        "titleFormatted": {
+          "en": "Turn off lights in zone [[zone]]",
+          "nl": "Zet lampen uit in zone [[zone]]",
+          "de": "Lichter in Zone [[zone]] ausschalten",
+          "fr": "Éteindre les lumières dans la zone [[zone]]",
+          "es": "Apagar luces en la zona [[zone]]"
+        }
+      },
+      {
+        "title": {
+          "en": "Turn on lights in zone [[zone]] with dim [[dim]]",
+          "nl": "Zet lampen aan in zone [[zone]] met dimniveau [[dim]]",
+          "de": "Lichter in Zone [[zone]] mit Dimmwert [[dim]] einschalten",
+          "fr": "Allumer les lumières dans la zone [[zone]] avec variation [[dim]]",
+          "es": "Encender luces en la zona [[zone]] con nivel [[dim]]"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "zone",
+            "title": {
+              "en": "Zone",
+              "nl": "Zone",
+              "de": "Zone",
+              "fr": "Zone",
+              "es": "Zone"
+            }
+          },
+          {
+            "type": "number",
+            "name": "dim",
+            "min": 0,
+            "max": 1,
+            "step": 0.05,
+            "placeholder": {
+              "en": "Optional, 0-1",
+              "nl": "Optioneel, 0-1",
+              "de": "Optional, 0-1",
+              "fr": "Optional, 0-1",
+              "es": "Optional, 0-1"
+            },
+            "title": {
+              "en": "Dim level",
+              "nl": "Dimniveau",
+              "de": "Dim level",
+              "fr": "Dim level",
+              "es": "Dim level"
+            }
+          }
+        ],
+        "id": "zone_lights_on",
+        "titleFormatted": {
+          "en": "Turn on lights in zone [[zone]] with dim [[dim]]",
+          "nl": "Zet lampen aan in zone [[zone]] met dimniveau [[dim]]",
+          "de": "Lichter in Zone [[zone]] mit Dimmwert [[dim]] einschalten",
+          "fr": "Allumer les lumières dans la zone [[zone]] avec variation [[dim]]",
+          "es": "Encender luces en la zona [[zone]] con nivel [[dim]]"
+        }
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "name": {
+        "en": "Mode Controller",
+        "nl": "Modus Controller",
+        "de": "Modus-Controller",
+        "fr": "Contrôleur de mode",
+        "es": "Controlador de modo"
+      },
+      "class": "other",
+      "capabilities": [
+        "mode_selector",
+        "sub_mode_selector",
+        "main_mode_selector"
+      ],
+      "capabilitiesOptions": {
+        "mode_selector": {
+          "title": {
+            "en": "Active mode",
+            "nl": "Actieve modus",
+            "de": "Aktiver Modus",
+            "fr": "Mode actif",
+            "es": "Modo activo"
+          }
+        },
+        "main_mode_selector": {
+          "title": {
+            "en": "Main mode",
+            "nl": "Hoofdmodus",
+            "de": "Hauptmodus",
+            "fr": "Mode principal",
+            "es": "Modo principal"
+          }
+        },
+        "sub_mode_selector": {
+          "title": {
+            "en": "Sub mode",
+            "nl": "Submodus",
+            "de": "Untermodus",
+            "fr": "Sous-mode",
+            "es": "Submodo"
+          }
+        }
+      },
+      "images": {
+        "small": "/drivers/mode_controller/assets/images/small.png",
+        "large": "/drivers/mode_controller/assets/images/large.png"
+      },
+      "icon": "/drivers/mode_controller/assets/icon.svg",
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "id": "mode_controller",
+      "settings": [
+        {
+          "id": "default_list",
+          "type": "dropdown",
+          "label": {
+            "en": "Default list",
+            "nl": "Standaard lijst",
+            "de": "Standardliste",
+            "fr": "Liste par défaut",
+            "es": "Lista predeterminada"
+          },
+          "hint": {
+            "en": "Choose which mode list should be shown/updated as default.",
+            "nl": "Kies welke moduslijst standaard gebruikt moet worden.",
+            "de": "Wähle, welche Modusliste standardmäßig angezeigt/aktualisiert werden soll.",
+            "fr": "Choisissez quelle liste de modes doit être affichée/mise à jour par défaut.",
+            "es": "Elige qué lista de modos se debe mostrar/actualizar de forma predeterminada."
+          },
+          "values": [
+            {
+              "id": "mode_selector",
+              "label": {
+                "en": "Active mode",
+                "nl": "Actieve modus",
+                "de": "Aktiver Modus",
+                "fr": "Mode actif",
+                "es": "Modo activo"
+              }
+            },
+            {
+              "id": "main_mode_selector",
+              "label": {
+                "en": "Main modes",
+                "nl": "Hoofdmodus",
+                "de": "Hauptmodi",
+                "fr": "Modes principaux",
+                "es": "Modos principales"
+              }
+            },
+            {
+              "id": "sub_mode_selector",
+              "label": {
+                "en": "Sub modes",
+                "nl": "Submodus",
+                "de": "Untermodi",
+                "fr": "Sous-modes",
+                "es": "Submodos"
+              }
+            }
+          ],
+          "value": "main_mode_selector"
+        }
+      ]
+    }
+  ],
+  "capabilities": {
+    "mode_selector": {
+      "type": "enum",
+      "title": {
+        "en": "Active mode",
+        "nl": "Actieve modus",
+        "de": "Aktiver Modus",
+        "fr": "Mode actif",
+        "es": "Modo activo"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/icons/mode_selector.svg",
+      "values": [
+        {
+          "id": "home",
+          "title": {
+            "en": "Home",
+            "nl": "Thuis",
+            "de": "Zuhause",
+            "fr": "Maison",
+            "es": "Casa"
+          }
+        },
+        {
+          "id": "away",
+          "title": {
+            "en": "Away",
+            "nl": "Afwezig",
+            "de": "Abwesend",
+            "fr": "Absent",
+            "es": "Fuera"
+          }
+        },
+        {
+          "id": "sleep",
+          "title": {
+            "en": "Sleep",
+            "nl": "Slapen",
+            "de": "Schlafen",
+            "fr": "Sommeil",
+            "es": "Dormir"
+          }
+        },
+        {
+          "id": "vacation",
+          "title": {
+            "en": "Vacation",
+            "nl": "Vakantie",
+            "de": "Urlaub",
+            "fr": "Vacances",
+            "es": "Vacaciones"
+          }
+        },
+        {
+          "id": "home_tv",
+          "title": {
+            "en": "Watch TV",
+            "nl": "TV kijken",
+            "de": "Fernsehen",
+            "fr": "Regarder la TV",
+            "es": "Ver TV"
+          }
+        },
+        {
+          "id": "home_romantic",
+          "title": {
+            "en": "Romantic",
+            "nl": "Romantisch",
+            "de": "Romantisch",
+            "fr": "Romantique",
+            "es": "Romántico"
+          }
+        },
+        {
+          "id": "home_game",
+          "title": {
+            "en": "Game",
+            "nl": "Game",
+            "de": "Gaming",
+            "fr": "Jeu",
+            "es": "Juego"
+          }
+        },
+        {
+          "id": "home_movie",
+          "title": {
+            "en": "Watch movie",
+            "nl": "Film kijken",
+            "de": "Film ansehen",
+            "fr": "Regarder un film",
+            "es": "Ver película"
+          }
+        }
+      ]
+    },
+    "main_mode_selector": {
+      "type": "enum",
+      "title": {
+        "en": "Main mode",
+        "nl": "Hoofdmodus",
+        "de": "Hauptmodus",
+        "fr": "Mode principal",
+        "es": "Modo principal"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/icons/mode_selector.svg",
+      "values": [
+        {
+          "id": "home",
+          "title": {
+            "en": "Home",
+            "nl": "Thuis",
+            "de": "Zuhause",
+            "fr": "Maison",
+            "es": "Casa"
+          }
+        },
+        {
+          "id": "away",
+          "title": {
+            "en": "Away",
+            "nl": "Afwezig",
+            "de": "Abwesend",
+            "fr": "Absent",
+            "es": "Fuera"
+          }
+        },
+        {
+          "id": "sleep",
+          "title": {
+            "en": "Sleep",
+            "nl": "Slapen",
+            "de": "Schlafen",
+            "fr": "Sommeil",
+            "es": "Dormir"
+          }
+        },
+        {
+          "id": "vacation",
+          "title": {
+            "en": "Vacation",
+            "nl": "Vakantie",
+            "de": "Urlaub",
+            "fr": "Vacances",
+            "es": "Vacaciones"
+          }
+        }
+      ]
+    },
+    "sub_mode_selector": {
+      "type": "enum",
+      "title": {
+        "en": "Sub mode",
+        "nl": "Submodus",
+        "de": "Untermodus",
+        "fr": "Sous-mode",
+        "es": "Submodo"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/icons/mode_selector.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "No sub mode",
+            "nl": "Geen submodus",
+            "de": "Kein Untermodus",
+            "fr": "Aucun sous-mode",
+            "es": "Sin submodo"
+          }
+        },
+        {
+          "id": "home_tv",
+          "title": {
+            "en": "Watch TV",
+            "nl": "TV kijken",
+            "de": "Fernsehen",
+            "fr": "Regarder la TV",
+            "es": "Ver TV"
+          }
+        },
+        {
+          "id": "home_romantic",
+          "title": {
+            "en": "Romantic",
+            "nl": "Romantisch",
+            "de": "Romantisch",
+            "fr": "Romantique",
+            "es": "Romántico"
+          }
+        },
+        {
+          "id": "home_game",
+          "title": {
+            "en": "Game",
+            "nl": "Game",
+            "de": "Gaming",
+            "fr": "Jeu",
+            "es": "Juego"
+          }
+        },
+        {
+          "id": "home_movie",
+          "title": {
+            "en": "Watch movie",
+            "nl": "Film kijken",
+            "de": "Film ansehen",
+            "fr": "Regarder un film",
+            "es": "Ver película"
+          }
+        }
+      ]
+    }
+  },
+  "widgets": {
+    "monitoring": {
+      "name": {
+        "en": "Monitoring",
+        "nl": "Monitoring",
+        "de": "Überwachung",
+        "fr": "Surveillance",
+        "es": "Monitorización"
+      },
+      "height": 360,
+      "transparent": true,
+      "api": {
+        "getStatus": {
+          "method": "GET",
+          "path": "/"
+        },
+        "setMode": {
+          "method": "POST",
+          "path": "/mode"
+        }
+      },
+      "id": "monitoring",
+      "settings": [
+        {
+          "id": "widgetHeight",
+          "type": "number",
+          "title": {
+            "en": "Widget height",
+            "nl": "Widget hoogte",
+            "de": "Widget-Höhe",
+            "fr": "Hauteur du widget",
+            "es": "Altura del widget"
+          },
+          "hint": {
+            "en": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height.",
+            "nl": "Hoogte in pixels (220-900). Voeg de widget opnieuw toe of bewerk hem als Homey een oude hoogte vasthoudt.",
+            "de": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height.",
+            "fr": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height.",
+            "es": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height."
+          },
+          "value": 360,
+          "min": 220,
+          "max": 900
+        }
+      ]
+    },
+    "mode": {
+      "name": {
+        "en": "Mode",
+        "nl": "Modus",
+        "de": "Modus",
+        "fr": "Mode",
+        "es": "Modo"
+      },
+      "height": 260,
+      "transparent": true,
+      "api": {
+        "getStatus": {
+          "method": "GET",
+          "path": "/"
+        },
+        "setMode": {
+          "method": "POST",
+          "path": "/mode"
+        }
+      },
+      "id": "mode",
+      "settings": [
+        {
+          "id": "widgetHeight",
+          "type": "number",
+          "title": {
+            "en": "Widget height",
+            "nl": "Widget hoogte",
+            "de": "Widget-Höhe",
+            "fr": "Hauteur du widget",
+            "es": "Altura del widget"
+          },
+          "hint": {
+            "en": "Height in pixels (220-900).",
+            "nl": "Hoogte in pixels (220-900).",
+            "de": "Höhe in Pixeln (220-900).",
+            "fr": "Hauteur en pixels (220-900).",
+            "es": "Altura en píxeles (220-900)."
+          },
+          "value": 260,
+          "min": 220,
+          "max": 900
+        },
+        {
+          "id": "showTemperature",
+          "type": "checkbox",
+          "title": {
+            "en": "Show temperature",
+            "nl": "Temperatuur tonen",
+            "de": "Temperatur anzeigen",
+            "fr": "Afficher la température",
+            "es": "Mostrar temperatura"
+          },
+          "hint": {
+            "en": "Show the selected temperature sensor in the top-right corner.",
+            "nl": "Toon de gekozen temperatuursensor rechtsboven in de widget.",
+            "de": "Zeige den ausgewählten Temperatursensor oben rechts im Widget an.",
+            "fr": "Afficher le capteur de température sélectionné dans le coin supérieur droit du widget.",
+            "es": "Mostrar el sensor de temperatura seleccionado en la esquina superior derecha del widget."
+          },
+          "value": true
+        },
+        {
+          "id": "liveWeatherBackground",
+          "type": "checkbox",
+          "title": {
+            "en": "Live weather background",
+            "nl": "Live weerachtergrond",
+            "de": "Live-Wetterhintergrund",
+            "fr": "Arrière-plan météo en direct",
+            "es": "Fondo meteorológico en vivo"
+          },
+          "hint": {
+            "en": "Use Homey's location/weather data as the widget background.",
+            "nl": "Gebruik de Homey-locatie/weerdata als achtergrond van de widget.",
+            "de": "Verwende Homeys Standort- und Wetterdaten als Hintergrund des Widgets.",
+            "fr": "Utiliser les données de localisation et de météo de Homey comme arrière-plan du widget.",
+            "es": "Usar los datos de ubicación y clima de Homey como fondo del widget."
+          },
+          "value": true
+        },
+        {
+          "id": "weatherBackgroundIntensity",
+          "type": "number",
+          "title": {
+            "en": "Weather background intensity",
+            "nl": "Intensiteit weerachtergrond",
+            "de": "Intensität des Wetterhintergrunds",
+            "fr": "Intensité de l’arrière-plan météo",
+            "es": "Intensidad del fondo meteorológico"
+          },
+          "hint": {
+            "en": "0 = subtle, 100 = strong.",
+            "nl": "0 = subtiel, 100 = sterk.",
+            "de": "0 = dezent, 100 = stark.",
+            "fr": "0 = discret, 100 = intense.",
+            "es": "0 = sutil, 100 = intenso."
+          },
+          "value": 80,
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "devices": {
+        "type": "global",
+        "singular": true,
+        "filter": {
+          "capabilities": "measure_temperature"
+        }
+      }
+    },
+    "appliance_monitoring": {
+      "name": {
+        "en": "Appliance monitoring",
+        "nl": "Apparaat monitoring",
+        "de": "Geräteüberwachung",
+        "fr": "Surveillance des appareils",
+        "es": "Monitorización de dispositivos"
+      },
+      "height": 360,
+      "transparent": true,
+      "api": {
+        "getStatus": {
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "id": "appliance_monitoring",
+      "settings": [
+        {
+          "id": "widgetHeight",
+          "type": "number",
+          "title": {
+            "en": "Widget height",
+            "nl": "Widget hoogte",
+            "de": "Widget-Höhe",
+            "fr": "Hauteur du widget",
+            "es": "Altura del widget"
+          },
+          "hint": {
+            "en": "Height in pixels (220-900).",
+            "nl": "Hoogte in pixels (220-900).",
+            "de": "Höhe in Pixeln (220-900).",
+            "fr": "Hauteur en pixels (220-900).",
+            "es": "Altura en píxeles (220-900)."
+          },
+          "value": 360,
+          "min": 220,
+          "max": 900
+        }
+      ]
+    },
+    "activity_monitoring": {
+      "name": {
+        "en": "Activity monitoring",
+        "nl": "Activiteit monitoring",
+        "de": "Aktivitätsüberwachung",
+        "fr": "Surveillance des activités",
+        "es": "Monitorización de actividades"
+      },
+      "height": 360,
+      "transparent": true,
+      "api": {
+        "getStatus": {
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "id": "activity_monitoring",
+      "settings": [
+        {
+          "id": "widgetHeight",
+          "type": "number",
+          "title": {
+            "en": "Widget height",
+            "nl": "Widget hoogte",
+            "de": "Widget-Höhe",
+            "fr": "Hauteur du widget",
+            "es": "Altura del widget"
+          },
+          "hint": {
+            "en": "Height in pixels (220-900).",
+            "nl": "Hoogte in pixels (220-900).",
+            "de": "Höhe in Pixeln (220-900).",
+            "fr": "Hauteur en pixels (220-900).",
+            "es": "Altura en píxeles (220-900)."
+          },
+          "value": 360,
+          "min": 220,
+          "max": 900
+        }
+      ]
+    }
+  }
+}

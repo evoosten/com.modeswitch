@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ModeSwitch settings widget</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;width:100%;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:transparent;color:#fff}
+body{padding:8px}
+:root{--accent:#60a5fa;--accent-soft:rgba(96,165,250,.22)}
+.widget{
+  width:100%;
+  height:calc(var(--widget-height,900px) - 16px);
+  max-height:900px;
+  min-height:520px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  border-radius:26px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background:
+    radial-gradient(circle at 82% 12%,var(--accent-soft),transparent 18%),
+    radial-gradient(circle at 18% 88%,rgba(168,85,247,.14),transparent 28%),
+    linear-gradient(145deg,#0f172a,#020617);
+  box-shadow:0 18px 50px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08)
+}
+.header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
+.title h1{margin:0;font-size:18px;line-height:1.05;letter-spacing:-.03em}.title p{margin:3px 0 0;color:#94a3b8;font-size:11px}
+.actions{display:flex;gap:6px}
+button{font-family:inherit;cursor:pointer}
+.action{border:0;border-radius:13px;padding:9px 10px;background:rgba(255,255,255,.09);color:#fff;font-size:12px;font-weight:900}
+.action.primary{background:#fff;color:#06111f}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;flex:0 0 auto}
+.tab{border:1px solid rgba(255,255,255,.08);border-radius:13px;min-height:32px;background:rgba(255,255,255,.065);color:#dbeafe;font-size:10px;font-weight:850;padding:4px}
+.tab.active{background:#fff;color:#06111f}
+.panel{display:none;min-height:0;flex:1 1 auto;border-radius:20px;padding:10px;background:linear-gradient(145deg,rgba(255,255,255,.11),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.10);overflow:hidden}
+.panel.active{display:flex;flex-direction:column}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex:0 0 auto}
+.panel h2{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#dbeafe}
+.subtabs{display:flex;gap:4px;flex-wrap:wrap}
+.subtab{height:24px;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:2px 8px;background:rgba(255,255,255,.06);color:#dbe4f0;font-size:9px;font-weight:850}
+.subtab.active{background:var(--accent);color:#06111f}
+.subpanel{display:none;min-height:0;flex:1 1 auto}.subpanel.active{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.card{border-radius:16px;padding:9px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);min-height:0}
+.card h3{margin:0 0 7px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#bfdbfe}
+.option{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:29px;padding:4px 0;border-top:1px solid rgba(255,255,255,.055)}
+.option:first-of-type{border-top:0}.option label{font-size:10px;color:#e5e7eb;font-weight:750}.option small{display:block;margin-top:1px;color:#94a3b8;font-size:9px;font-weight:500}
+select,input{width:96px;min-height:24px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:rgba(2,6,23,.55);color:#fff;padding:3px 7px;font-size:10px;font-weight:700}
+input[type=color]{width:42px;padding:2px}input[type=time]{width:78px}.mini{width:58px}
+.toggle{position:relative;width:38px;height:22px;flex:0 0 auto}.toggle input{display:none}.slider{position:absolute;inset:0;border-radius:999px;background:rgba(148,163,184,.28)}.slider::after{content:"";position:absolute;width:16px;height:16px;top:3px;left:3px;border-radius:50%;background:#fff;transition:.2s}.toggle input:checked + .slider{background:var(--accent)}.toggle input:checked + .slider::after{transform:translateX(16px)}
+.list{display:grid;gap:5px}.item{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;min-height:34px;border-radius:13px;padding:6px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06)}
+.item strong{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.item span{font-size:9px;color:#94a3b8;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:4px}.chip{height:22px;border-radius:10px;padding:2px 7px;background:rgba(255,255,255,.07);font-size:9px;font-weight:750;color:#dbe4f0;border:1px solid rgba(255,255,255,.06)}.chip.active{background:var(--accent);color:#06111f}
+.add{height:30px;border:1px dashed rgba(255,255,255,.18);border-radius:13px;background:rgba(255,255,255,.04);color:#dbeafe;font-size:10px;font-weight:850;width:100%;margin-top:6px}
+.preview{min-height:88px;border-radius:18px;padding:10px;background:radial-gradient(circle at 78% 20%,rgba(147,197,253,.30),transparent 18%),linear-gradient(145deg,#09152b,#020617);border:1px solid rgba(255,255,255,.10)}
+.preview-title{font-size:10px;color:#94a3b8;text-transform:uppercase;margin-bottom:5px}.preview-mode{font-size:21px;font-weight:900}
+.note{margin-top:auto;color:#94a3b8;font-size:10px;line-height:1.25;padding-top:6px}.status{font-size:10px;color:#93c5fd;min-height:13px}
+.raw{width:100%;height:120px;resize:none;border:1px solid rgba(255,255,255,.10);border-radius:14px;background:rgba(2,6,23,.55);color:#dbeafe;font-size:9px;padding:8px}
+@media(max-width:370px){.tabs{grid-template-columns:repeat(3,1fr)}.grid,.grid3{grid-template-columns:1fr}.item{grid-template-columns:1fr auto}}
+
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  z-index:50;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:10px;
+  background:rgba(2,6,23,.72);
+  backdrop-filter:blur(12px);
+}
+.modal-backdrop.show{display:flex}
+.modal{
+  width:100%;
+  max-width:560px;
+  max-height:820px;
+  overflow:hidden;
+  border-radius:22px;
+  padding:12px;
+  background:linear-gradient(145deg,#172033,#020617);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 24px 70px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:10px;
+}
+.modal-title{
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:-.03em;
+}
+.modal-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.field{
+  border-radius:15px;
+  padding:8px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.07);
+}
+.field.full{grid-column:1 / -1}
+.field label{
+  display:block;
+  margin-bottom:5px;
+  color:#cbd5e1;
+  font-size:10px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.field input,.field select{
+  width:100%;
+}
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:7px;
+  margin-top:10px;
+}
+.item button.edit{
+  height:24px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:10px;
+  background:rgba(255,255,255,.07);
+  color:#dbeafe;
+  font-size:9px;
+  font-weight:850;
+  padding:2px 7px;
+}
+@media(max-width:370px){.modal-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="header">
+    <div class="title"><h1>Instellingen</h1><p>Alleen bestaande ModeSwitch instellingen</p></div>
+    <div class="actions"><button class="action" id="refresh">↻</button><button class="action primary" id="save">Opslaan</button></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="overview">Overzicht</button>
+    <button class="tab" data-tab="modes">Modi</button>
+    <button class="tab" data-tab="zones">Zones</button>
+    <button class="tab" data-tab="temperature">Temp.</button>
+    <button class="tab" data-tab="appliances">Monitoring</button>
+    <button class="tab" data-tab="schedule">Planning</button>
+    <button class="tab" data-tab="auto">Auto</button>
+    <button class="tab" data-tab="export">Export</button>
+  </div>
+
+  <section class="panel active" id="overview">
+    <div class="panel-head"><h2>Overzicht</h2><div class="status" id="statusText"></div></div>
+    <div class="grid">
+      <div class="card">
+        <h3>Aantallen</h3>
+        <div class="chips" id="countChips"></div>
+      </div>
+      <div class="preview">
+        <div class="preview-title">Huidige modus</div>
+        <div class="preview-mode" id="currentModeText">...</div>
+        <div class="chips" style="margin-top:10px" id="overviewChips"></div>
+      </div>
+    </div>
+    <div class="note">Deze widget gebruikt alleen bestaande configuratie: submodussen, modusregels, zoneregels, temperatuurregels, apparaatmeldingen, planning en automatische modus.</div>
+  </section>
+
+  <section class="panel" id="modes">
+    <div class="panel-head"><h2>Modi</h2><div class="subtabs"><button class="subtab active" data-subtab="submodes">Submodussen</button><button class="subtab" data-subtab="moderules">Modusregels</button></div></div>
+    <div class="subpanel active" id="submodes">
+      <div class="list" id="subModeList"></div>
+      <button class="add" id="addSubMode">+ Nieuwe submodus</button>
+    </div>
+    <div class="subpanel" id="moderules">
+      <div class="list" id="modeRuleList"></div>
+      <div class="note">Modusregels worden hier compact getoond. Gedetailleerde regels blijven in de normale instellingenpagina.</div>
+    </div>
+  </section>
+
+  <section class="panel" id="zones">
+    <div class="panel-head"><h2>Zoneregels</h2></div>
+    <div class="list" id="zoneRuleList"></div>
+    <button class="add" id="addZoneRule">+ Nieuwe zoneregel</button>
+    <div class="note">Zoneregels bevatten bestaande instellingen zoals beweging, deur/raamcontacten, lampen, lux en tijden.</div>
+  </section>
+
+  <section class="panel" id="temperature">
+    <div class="panel-head"><h2>Temperatuur</h2></div>
+    <div class="list" id="tempRuleList"></div>
+    <button class="add" id="addTempRule">+ Nieuwe temperatuurregel</button>
+    <div class="note">Gebruikt bestaande temperatuurregels per modus/zone, inclusief raam- en slimme weerinstellingen waar aanwezig.</div>
+  </section>
+
+  <section class="panel" id="appliances">
+    <div class="panel-head"><h2>Apparaatmeldingen</h2></div>
+    <div class="list" id="applianceRuleList"></div>
+    <button class="add" id="addApplianceRule">+ Nieuw apparaat</button>
+    <div class="note">Gebruikt bestaande monitoringregels op basis van stroomverbruik.</div>
+  </section>
+
+  <section class="panel" id="schedule">
+    <div class="panel-head"><h2>Planning</h2></div>
+    <div class="list" id="scheduleRuleList"></div>
+    <button class="add" id="addScheduleRule">+ Nieuwe planning</button>
+    <div class="note">Planning gebruikt bestaande opties: vaste tijd, random tijd, zonsopkomst/-ondergang, auto aan/uit en luxcondities.</div>
+  </section>
+
+  <section class="panel" id="auto">
+    <div class="panel-head"><h2>Automatische modus</h2></div>
+    <div class="grid">
+      <div class="card">
+        <h3>Status</h3>
+        <div class="option"><div><label>Automatische modus</label><small>Bestaande autoMode.enabled</small></div><label class="toggle"><input id="autoEnabled" type="checkbox"><span class="slider"></span></label></div>
+        <div class="option"><div><label>Vakantie na uren</label><small>Bestaande autoMode.vacationAfterHours</small></div><input class="mini" id="vacationAfterHours" type="number" min="1" value="72"></div>
+      </div>
+      <div class="card">
+        <h3>Samenvatting</h3>
+        <div class="chips" id="autoChips"></div>
+      </div>
+    </div>
+    <div class="note">Alleen bestaande automatische-modus velden worden bewaard; onbekende velden blijven ongemoeid.</div>
+  </section>
+
+  <section class="panel" id="export">
+    <div class="panel-head"><h2>Import/Export</h2></div>
+    <div class="grid">
+      <div class="card"><h3>Export</h3><textarea class="raw" id="exportText" readonly></textarea></div>
+      <div class="card"><h3>Onderdelen</h3><div class="chips"><span class="chip">Submodussen</span><span class="chip">Modusregels</span><span class="chip">Zoneregels</span><span class="chip">Temperatuur</span><span class="chip">Monitoring</span><span class="chip">Planning</span><span class="chip">Auto</span></div></div>
+    </div>
+    <div class="note">Importeren blijft bewust in de normale instellingenpagina, zodat je preview/controle houdt.</div>
+  </section>
+
+  <div class="modal-backdrop" id="editorModal">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title" id="editorTitle">Nieuw</div>
+        <button class="action" id="editorClose" type="button">✕</button>
+      </div>
+      <div class="modal-grid" id="editorFields"></div>
+      <div class="modal-actions">
+        <button class="action" id="editorCancel" type="button">Annuleren</button>
+        <button class="action primary" id="editorApply" type="button">Toevoegen</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var WIDGET_LANG='nl';
+function detectWidgetLang(Homey){
+  var candidates=[];
+  try{ if(Homey){ candidates.push(Homey.language, Homey.lang, Homey.locale); } }catch(e){}
+  try{ candidates.push(document.documentElement.lang); }catch(e){}
+  try{ candidates.push(navigator.language, (navigator.languages&&navigator.languages[0])); }catch(e){}
+  for(var i=0;i<candidates.length;i++){
+    var v=String(candidates[i]||'').toLowerCase();
+    if(v.indexOf('de')===0)return 'de';
+    if(v.indexOf('fr')===0)return 'fr';
+    if(v.indexOf('es')===0)return 'es';
+    if(v.indexOf('en')===0)return 'en';
+    if(v.indexOf('nl')===0)return 'nl';
+  }
+  return 'nl';
+}
+var I18N={
+  'Instellingen':{en:'Settings',de:'Einstellungen',fr:'Paramètres',es:'Configuración'},
+  'Alleen bestaande ModeSwitch instellingen':{en:'Only existing ModeSwitch settings',de:'Nur vorhandene ModeSwitch-Einstellungen',fr:'Uniquement les paramètres ModeSwitch existants',es:'Solo ajustes existentes de ModeSwitch'},
+  'Opslaan':{en:'Save',de:'Speichern',fr:'Enregistrer',es:'Guardar'},
+  'Vernieuwen':{en:'Refresh',de:'Aktualisieren',fr:'Actualiser',es:'Actualizar'},
+  'Overzicht':{en:'Overview',de:'Übersicht',fr:'Aperçu',es:'Resumen'},
+  'Modi':{en:'Modes',de:'Modi',fr:'Modes',es:'Modos'},
+  'Zones':{en:'Zones',de:'Zonen',fr:'Zones',es:'Zonas'},
+  'Temp.':{en:'Temp.',de:'Temp.',fr:'Temp.',es:'Temp.'},
+  'Monitoring':{en:'Monitoring',de:'Überwachung',fr:'Surveillance',es:'Monitorización'},
+  'Planning':{en:'Schedule',de:'Zeitplan',fr:'Planning',es:'Planificación'},
+  'Auto':{en:'Auto',de:'Auto',fr:'Auto',es:'Auto'},
+  'Export':{en:'Export',de:'Export',fr:'Export',es:'Exportar'},
+  'Aantallen':{en:'Counts',de:'Anzahlen',fr:'Compteurs',es:'Totales'},
+  'Huidige modus':{en:'Current mode',de:'Aktueller Modus',fr:'Mode actuel',es:'Modo actual'},
+  'Deze widget gebruikt alleen bestaande configuratie: submodussen, modusregels, zoneregels, temperatuurregels, apparaatmeldingen, planning en automatische modus.':{en:'This widget only uses existing configuration: sub modes, mode rules, zone rules, temperature rules, appliance notifications, schedules and automatic mode.',de:'Dieses Widget nutzt nur vorhandene Konfiguration: Untermodi, Modusregeln, Zonenregeln, Temperaturregeln, Gerätemeldungen, Zeitpläne und automatischen Modus.',fr:'Ce widget utilise uniquement la configuration existante : sous-modes, règles de mode, règles de zone, règles de température, notifications d’appareils, planning et mode automatique.',es:'Este widget solo usa la configuración existente: submodos, reglas de modo, reglas de zona, reglas de temperatura, avisos de dispositivos, planificación y modo automático.'},
+  'Submodussen':{en:'Sub modes',de:'Untermodi',fr:'Sous-modes',es:'Submodos'},
+  'Modusregels':{en:'Mode rules',de:'Modusregeln',fr:'Règles de mode',es:'Reglas de modo'},
+  '+ Nieuwe submodus':{en:'+ New sub mode',de:'+ Neuer Untermodus',fr:'+ Nouveau sous-mode',es:'+ Nuevo submodo'},
+  'Modusregels worden hier compact getoond. Gedetailleerde regels blijven in de normale instellingenpagina.':{en:'Mode rules are shown compactly here. Detailed rules remain in the normal settings page.',de:'Modusregeln werden hier kompakt angezeigt. Detaillierte Regeln bleiben auf der normalen Einstellungsseite.',fr:'Les règles de mode sont affichées ici de manière compacte. Les règles détaillées restent dans la page de paramètres normale.',es:'Las reglas de modo se muestran aquí de forma compacta. Las reglas detalladas permanecen en la página normal de ajustes.'},
+  'Zoneregels':{en:'Zone rules',de:'Zonenregeln',fr:'Règles de zone',es:'Reglas de zona'},
+  '+ Nieuwe zoneregel':{en:'+ New zone rule',de:'+ Neue Zonenregel',fr:'+ Nouvelle règle de zone',es:'+ Nueva regla de zona'},
+  'Temperatuur':{en:'Temperature',de:'Temperatur',fr:'Température',es:'Temperatura'},
+  '+ Nieuwe temperatuurregel':{en:'+ New temperature rule',de:'+ Neue Temperaturregel',fr:'+ Nouvelle règle de température',es:'+ Nueva regla de temperatura'},
+  'Apparaatmeldingen':{en:'Appliance notifications',de:'Gerätemeldungen',fr:'Notifications des appareils',es:'Avisos de dispositivos'},
+  '+ Nieuw apparaat':{en:'+ New appliance',de:'+ Neues Gerät',fr:'+ Nouvel appareil',es:'+ Nuevo dispositivo'},
+  'Automatische modus':{en:'Automatic mode',de:'Automatischer Modus',fr:'Mode automatique',es:'Modo automático'},
+  'Status':{en:'Status',de:'Status',fr:'Statut',es:'Estado'},
+  'Vakantie na uren':{en:'Vacation after hours',de:'Urlaub nach Stunden',fr:'Vacances après heures',es:'Vacaciones después de horas'},
+  'Samenvatting':{en:'Summary',de:'Zusammenfassung',fr:'Résumé',es:'Resumen'},
+  'Onderdelen':{en:'Sections',de:'Bereiche',fr:'Sections',es:'Secciones'},
+  'Nieuw':{en:'New',de:'Neu',fr:'Nouveau',es:'Nuevo'},
+  'Annuleren':{en:'Cancel',de:'Abbrechen',fr:'Annuler',es:'Cancelar'},
+  'Toevoegen':{en:'Add',de:'Hinzufügen',fr:'Ajouter',es:'Añadir'},
+  'Bewerk':{en:'Edit',de:'Bearbeiten',fr:'Modifier',es:'Editar'},
+  'Regel':{en:'Rule',de:'Regel',fr:'Règle',es:'Regla'},
+  'Geen zone':{en:'No zone',de:'Keine Zone',fr:'Aucune zone',es:'Sin zona'},
+  'Hoofdmodus':{en:'Main mode',de:'Hauptmodus',fr:'Mode principal',es:'Modo principal'},
+  'Achtergrond URL':{en:'Background URL',de:'Hintergrund-URL',fr:'URL d’arrière-plan',es:'URL de fondo'},
+  'Zone':{en:'Zone',de:'Zone',fr:'Zone',es:'Zona'},
+  'Geen beweging na sec.':{en:'No motion after sec.',de:'Keine Bewegung nach Sek.',fr:'Aucun mouvement après sec.',es:'Sin movimiento tras seg.'},
+  'Lux onder':{en:'Lux below',de:'Lux unter',fr:'Lux inférieur à',es:'Lux por debajo'},
+  'Actief':{en:'Active',de:'Aktiv',fr:'Actif',es:'Activo'},
+  'Ja':{en:'Yes',de:'Ja',fr:'Oui',es:'Sí'},
+  'Nee':{en:'No',de:'Nein',fr:'Non',es:'No'},
+  'Geladen':{en:'Loaded',de:'Geladen',fr:'Chargé',es:'Cargado'},
+  'Basis geladen':{en:'Basic loaded',de:'Basis geladen',fr:'Base chargée',es:'Base cargada'},
+  'Renderfout':{en:'Render error',de:'Renderfehler',fr:'Erreur d’affichage',es:'Error de renderizado'},
+  'Opslaan...':{en:'Saving...',de:'Speichern...',fr:'Enregistrement...',es:'Guardando...'},
+  'Opgeslagen':{en:'Saved',de:'Gespeichert',fr:'Enregistré',es:'Guardado'},
+  'Opslaan mislukt':{en:'Save failed',de:'Speichern fehlgeschlagen',fr:'Échec de l’enregistrement',es:'Error al guardar'}
+};
+function tt(s){var v=I18N[s];return (v&&v[WIDGET_LANG])||s;}
+function translateDom(){document.documentElement.lang=WIDGET_LANG;var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null);var nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(function(n){var raw=n.nodeValue;var key=raw.trim();if(I18N[key])n.nodeValue=raw.replace(key,tt(key));});var refresh=document.getElementById('refresh');if(refresh)refresh.setAttribute('title',tt('Vernieuwen'));}
+
+var HomeyApi=null, config=null, environment=null;
+function $(id){return document.getElementById(id)}
+
+function defaultConfig(){
+  return {
+    modes:[
+      {id:'home',label:'Thuis'},
+      {id:'sleep',label:'Slapen'},
+      {id:'away',label:'Afwezig'},
+      {id:'vacation',label:'Vakantie'}
+    ],
+    currentMode:'home',
+    rules:{},
+    subModes:[],
+    zoneRules:[],
+    temperatureRules:[],
+    applianceRules:[],
+    scheduleRules:[],
+    autoMode:{}
+  };
+}
+function defaultEnvironment(){
+  return {
+    zones:[],
+    switchableDevices:[],
+    lightDevices:[],
+    powerDevices:[],
+    thermostatDevices:[],
+    motionDevices:[],
+    contactDevices:[]
+  };
+}
+function safeInitialRender(){
+  if(!config)config=defaultConfig();
+  if(!environment)environment=defaultEnvironment();
+  try{render();setStatus('Basis geladen');}catch(e){setStatus('Renderfout');}
+}
+
+function modeLabel(id){var m=(config?.modes||[]).find(x=>x.id===id);return (m&&m.label)||({home:'Thuis',sleep:'Slapen',away:'Afwezig',vacation:'Vakantie'}[id]||id||'')}
+function modeIcon(id){return {home:'🏠',sleep:'🌙',away:'🚶',vacation:'🏖️'}[id]||'•'}
+function zoneName(id){var z=(environment?.zones||[]).find(x=>x.id===id);return (z&&z.name)||id||'Geen zone'}
+function deviceName(id){var pools=[environment?.switchableDevices,environment?.lightDevices,environment?.powerDevices,environment?.thermostatDevices,environment?.motionDevices,environment?.contactDevices,environment?.luminanceDevices,environment?.presenceDevices].flat().filter(Boolean);var d=pools.find(x=>x.id===id);return (d&&d.name)||'Onbekend apparaat'}
+function allDevices(){
+  var arr=[];
+  ['switchableDevices','lightDevices','powerDevices','thermostatDevices','motionDevices','contactDevices','luminanceDevices','presenceDevices'].forEach(function(k){
+    if(environment&&Array.isArray(environment[k]))arr=arr.concat(environment[k].map(function(d){return Object.assign({__type:k},d)}));
+  });
+  var seen={};
+  return arr.filter(function(d){if(!d||!d.id||seen[d.id])return false;seen[d.id]=true;return true});
+}
+function deviceOptions(type){
+  var list=[];
+  if(type&&environment&&Array.isArray(environment[type]))list=environment[type];
+  else list=allDevices();
+  return list.map(function(d){return '<option value="'+esc(d.id)+'">'+esc(d.name||d.id)+'</option>'}).join('');
+}
+function zoneOptions(){
+  var list=(environment&&Array.isArray(environment.zones))?environment.zones:[];
+  return '<option value="">Geen zone</option>'+list.map(function(z){return '<option value="'+esc(z.id)+'">'+esc(z.name||z.id)+'</option>'}).join('');
+}
+function modeOptions(){
+  return (config&&Array.isArray(config.modes)?config.modes:[]).map(function(m){return '<option value="'+esc(m.id)+'">'+esc((modeIcon(m.id)+' '+(m.label||m.id)).trim())+'</option>'}).join('');
+}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+var editor={type:null,index:null};
+function openEditor(type,index){
+  editor={type:type,index:index==null?null:index};
+  var existing=getEditorExisting(type,index);
+  $('editorTitle').textContent=(index==null?'Nieuw ':'Bewerk ')+editorTitle(type);
+  $('editorFields').innerHTML=editorFields(type,existing);
+  $('editorApply').textContent=index==null?'Toevoegen':'Opslaan';
+  setSelectValues(type,existing);
+  $('editorModal').classList.add('show');
+}
+function closeEditor(){ $('editorModal').classList.remove('show'); editor={type:null,index:null}; }
+function editorTitle(type){
+  return ({sub:'submodus',zone:'zoneregel',temp:'temperatuurregel',appliance:'apparaatmelding',schedule:'planning'})[type]||'regel';
+}
+function getEditorExisting(type,index){
+  if(index==null)return {};
+  var map={sub:'subModes',zone:'zoneRules',temp:'temperatureRules',appliance:'applianceRules',schedule:'scheduleRules'};
+  return (config[map[type]]||[])[index]||{};
+}
+function field(name,label,value,type,extra){
+  type=type||'text';
+  extra=extra||'';
+  return '<div class="field"><label>'+esc(label)+'</label><input data-edit="'+esc(name)+'" type="'+esc(type)+'" value="'+esc(value||'')+'" '+extra+'></div>';
+}
+function selectField(name,label,value,options){
+  return '<div class="field"><label>'+esc(label)+'</label><select data-edit="'+esc(name)+'">'+options+'</select></div>'.replace('value="'+esc(value)+'"','');
+}
+function editorFields(type,r){
+  if(type==='sub'){
+    return field('label','Naam',r.label||'Nieuwe submodus')+
+      '<div class="field"><label>Hoofdmodus</label><select data-edit="parentMode">'+modeOptions()+'</select></div>'+
+      field('icon','Icoon',r.icon||'')+
+      field('accentColor','Accentkleur',r.accentColor||'#60a5fa','color')+
+      '<div class="field full"><label>Achtergrond URL</label><input data-edit="imageUrl" value="'+esc(r.imageUrl||'')+'"></div>';
+  }
+  if(type==='zone'){
+    return field('name','Naam',r.name||'Nieuwe zoneregel')+
+      '<div class="field"><label>Zone</label><select data-edit="zoneId">'+zoneOptions()+'</select></div>'+
+      '<div class="field"><label>Geen beweging na sec.</label><input data-edit="noMotionSeconds" type="number" value="'+esc(r.noMotionSeconds||180)+'"></div>'+
+      '<div class="field"><label>Lux onder</label><input data-edit="luxBelow" type="number" value="'+esc(r.luxBelow||30)+'"></div>'+
+      '<div class="field full"><label>Actief</label><select data-edit="enabled"><option value="true">Ja</option><option value="false">Nee</option></select></div>';
+  }
+  if(type==='temp'){
+    return field('name','Naam',r.name||'Nieuwe temperatuurregel')+
+      '<div class="field"><label>Modus</label><select data-edit="modeId">'+modeOptions()+'</select></div>'+
+      '<div class="field"><label>Zone</label><select data-edit="zoneId">'+zoneOptions()+'</select></div>'+
+      '<div class="field"><label>Temperatuur °C</label><input data-edit="temperature" type="number" step="0.5" value="'+esc(r.temperature||20)+'"></div>'+
+      '<div class="field"><label>Raam open</label><select data-edit="windowMode"><option value="ignore">Negeren</option><option value="skip">Overslaan</option><option value="setback">Setback</option></select></div>'+
+      '<div class="field"><label>Raam temp. °C</label><input data-edit="windowTemperature" type="number" step="0.5" value="'+esc(r.windowTemperature||15)+'"></div>';
+  }
+  if(type==='appliance'){
+    return field('name','Naam',r.name||'Wasmachine')+
+      '<div class="field"><label>Apparaat</label><select data-edit="deviceId">'+deviceOptions('powerDevices')+'</select></div>'+
+      '<div class="field"><label>Type</label><select data-edit="type"><option value="washing_machine">Wasmachine</option><option value="dryer">Droger</option><option value="dishwasher">Vaatwasser</option><option value="custom">Custom</option></select></div>'+
+      '<div class="field"><label>Start boven W</label><input data-edit="startAboveWatt" type="number" value="'+esc(r.startAboveWatt||10)+'"></div>'+
+      '<div class="field"><label>Klaar onder W</label><input data-edit="readyBelowWatt" type="number" value="'+esc(r.readyBelowWatt||5)+'"></div>'+
+      '<div class="field"><label>Klaar delay sec.</label><input data-edit="readyDelaySeconds" type="number" value="'+esc(r.readyDelaySeconds||180)+'"></div>';
+  }
+  if(type==='schedule'){
+    return field('name','Naam',r.name||'Nieuwe planning')+
+      '<div class="field"><label>Actie</label><select data-edit="action"><option value="on">Aan</option><option value="off">Uit</option><option value="toggle">Toggle</option></select></div>'+
+      '<div class="field"><label>Tijdmodus</label><select data-edit="timeMode"><option value="fixed">Vaste tijd</option><option value="random">Random</option><option value="sunrise">Zonsopkomst</option><option value="sunset">Zonsondergang</option></select></div>'+
+      '<div class="field"><label>Vaste tijd</label><input data-edit="fixedTime" type="time" value="'+esc(r.fixedTime||'19:00')+'"></div>'+
+      '<div class="field"><label>Zone</label><select data-edit="zoneId">'+zoneOptions()+'</select></div>'+
+      '<div class="field"><label>Lux onder</label><input data-edit="luxThreshold" type="number" value="'+esc(r.luxThreshold||30)+'"></div>';
+  }
+  return '';
+}
+function setSelectValues(type,r){
+  var modal=$('editorModal');
+  ['parentMode','zoneId','modeId','deviceId','type','action','timeMode','windowMode','enabled'].forEach(function(k){
+    var el=modal.querySelector('[data-edit="'+k+'"]');
+    if(el&&r&&r[k]!=null)el.value=String(r[k]);
+  });
+}
+function applyEditor(){
+  var type=editor.type, idx=editor.index;
+  var r=getEditorExisting(type,idx);
+  var data=Object.assign({},r);
+  $('editorFields').querySelectorAll('[data-edit]').forEach(function(el){
+    var k=el.dataset.edit;
+    var v=el.value;
+    if(el.type==='number')v=Number(v);
+    if(v==='true')v=true;
+    if(v==='false')v=false;
+    data[k]=v;
+  });
+  saveEditorData(type,idx,data);
+  closeEditor();
+  render();
+}
+function makeId(prefix){return prefix+'-'+Date.now()}
+function saveEditorData(type,idx,data){
+  if(type==='sub'){
+    config.subModes=config.subModes||[];
+    var item=Object.assign({id:'sub-'+Date.now(),parentMode:'home',label:'Nieuwe submodus',autoEnabled:false,autoDeviceId:'',autoOperator:'above',autoWatt:50,autoDelaySeconds:10,autoReturnEnabled:true,autoReturnOperator:'below',autoReturnWatt:15,autoReturnDelaySeconds:300,icon:'',accentColor:'#60a5fa',imageUrl:''},data);
+    if(!item.id)item.id=makeId('sub');
+    if(idx==null)config.subModes.push(item);else config.subModes[idx]=item;
+  }
+  if(type==='zone'){
+    config.zoneRules=config.zoneRules||[];
+    var item=Object.assign({id:makeId('rule'),name:'Nieuwe zoneregel',enabled:true,modeIds:(config.modes||[]).map(m=>m.id),zoneId:'',includeSubzones:false,motionDeviceIds:[],contactDeviceIds:[],lightDeviceIds:[],turnOnOnMotion:true,turnOnOnContact:false,turnOffAfterNoMotion:true,turnOffWhenContactClosed:false,invertContactLogic:false,noMotionSeconds:180,dimValue:null,timeEnabled:false,timeFrom:'18:00',timeTo:'23:59',onlyIfLightsOff:false,onlyIfDark:false,luxDeviceIds:[],luxBelow:30},data);
+    if(idx==null)config.zoneRules.push(item);else config.zoneRules[idx]=item;
+  }
+  if(type==='temp'){
+    config.temperatureRules=config.temperatureRules||[];
+    var item=Object.assign({id:makeId('temp'),name:'Nieuwe temperatuurregel',enabled:true,modeId:config.currentMode||'home',zoneId:'',includeSubzones:false,thermostatDeviceIds:[],temperature:20,windowMode:'ignore',windowTemperature:15,contactDeviceIds:[],smartWeatherEnabled:false,weatherDeviceId:'',weatherColdBelow:5,weatherColdBoost:1,weatherWarmAbove:16,weatherWarmReduce:1,weatherMinTarget:5,weatherMaxTarget:25},data);
+    if(idx==null)config.temperatureRules.push(item);else config.temperatureRules[idx]=item;
+  }
+  if(type==='appliance'){
+    config.applianceRules=config.applianceRules||[];
+    var item=Object.assign({id:makeId('appliance'),name:'Wasmachine',enabled:true,type:'washing_machine',deviceId:'',startAboveWatt:10,readyBelowWatt:5,minRunSeconds:120,readyDelaySeconds:180,resetMode:'manual',resetAfterReadySeconds:0,resetMotionDeviceIds:[],resetContactDeviceIds:[],repeatReadyNotification:false,readyReminderSeconds:1800,notifyOnStart:false,notifyOnReady:true,useTimelineNotification:false},data);
+    if(idx==null)config.applianceRules.push(item);else config.applianceRules[idx]=item;
+  }
+  if(type==='schedule'){
+    config.scheduleRules=config.scheduleRules||[];
+    var item=Object.assign({id:makeId('schedule'),name:'Nieuwe planning',enabled:true,modeIds:(config.modes||[]).map(m=>m.id),deviceIds:[],action:'on',timeMode:'fixed',fixedTime:'19:00',randomFrom:'18:30',randomTo:'23:00',sunOffsetMinutes:0,autoOffEnabled:false,autoOffMode:'hours',autoOffAfterHours:1,autoOffTime:'23:00',autoOffRandomFromHours:0.5,autoOffRandomToHours:2,autoOffRandomFromTime:'22:00',autoOffRandomToTime:'23:30',autoOnEnabled:false,autoOnMode:'hours',autoOnAfterHours:1,autoOnTime:'07:00',autoOnRandomFromHours:0.5,autoOnRandomToHours:2,autoOnRandomFromTime:'06:30',autoOnRandomToTime:'08:00',zoneId:'',includeSubzones:true,luxCondition:false,luxDeviceIds:[],luxOperator:'below',luxThreshold:30,days:[0,1,2,3,4,5,6]},data);
+    if(idx==null)config.scheduleRules.push(item);else config.scheduleRules[idx]=item;
+  }
+}
+
+function setStatus(t){var e=$('statusText');if(e)e.textContent=t?tt(t):''}
+function api(method,path,body){
+  return new Promise((resolve,reject)=>{
+    if(!window.Homey||typeof Homey.api!=='function')return reject(new Error('Homey API niet klaar'));
+    var settled=false;
+    function done(err,res){
+      if(settled)return;
+      settled=true;
+      err?reject(err):resolve(res);
+    }
+    try{
+      var result;
+      if(body===undefined || body===null){
+        result=Homey.api(method,path,done);
+      }else{
+        result=Homey.api(method,path,body,done);
+      }
+      if(result&&typeof result.then==='function')result.then(r=>done(null,r)).catch(done);
+      setTimeout(()=>{if(!settled)reject(new Error('API timeout: '+method+' '+path));},2500);
+    }catch(e){done(e);}
+  });
+}
+function checked(v){return v?'checked':''}
+function item(title,meta,enabled,onToggle,onEdit){
+  var div=document.createElement('div');div.className='item';
+  div.innerHTML='<strong></strong><span></span><button class="edit" type="button">'+tt('Bewerk')+'</button><label class="toggle"><input type="checkbox"><span class="slider"></span></label>';
+  div.querySelector('strong').textContent=title||tt('Regel');
+  div.querySelector('span').textContent=meta||'';
+  var cb=div.querySelector('input');cb.checked=enabled!==false;cb.addEventListener('change',()=>onToggle&&onToggle(cb.checked));
+  var eb=div.querySelector('button.edit');eb.addEventListener('click',()=>onEdit&&onEdit());
+  if(!onEdit)eb.style.display='none';
+  return div;
+}
+function render(){
+  if(!config)return;
+  config.subModes=Array.isArray(config.subModes)?config.subModes:[];
+  config.zoneRules=Array.isArray(config.zoneRules)?config.zoneRules:[];
+  config.temperatureRules=Array.isArray(config.temperatureRules)?config.temperatureRules:[];
+  config.applianceRules=Array.isArray(config.applianceRules)?config.applianceRules:[];
+  config.scheduleRules=Array.isArray(config.scheduleRules)?config.scheduleRules:[];
+  config.rules=config.rules||{};
+  config.autoMode=config.autoMode||{};
+
+  $('currentModeText').textContent=modeIcon(config.currentMode)+' '+modeLabel(config.currentMode);
+  $('countChips').innerHTML=[
+    ['Submodi',config.subModes.length],['Modusregels',Object.keys(config.rules).length],['Zones',config.zoneRules.length],
+    ['Temp.',config.temperatureRules.length],['Monitoring',config.applianceRules.length],['Planning',config.scheduleRules.length]
+  ].map(x=>'<span class="chip">'+x[0]+': '+x[1]+'</span>').join('');
+  $('overviewChips').innerHTML=(config.modes||[]).slice(0,4).map(m=>'<span class="chip '+(m.id===config.currentMode?'active':'')+'">'+modeIcon(m.id)+' '+(m.label||m.id)+'</span>').join('');
+
+  $('subModeList').innerHTML='';
+  config.subModes.slice(0,6).forEach((r,i)=>$('subModeList').appendChild(item((r.icon?r.icon+' ':'')+(r.label||r.id), modeLabel(r.parentMode), true, null, ()=>openEditor('sub',i))));
+  if(config.subModes.length>6) $('subModeList').insertAdjacentHTML('beforeend','<div class="note">+'+(config.subModes.length-6)+' meer in normale instellingen</div>');
+
+  $('modeRuleList').innerHTML='';
+  Object.keys(config.rules||{}).slice(0,6).forEach(k=>{var r=config.rules[k]||{};$('modeRuleList').appendChild(item(modeLabel(k), Object.keys(r).length+' instellingen', true, null));});
+
+  $('zoneRuleList').innerHTML='';
+  config.zoneRules.slice(0,7).forEach((r,i)=>$('zoneRuleList').appendChild(item(r.name||'Zoneregel', zoneName(r.zoneId)+' · '+(r.modeIds||[]).map(modeLabel).join(', '), r.enabled, v=>{r.enabled=v}, ()=>openEditor('zone',i))));
+  if(config.zoneRules.length>7) $('zoneRuleList').insertAdjacentHTML('beforeend','<div class="note">+'+(config.zoneRules.length-7)+' meer</div>');
+
+  $('tempRuleList').innerHTML='';
+  config.temperatureRules.slice(0,7).forEach((r,i)=>$('tempRuleList').appendChild(item(r.name||'Temperatuurregel', modeLabel(r.modeId)+' · '+zoneName(r.zoneId)+' · '+(r.temperature??20)+'°C', r.enabled, v=>{r.enabled=v}, ()=>openEditor('temp',i))));
+
+  $('applianceRuleList').innerHTML='';
+  config.applianceRules.slice(0,7).forEach((r,i)=>$('applianceRuleList').appendChild(item(r.name||'Apparaat', deviceName(r.deviceId), r.enabled, v=>{r.enabled=v}, ()=>openEditor('appliance',i))));
+
+  $('scheduleRuleList').innerHTML='';
+  config.scheduleRules.slice(0,7).forEach((r,i)=>{var time=r.timeMode==='fixed'?(r.fixedTime||'19:00'):r.timeMode||'tijd';$('scheduleRuleList').appendChild(item(r.name||'Planning', time+' · '+(r.action||'on'), r.enabled, v=>{r.enabled=v}, ()=>openEditor('schedule',i)))});
+
+  $('autoEnabled').checked=!!config.autoMode.enabled;
+  $('vacationAfterHours').value=Number(config.autoMode.vacationAfterHours||72);
+  $('autoChips').innerHTML='<span class="chip '+(config.autoMode.enabled?'active':'')+'">'+(config.autoMode.enabled?'Actief':'Uit')+'</span><span class="chip">Vakantie na '+(config.autoMode.vacationAfterHours||72)+'u</span>';
+  $('exportText').value=JSON.stringify({subModes:config.subModes,rules:config.rules,zoneRules:config.zoneRules,temperatureRules:config.temperatureRules,applianceRules:config.applianceRules,scheduleRules:config.scheduleRules,autoMode:config.autoMode},null,2);
+}
+function addSubMode(){
+  config.subModes.push({id:'sub-'+Date.now(),parentMode:'home',label:'Nieuwe submodus',autoEnabled:false,autoDeviceId:'',autoOperator:'above',autoWatt:50,autoDelaySeconds:10,autoReturnEnabled:true,autoReturnOperator:'below',autoReturnWatt:15,autoReturnDelaySeconds:300,icon:'',accentColor:'#60a5fa',imageUrl:''});
+  render();
+}
+function addZoneRule(){
+  config.zoneRules.push({id:'rule-'+Date.now(),name:'Nieuwe zoneregel',enabled:true,modeIds:(config.modes||[]).map(m=>m.id),zoneId:(environment?.zones?.[0]?.id)||'',includeSubzones:false,motionDeviceIds:[],contactDeviceIds:[],lightDeviceIds:[],turnOnOnMotion:true,turnOnOnContact:false,turnOffAfterNoMotion:true,turnOffWhenContactClosed:false,invertContactLogic:false,noMotionSeconds:180,dimValue:null,timeEnabled:false,timeFrom:'18:00',timeTo:'23:59',onlyIfLightsOff:false,onlyIfDark:false,luxDeviceIds:[],luxBelow:30});
+  render();
+}
+function addTempRule(){
+  config.temperatureRules.push({id:'temp-'+Date.now(),name:'Nieuwe temperatuurregel',enabled:true,modeId:config.currentMode||(config.modes?.[0]?.id)||'home',zoneId:(environment?.zones?.[0]?.id)||'',includeSubzones:false,thermostatDeviceIds:[],temperature:20,windowMode:'ignore',windowTemperature:15,contactDeviceIds:[],smartWeatherEnabled:false,weatherDeviceId:'',weatherColdBelow:5,weatherColdBoost:1,weatherWarmAbove:16,weatherWarmReduce:1,weatherMinTarget:5,weatherMaxTarget:25});
+  render();
+}
+function addApplianceRule(){
+  config.applianceRules.push({id:'appliance-'+Date.now(),name:'Wasmachine',enabled:true,type:'washing_machine',deviceId:(environment?.powerDevices?.[0]?.id)||'',startAboveWatt:10,readyBelowWatt:5,minRunSeconds:120,readyDelaySeconds:180,resetMode:'manual',resetAfterReadySeconds:0,resetMotionDeviceIds:[],resetContactDeviceIds:[],repeatReadyNotification:false,readyReminderSeconds:1800,notifyOnStart:false,notifyOnReady:true,useTimelineNotification:false});
+  render();
+}
+function addScheduleRule(){
+  config.scheduleRules.push({id:'schedule-'+Date.now(),name:'Nieuwe planning',enabled:true,modeIds:(config.modes||[]).map(m=>m.id),deviceIds:[],action:'on',timeMode:'fixed',fixedTime:'19:00',randomFrom:'18:30',randomTo:'23:00',sunOffsetMinutes:0,autoOffEnabled:false,autoOffMode:'hours',autoOffAfterHours:1,autoOffTime:'23:00',autoOffRandomFromHours:0.5,autoOffRandomToHours:2,autoOffRandomFromTime:'22:00',autoOffRandomToTime:'23:30',autoOnEnabled:false,autoOnMode:'hours',autoOnAfterHours:1,autoOnTime:'07:00',autoOnRandomFromHours:0.5,autoOnRandomToHours:2,autoOnRandomFromTime:'06:30',autoOnRandomToTime:'08:00',zoneId:(environment?.zones?.[0]?.id)||'',includeSubzones:true,luxCondition:false,luxDeviceIds:[],luxOperator:'below',luxThreshold:30,days:[0,1,2,3,4,5,6]});
+  render();
+}
+async function loadData(){
+  safeInitialRender();
+  setStatus('Bijladen...');
+  var gotConfig=false;
+  try{
+    var c=await api('GET','/');
+    if(c&&typeof c==='object'){
+      config=Object.assign(defaultConfig(), c);
+      gotConfig=true;
+    }
+  }catch(e1){
+    try{
+      var c2=await api('GET','/config');
+      if(c2&&typeof c2==='object'){
+        config=Object.assign(defaultConfig(), c2);
+        gotConfig=true;
+      }
+    }catch(e2){}
+  }
+  try{
+    var env=await api('GET','/environment');
+    if(env&&typeof env==='object')environment=Object.assign(defaultEnvironment(), env);
+  }catch(e3){
+    environment=environment||defaultEnvironment();
+  }
+  try{
+    render();
+    setStatus(gotConfig?'Geladen':'Basis geladen');
+  }catch(e4){
+    setStatus('Renderfout');
+  }
+}
+async function saveAll(){
+  if(!config)return;
+  safeInitialRender();setStatus('Opslaan...');
+  config.autoMode=config.autoMode||{};
+  config.autoMode.enabled=$('autoEnabled').checked;
+  config.autoMode.vacationAfterHours=Number($('vacationAfterHours').value||72);
+  try{
+    var results=await Promise.all([
+      api('PUT','/sub_modes',{subModes:config.subModes||[]}),
+      api('PUT','/zone_rules',{zoneRules:config.zoneRules||[]}),
+      api('PUT','/temperature_rules',{temperatureRules:config.temperatureRules||[]}),
+      api('PUT','/appliance_rules',{applianceRules:config.applianceRules||[]}),
+      api('PUT','/schedule_rules',{scheduleRules:config.scheduleRules||[]}),
+      api('PUT','/auto_mode',{autoMode:config.autoMode||{}})
+    ]);
+    if(results[0]){config.subModes=results[0].subModes||config.subModes;config.modes=results[0].modes||config.modes}
+    if(results[1])config.zoneRules=results[1].zoneRules||config.zoneRules;
+    if(results[2])config.temperatureRules=results[2].temperatureRules||config.temperatureRules;
+    if(results[3])config.applianceRules=results[3].applianceRules||config.applianceRules;
+    if(results[4])config.scheduleRules=results[4].scheduleRules||config.scheduleRules;
+    if(results[5])config.autoMode=results[5].autoMode||config.autoMode;
+    render(); setStatus('Opgeslagen');
+  }catch(e){setStatus('Opslaan mislukt');}
+}
+document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{var id=tab.dataset.tab;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===tab));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));}));
+document.querySelectorAll('.subtab').forEach(tab=>tab.addEventListener('click',()=>{var id=tab.dataset.subtab;var p=tab.closest('.panel');p.querySelectorAll('.subtab').forEach(t=>t.classList.toggle('active',t===tab));p.querySelectorAll('.subpanel').forEach(s=>s.classList.toggle('active',s.id===id));}));
+if($('refresh'))$('refresh').addEventListener('click',loadData);
+if($('save'))$('save').addEventListener('click',saveAll);
+if($('addSubMode'))$('addSubMode').addEventListener('click',()=>openEditor('sub',null));
+if($('addZoneRule'))$('addZoneRule').addEventListener('click',()=>openEditor('zone',null));
+if($('addTempRule'))$('addTempRule').addEventListener('click',()=>openEditor('temp',null));
+if($('addApplianceRule'))$('addApplianceRule').addEventListener('click',()=>openEditor('appliance',null));
+if($('addScheduleRule'))$('addScheduleRule').addEventListener('click',()=>openEditor('schedule',null));
+if($('editorClose'))$('editorClose').addEventListener('click',closeEditor);
+if($('editorCancel'))$('editorCancel').addEventListener('click',closeEditor);
+if($('editorApply'))$('editorApply').addEventListener('click',applyEditor);
+if($('editorModal'))$('editorModal').addEventListener('click',function(e){if(e.target===$('editorModal'))closeEditor();});
+function onHomeyReady(Homey){
+  window.Homey=Homey;
+  WIDGET_LANG=detectWidgetLang(Homey);
+  translateDom();
+  if(Homey&&typeof Homey.setHeight==='function')Homey.setHeight(900);
+  if(Homey&&typeof Homey.ready==='function')Homey.ready({height:900});
+  safeInitialRender();
+  loadData();
+}
+WIDGET_LANG=detectWidgetLang(window.Homey);
+translateDom();
+safeInitialRender();
+setTimeout(function(){
+  if(window.Homey&&typeof Homey.api==='function')loadData();
+},500);
+</script>
+</body>
+</html>

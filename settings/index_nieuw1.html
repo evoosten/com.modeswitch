@@ -1,0 +1,1559 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+  <title>Mode Switch</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg:#eef3f8;
+      --bg2:#f7f9fc;
+      --card:#ffffff;
+      --card2:#f8fbff;
+      --text:#16202d;
+      --muted:#65758b;
+      --line:#dbe5ef;
+      --brand:#1677ff;
+      --brand-dark:#075ccc;
+      --brand-soft:#eaf3ff;
+      --danger:#d43f3a;
+      --success:#0f9d58;
+      --shadow:0 12px 34px rgba(20,45,80,.08);
+      --shadow-soft:0 5px 16px rgba(20,45,80,.06);
+      --radius:22px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:#0e141b;
+        --bg2:#111922;
+        --card:#18212c;
+        --card2:#1d2835;
+        --text:#edf4fb;
+        --muted:#a7b6c7;
+        --line:#2d3b4b;
+        --brand-soft:rgba(22,119,255,.16);
+        --shadow:0 14px 36px rgba(0,0,0,.24);
+        --shadow-soft:0 6px 18px rgba(0,0,0,.18);
+      }
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0;
+      min-height:100vh;
+      padding:18px;
+      font:14px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(22,119,255,.13), transparent 32rem),
+        linear-gradient(180deg,var(--bg2),var(--bg));
+      color:var(--text);
+    }
+    .wrap { max-width:1220px; margin:0 auto; }
+    .hero,.card {
+      background:rgba(255,255,255,.86);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow-soft);
+    }
+    @media (prefers-color-scheme: dark) { .hero,.card { background:rgba(24,33,44,.88); } }
+    .hero {
+      padding:22px;
+      margin-bottom:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:after {
+      content:'';
+      position:absolute;
+      inset:auto -70px -90px auto;
+      width:220px;
+      height:220px;
+      border-radius:999px;
+      background:linear-gradient(135deg, rgba(22,119,255,.10), rgba(22,119,255,.04));
+      pointer-events:none;
+      opacity:.55;
+    }
+    h1 { margin:0 0 8px; font-size:26px; letter-spacing:-.03em; }
+    h2 { margin:0 0 8px; font-size:19px; letter-spacing:-.02em; }
+    h3 { margin:14px 0 8px; font-size:15px; }
+    p { margin:0; color:var(--muted); }
+    .toolbar {
+      position:sticky;
+      top:0;
+      z-index:10;
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin:12px 0 14px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:color-mix(in srgb,var(--card) 92%,transparent);
+      backdrop-filter:blur(14px);
+      box-shadow:var(--shadow-soft);
+    }
+    .status {
+      position:relative;
+      padding:11px 68px 11px 14px;
+      border-radius:15px;
+      background:linear-gradient(135deg,var(--brand-soft),transparent);
+      font-weight:800;
+      min-height:46px;
+      display:flex;
+      align-items:center;
+      border:1px solid color-mix(in srgb,var(--brand) 18%,var(--line));
+    }
+    .temperature-badge {
+      position:absolute;
+      right:10px;
+      top:50%;
+      transform:translateY(-50%);
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      padding:5px 8px;
+      border-radius:999px;
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .temperature-badge.is-hidden { display:none; }
+    .timebar { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin:-6px 0 14px; }
+    .timecard { padding:10px 12px; border:1px solid var(--line); border-radius:14px; background:var(--card); }
+    .timecard strong { display:block; font-size:12px; color:var(--muted); margin-bottom:3px; }
+    .timecard span { font-weight:800; }
+    .actions,.row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    button {
+      border:0;
+      border-radius:13px;
+      padding:10px 14px;
+      cursor:pointer;
+      font:inherit;
+      font-weight:800;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+    }
+    button:hover { transform:translateY(-1px); }
+    button:active { transform:translateY(0); }
+    .btn-primary { background:linear-gradient(135deg,var(--brand),var(--brand-dark)); color:#fff; box-shadow:0 8px 18px rgba(22,119,255,.22); }
+    .btn-secondary { background:var(--card); color:var(--text); border:1px solid var(--line); }
+    .btn-danger { background:transparent; color:var(--danger); border:1px solid rgba(212,63,58,.45); }
+    .tabs {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(138px,1fr));
+      gap:8px;
+      margin:14px 0 16px;
+      padding:8px;
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:var(--card);
+      box-shadow:var(--shadow-soft);
+    }
+    .tab {
+      border-radius:14px;
+      background:transparent;
+      border:1px solid transparent;
+      color:var(--muted);
+      padding:11px 12px;
+    }
+    .tab.active {
+      background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      box-shadow:0 9px 18px rgba(22,119,255,.20);
+    }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px; }
+    .card { padding:17px; margin-bottom:14px; }
+    section[id^="tab-"] > .card:first-child,
+    #autoMode > .card:first-child {
+      background:linear-gradient(135deg,var(--card),var(--card2));
+      box-shadow:var(--shadow);
+    }
+    label { display:block; margin:12px 0 6px; font-weight:800; }
+    select,input,textarea {
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:13px;
+      background:var(--card);
+      color:var(--text);
+      padding:10px 11px;
+      font:inherit;
+      outline:none;
+      transition:border-color .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+    select:focus,input:focus,textarea:focus {
+      border-color:color-mix(in srgb,var(--brand) 55%,var(--line));
+      box-shadow:0 0 0 4px var(--brand-soft);
+    }
+    select[multiple] { min-height:132px; }
+    input[type="checkbox"],input[type="radio"] { width:auto; margin-right:8px; accent-color:var(--brand); }
+    input[type="color"] { padding:4px; min-height:42px; }
+    .check {
+      display:flex;
+      align-items:center;
+      gap:4px;
+      margin:8px 0;
+      font-weight:700;
+      padding:7px 9px;
+      border-radius:12px;
+    }
+    .check:hover { background:var(--brand-soft); }
+    .hint { font-size:12px; color:var(--muted); margin-top:6px; }
+    .muted { color:var(--muted); }
+    .two { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+    .three { display:grid; grid-template-columns:repeat(auto-fit,minmax(185px,1fr)); gap:12px; }
+    .pill { display:inline-block; padding:4px 8px; border-radius:999px; background:var(--brand-soft); color:var(--text); font-size:12px; font-weight:800; }
+    .toast {
+      position:sticky;
+      top:12px;
+      z-index:20;
+      margin-bottom:12px;
+      padding:12px 14px;
+      border-radius:14px;
+      display:none;
+      font-weight:800;
+      box-shadow:var(--shadow-soft);
+    }
+    .toast.show { display:block; }
+    .toast.ok { background:rgba(15,157,88,.14); color:var(--success); border:1px solid rgba(15,157,88,.22); }
+    .toast.error { background:rgba(220,54,46,.14); color:var(--danger); border:1px solid rgba(220,54,46,.22); }
+    .fold { padding:0; overflow:hidden; }
+    .fold-head {
+      cursor:pointer;
+      padding:15px 17px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      border-bottom:1px solid transparent;
+      user-select:none;
+    }
+    .fold.open .fold-head { border-bottom-color:var(--line); }
+    .fold-head:hover { background:var(--brand-soft); }
+    .fold-head strong { display:block; font-size:15px; letter-spacing:-.01em; }
+    .fold-body { display:none; padding:17px; background:linear-gradient(180deg,transparent,var(--card2)); }
+    .fold.open .fold-body { display:block; }
+    .field.is-hidden,.check.is-hidden,.option-group.is-hidden { display:none !important; }
+    .field { min-width:0; }
+    .option-note { padding:10px 12px; border:1px dashed var(--line); border-radius:13px; color:var(--muted); background:var(--brand-soft); margin:8px 0 12px; }
+    .summary { margin-top:5px; color:var(--muted); font-size:12px; }
+    .caret {
+      display:inline-flex;
+      width:30px;
+      height:30px;
+      min-width:30px;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      background:var(--brand-soft);
+      font-weight:900;
+      transition:transform .16s ease;
+    }
+    .fold.open .caret { transform:rotate(180deg); }
+    .theme-box { margin:14px 0; padding:14px; border:1px solid var(--line); border-radius:18px; background:var(--card2); }
+    .theme-preview {
+      height:78px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:linear-gradient(145deg,rgba(11,95,255,.35),rgba(255,255,255,.08));
+      background-size:cover;
+      background-position:center;
+      display:flex;
+      align-items:end;
+      padding:10px;
+      font-weight:900;
+      color:#fff;
+      text-shadow:0 2px 12px rgba(0,0,0,.55);
+      overflow:hidden;
+      box-shadow:inset 0 -30px 60px rgba(0,0,0,.18);
+    }
+    .theme-preview span { display:inline-flex; gap:6px; align-items:center; padding:5px 8px; border-radius:999px; background:rgba(0,0,0,.28); backdrop-filter:blur(8px); }
+    .rule-list.compact { display:grid; gap:10px; margin-bottom:10px; }
+    .rule-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; align-items:end; padding:12px; border:1px solid var(--line); border-radius:16px; background:var(--card2); }
+    .secondary { background:var(--card); color:var(--text); border:1px solid var(--line); }
+    
+
+    .fold-actions {
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .fold-edit {
+      width:38px;
+      height:38px;
+      min-width:38px;
+      padding:0;
+      border:none;
+      border-radius:12px;
+      background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:16px;
+      font-weight:700;
+      box-shadow:0 8px 18px rgba(22,119,255,.24);
+      transition:transform .18s ease, opacity .18s ease;
+    }
+
+    .fold-edit:hover {
+      transform:scale(1.06);
+      opacity:.96;
+    }
+    
+    .fold .fold-body {
+      display:none !important;
+    }
+
+    .fold.modal-edit .fold-body {
+      display:block !important;
+    }
+
+    .fold-head {
+      cursor:default;
+    }
+
+    .modal-backdrop {
+      position:fixed;
+      inset:0;
+      z-index:1001;
+      background:rgba(8,18,32,.42);
+      backdrop-filter:blur(8px);
+    }
+    body.modal-open { overflow:hidden; }
+    .fold.modal-edit {
+      position:fixed;
+      z-index:1002;
+      top:22px;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(860px, calc(100vw - 24px));
+      max-height:calc(100vh - 44px);
+      overflow:hidden;
+      margin:0;
+      box-shadow:0 24px 70px rgba(0,0,0,.28);
+      border-radius:22px;
+    }
+    .fold.modal-edit .fold-head {
+      position:sticky;
+      top:0;
+      z-index:2;
+      background:var(--card);
+      border-bottom:1px solid var(--line);
+    }
+    .fold.modal-edit .fold-body {
+      display:block;
+      max-height:calc(100vh - 118px);
+      overflow:auto;
+      padding-bottom:22px;
+    }
+    .fold.modal-edit .caret { transform:rotate(180deg); }
+
+    .fab-menu {
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:1000;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:10px;
+    }
+
+    .fab-actions {
+      display:none;
+      flex-direction:column;
+      gap:8px;
+      align-items:flex-end;
+    }
+
+    .fab-menu.open .fab-actions {
+      display:flex;
+    }
+
+    .fab-tab {
+      min-width:170px;
+      justify-content:flex-start;
+      border-radius:14px;
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
+      color:var(--text);
+    }
+
+    .fab-main {
+      width:64px;
+      height:64px;
+      border:none;
+      border-radius:22px;
+      font-size:28px;
+      font-weight:700;
+      padding:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+      color:#fff;
+      box-shadow:0 14px 34px rgba(22,119,255,.34);
+      transition:transform .18s ease, border-radius .18s ease;
+    }
+
+    .fab-menu.open .fab-main {
+      transform:rotate(90deg);
+      border-radius:18px;
+    }
+
+
+    @media (max-width:720px) {
+      body { padding:10px; }
+      .toolbar { position:static; }
+      .tabs { grid-template-columns:1fr 1fr; }
+      .hero { padding:18px; }
+      .row { align-items:stretch; }
+      .row > button { flex:1 1 auto; }
+    }
+
+    .mode-temperature-box { display:grid; gap:10px; margin:10px 0 12px; }
+    .mode-temperature-box .inline-temperature-rule { margin-bottom:0; border-radius:16px; }
+    .mode-temperature-box .inline-temperature-rule .fold-head { padding:12px 14px; }
+    .mode-temperature-box .inline-temperature-rule .fold-body { padding:14px; }
+    .mode-temperature-box .inline-temperature-rule.fold .fold-body { display:none; }
+    .mode-temperature-box .inline-temperature-rule.fold.open .fold-body { display:block; }
+
+
+    /* Compacte submodus-kaarten: standaard ingeklapt en veel minder hoge velden */
+    #subModeList { display:grid; gap:10px; margin-top:12px; }
+    #subModeList .card.fold { padding:0; margin-bottom:0; border-radius:16px; }
+    #subModeList .fold-head { padding:11px 12px; align-items:center; }
+    #subModeList .fold-head strong { font-size:13px; }
+    #subModeList .summary { font-size:11px; line-height:1.25; }
+    #subModeList .fold-body { padding:12px; }
+    #subModeList .field label { margin:6px 0 4px; font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+    #subModeList input, #subModeList select { min-height:36px; padding:7px 9px; border-radius:10px; font-size:13px; }
+    #subModeList .check { margin:6px 0; font-size:12px; }
+    #subModeList .hint { font-size:11px; line-height:1.3; }
+    #subModeList h3 { margin:10px 0 6px; font-size:12px; }
+    #subModeList .theme-box { margin:8px 0; padding:10px; border-radius:12px; }
+    #subModeList .theme-preview { height:44px; border-radius:11px; padding:7px; font-size:12px; }
+    #subModeList .compact-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+    #subModeList .submode-inline { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    @media (max-width:520px) {
+      #subModeList .submode-inline { grid-template-columns:1fr; }
+      #subModeList .fold-body { padding:10px; }
+    }
+
+  
+    
+    
+    /* Popup scroll fix voor Homey WebView */
+    html.modal-open,
+    body.modal-open {
+      overflow:hidden !important;
+      height:100% !important;
+      position:fixed !important;
+      width:100% !important;
+      touch-action:none !important;
+    }
+
+    .fold.modal-edit {
+      display:flex !important;
+      flex-direction:column !important;
+      overflow:hidden !important;
+      touch-action:auto !important;
+    }
+
+    .fold.modal-edit .fold-head {
+      flex:0 0 auto !important;
+    }
+
+    .fold.modal-edit .fold-body {
+      flex:1 1 auto !important;
+      min-height:0 !important;
+      height:auto !important;
+      max-height:none !important;
+      overflow-y:auto !important;
+      overflow-x:hidden !important;
+      -webkit-overflow-scrolling:touch !important;
+      touch-action:pan-y !important;
+      overscroll-behavior:contain !important;
+    }
+
+
+    /* Sterkere overlays zodat achtergrond volledig wegvalt */
+    .modal-backdrop {
+      position:fixed !important;
+      inset:0 !important;
+      z-index:99998 !important;
+      background:rgba(12,18,28,.82) !important;
+      opacity:1 !important;
+      backdrop-filter:none !important;
+    }
+
+    .fold.modal-edit {
+      position:fixed !important;
+      top:12px !important;
+      left:12px !important;
+      right:12px !important;
+      bottom:12px !important;
+      width:auto !important;
+      margin:0 !important;
+      transform:none !important;
+      max-width:none !important;
+      max-height:none !important;
+      z-index:99999 !important;
+      background:var(--card) !important;
+      opacity:1 !important;
+      overflow:hidden !important;
+      border-radius:18px !important;
+      border:1px solid var(--line) !important;
+    }
+
+    .fold.modal-edit .fold-head {
+      background:var(--card) !important;
+      position:sticky !important;
+      top:0 !important;
+      z-index:2 !important;
+    }
+
+    .fold.modal-edit .fold-body {
+      background:var(--card) !important;
+      overflow:auto !important;
+      max-height:calc(100vh - 90px) !important;
+      padding-bottom:80px !important;
+    }
+
+    .fold.modal-edit * {
+      position:relative;
+      z-index:1;
+    }
+
+    .fab-menu {
+      z-index:99990 !important;
+    }
+
+    .fab-actions {
+      background:var(--bg);
+      padding:10px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      box-shadow:none !important;
+    }
+
+    .fab-tab {
+      background:var(--card) !important;
+      opacity:1 !important;
+    }
+
+    body.modal-open .fab-menu {
+      display:none !important;
+    }
+
+    body.modal-open .wrap,
+    body.modal-open header,
+    body.modal-open main {
+      filter:none !important;
+      pointer-events:none;
+      user-select:none;
+    }
+
+
+    /* Homey-safe UI overrides: minder afhankelijk van gradients/shadows/transforms */
+    button {
+      -webkit-appearance:none;
+      appearance:none;
+    }
+
+    .btn-primary {
+      background:var(--brand) !important;
+      color:#fff !important;
+      box-shadow:none !important;
+    }
+
+    .btn-secondary,
+    .secondary {
+      background:var(--card) !important;
+      color:var(--text) !important;
+      border:1px solid var(--line) !important;
+      box-shadow:none !important;
+    }
+
+    button:hover,
+    .fold-edit:hover,
+    .fab-main:hover {
+      transform:none !important;
+      opacity:1 !important;
+    }
+
+    .fold-edit {
+      width:auto !important;
+      height:34px !important;
+      min-width:64px !important;
+      padding:0 10px !important;
+      border-radius:10px !important;
+      background:var(--brand-soft) !important;
+      color:var(--brand) !important;
+      border:1px solid color-mix(in srgb,var(--brand) 22%,var(--line)) !important;
+      box-shadow:none !important;
+      font-size:15px !important;
+    }
+
+    .fab-menu {
+      right:14px !important;
+      bottom:14px !important;
+    }
+
+    .fab-main {
+      width:auto !important;
+      min-width:72px !important;
+      height:50px !important;
+      padding:0 14px !important;
+      border-radius:16px !important;
+      background:var(--brand) !important;
+      color:#fff !important;
+      border:0 !important;
+      box-shadow:none !important;
+      font-size:22px !important;
+      transform:none !important;
+    }
+
+    .fab-menu.open .fab-main {
+      transform:none !important;
+      border-radius:16px !important;
+    }
+
+    .fab-tab {
+      min-width:160px !important;
+      background:var(--card) !important;
+      color:var(--text) !important;
+      border:1px solid var(--line) !important;
+      box-shadow:none !important;
+      text-align:left !important;
+    }
+
+    .fab-tab.active {
+      background:var(--brand-soft) !important;
+      color:var(--brand) !important;
+      border-color:color-mix(in srgb,var(--brand) 28%,var(--line)) !important;
+    }
+
+    .hero,.card,.toolbar,.tabs {
+      box-shadow:none !important;
+    }
+
+    .status {
+      background:var(--brand-soft) !important;
+      box-shadow:none !important;
+    }
+
+    .modal-backdrop {
+      background:rgba(0,0,0,.42) !important;
+      backdrop-filter:none !important;
+    }
+
+    .fold.modal-edit {
+      box-shadow:none !important;
+      border:1px solid var(--line) !important;
+    }
+
+  
+    /* Definitieve Homey popup scroll fix */
+    html.modal-open,
+    body.modal-open {
+      overflow:hidden !important;
+      height:100% !important;
+      width:100% !important;
+      position:static !important;
+      touch-action:auto !important;
+    }
+
+    body.modal-open .wrap {
+      pointer-events:auto !important;
+      user-select:auto !important;
+    }
+
+    .fold.modal-edit {
+      pointer-events:auto !important;
+      display:flex !important;
+      flex-direction:column !important;
+      overflow:hidden !important;
+      height:calc(100vh - 24px) !important;
+      max-height:calc(100vh - 24px) !important;
+    }
+
+    .fold.modal-edit .fold-body {
+      display:block !important;
+      flex:1 1 auto !important;
+      min-height:0 !important;
+      height:auto !important;
+      max-height:none !important;
+      overflow-y:scroll !important;
+      overflow-x:hidden !important;
+      -webkit-overflow-scrolling:touch !important;
+      touch-action:pan-y !important;
+      padding-bottom:120px !important;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="toast" class="toast"></div>
+    <section class="hero"><h1>Mode Switch</h1><p data-i18n="settings.hero.description">Modussen, zoneregels, deur/raamcontacten, planning, zon/zonsondergang, lux en automatische modus.</p></section>
+    <div class="toolbar"><div id="currentMode" class="status" data-i18n="settings.current_mode.loading">Huidige modus: laden...</div><div class="actions"><button id="reloadBtn" class="btn-secondary" type="button" data-i18n="common.refresh">Ververs</button><button id="saveBtn" class="btn-primary" type="button" data-i18n="common.save_all">Alles opslaan</button></div></div>
+    <section id="tab-modes"><div class="card"><div class="row" style="justify-content:space-between"><div><h2 data-i18n="settings.submodes.title">Submodussen</h2><p data-i18n="settings.submodes.description">Maak extra keuzes onder een hoofdmodus, bijvoorbeeld TV kijken onder Thuis.</p></div><button id="addSubModeBtn" class="btn-primary" type="button" data-i18n="settings.submodes.add">Nieuwe submodus</button></div><div id="subModeList"></div></div><div id="modeGrid" class="grid"></div></section>
+    <section id="tab-zones" style="display:none"><div class="card"><div class="row" style="justify-content:space-between"><div><h2 data-i18n="settings.zones.title">Zoneregels</h2><p data-i18n="settings.zones.description">Beweging, deur/raamcontacten, subzones, lampen, dimmen en voorwaarden.</p></div><button id="addZoneBtn" class="btn-primary" type="button" data-i18n="settings.zones.add">Nieuwe zoneregel</button></div></div><div id="zoneRules"></div></section>
+    <section id="tab-appliances" style="display:none"><div class="card"><div class="row" style="justify-content:space-between"><div><h2 data-i18n="settings.appliances.title">Apparaatmeldingen</h2><p data-i18n="settings.appliances.description">Detecteer starten en klaar zijn via stroomverbruik van een slimme stekker of apparaat met measure_power.</p></div><button id="addApplianceBtn" class="btn-primary" type="button" data-i18n="settings.appliances.add">Nieuw apparaat</button></div></div><div id="applianceRules"></div></section>
+    <section id="tab-schedule" style="display:none"><div class="card"><div class="row" style="justify-content:space-between"><div><h2 data-i18n="settings.schedule.title">Planning</h2><p data-i18n="settings.schedule.description">Zet lampen/apparaten aan of uit op vaste tijd, random tijd, zonsopkomst of zonsondergang. Gebruik eventueel lux per zone.</p></div><button id="addScheduleBtn" class="btn-primary" type="button" data-i18n="settings.schedule.add">Nieuwe planning</button></div></div><div id="scheduleRules"></div></section>
+    <section id="tab-export" style="display:none"><div class="card"><h2 data-i18n="settings.import_export.title">Importeren / exporteren</h2><p data-i18n="settings.import_export.description">Maak een back-up van alles of kies welke onderdelen je wilt meenemen.</p></div><div class="grid"><section class="card"><h3 data-i18n="settings.export.title">Exporteren</h3><p data-i18n="settings.export.description">Kies onderdelen en kopieer een JSON-back-up.</p><div id="exportSectionList"></div><div class="actions"><button id="selectAllExportBtn" class="btn-secondary" type="button" data-i18n="common.select_all">Alles selecteren</button><button id="copyExportJsonBtn" class="btn-primary" type="button" data-i18n="settings.export.copy_json">Kopieer JSON</button></div><div id="exportDownloadArea" class="hint"></div></section><section class="card"><h3 data-i18n="settings.import.title">Importeren</h3><p data-i18n="settings.import.description">Kies een eerder gemaakte JSON-back-up. Je kunt daarna selecteren welke onderdelen teruggezet worden.</p><input id="importFileInput" type="file" accept="application/json,.json" /><textarea id="importJsonText" rows="8" data-i18n-placeholder="settings.import.placeholder" placeholder="Plak hier eventueel de JSON-export als bestand kiezen niet werkt" style="width:100%;margin-top:10px;display:block"></textarea><div class="actions"><button id="loadImportTextBtn" class="btn-secondary" type="button" data-i18n="settings.import.load_from_text">JSON laden uit tekstveld</button></div><div id="importPreview" class="hint" data-i18n="settings.import.no_file">Nog geen bestand gekozen.</div><div id="importSectionList"></div><div class="actions"><button id="importBtn" class="btn-primary" type="button" data-i18n="settings.import.apply">Import toepassen</button></div></section></div></section>
+    <section id="tab-auto" style="display:none"><div id="autoMode"></div></section>
+  
+    <div class="fab-menu" id="fabMenu">
+      <div class="fab-actions">
+        <button class="fab-tab btn-secondary" data-tab="modes" type="button">🏠 Modussen</button>
+        <button class="fab-tab btn-secondary" data-tab="zones" type="button">🚶 Zones</button>
+        <button class="fab-tab btn-secondary" data-tab="appliances" type="button">⚡ Monitoring</button>
+        <button class="fab-tab btn-secondary" data-tab="schedule" type="button">🗓️ Planning</button>
+        <button class="fab-tab btn-secondary" data-tab="export" type="button">📦 Import/Export</button>
+        <button class="fab-tab btn-secondary" data-tab="auto" type="button">✨ Automatisch</button>
+      </div>
+      <button class="fab-main" id="fabToggle" type="button">☰</button>
+    </div>
+
+  </div>
+<script>
+
+let HomeyInstance;
+let APP_LANG = ((navigator.language || 'nl').toLowerCase().startsWith('en')) ? 'en' : 'nl';
+document.documentElement.lang = APP_LANG;
+
+const I18N = {
+  nl: {
+    'settings.hero.description': 'Modussen, zoneregels, deur/raamcontacten, planning, zon/zonsondergang, lux en automatische modus.',
+    'settings.current_mode.loading': 'Huidige modus: laden...',
+    'common.refresh': 'Ververs',
+    'common.save_all': 'Alles opslaan',
+    'common.expand_all': 'Alles open',
+    'common.collapse_all': 'Alles dicht',
+    'common.select_all': 'Alles selecteren',
+    'tabs.modes': '🏠 Modussen',
+    'tabs.zones': '🚶 Zones',
+    'tabs.temperature': '🌡️ Temperatuur',
+    'tabs.monitoring': '⚡ Monitoring',
+    'tabs.schedule': '🗓️ Planning',
+    'tabs.import_export': '📦 Import/Export',
+    'tabs.automatic_mode': '✨ Automatisch',
+    'settings.submodes.title': 'Submodussen',
+    'settings.submodes.description': 'Maak extra keuzes onder een hoofdmodus, bijvoorbeeld TV kijken onder Thuis.',
+    'settings.submodes.add': 'Nieuwe submodus',
+    'settings.zones.title': 'Zoneregels',
+    'settings.zones.description': 'Beweging, deur/raamcontacten, subzones, lampen, dimmen en voorwaarden.',
+    'settings.zones.add': 'Nieuwe zoneregel',
+    'settings.temperature.title': 'Temperatuur per modus en zone',
+    'settings.temperature.description': 'Stel per modus en zone de gewenste temperatuur in. Apparaten met target_temperature worden automatisch aangepast bij een moduswissel.',
+    'settings.temperature.add': 'Nieuwe temperatuurregel',
+    'settings.display.title': 'Weergave huidige modus',
+    'settings.display.description': 'Kies welk temperatuurapparaat rechtsboven in Huidige modus wordt getoond en of de Mode-widget live context toont.',
+    'settings.display.temperature_device': 'Temperatuur in Huidige modus',
+    'settings.display.temperature_device_hint': 'Kies een apparaat met temperatuurmeting. Leeg = geen badge tonen.',
+    'settings.display.live_context': 'Weerbeeld als achtergrond bij hoofdmodussen',
+    'settings.display.live_context_hint': 'Geeft de hoofdmodusknoppen automatisch een dag/nacht-achtergrond met zon, maan, wolken, regen, sneeuw, mist of onweer. Gebruikt het gekozen temperatuur-/weer-apparaat waar mogelijk.',
+    'settings.appliances.title': 'Apparaatmeldingen',
+    'settings.appliances.description': 'Detecteer starten en klaar zijn via stroomverbruik van een slimme stekker of apparaat met measure_power.',
+    'settings.appliances.add': 'Nieuw apparaat',
+    'settings.schedule.title': 'Planning',
+    'settings.schedule.description': 'Zet lampen/apparaten aan of uit op vaste tijd, random tijd, zonsopkomst of zonsondergang. Gebruik eventueel lux per zone.',
+    'settings.schedule.add': 'Nieuwe planning',
+    'settings.import_export.title': 'Importeren / exporteren',
+    'settings.import_export.description': 'Maak een back-up van alles of kies welke onderdelen je wilt meenemen.',
+    'settings.export.title': 'Exporteren',
+    'settings.export.description': 'Kies onderdelen en kopieer een JSON-back-up.',
+    'settings.export.copy_json': 'Kopieer JSON',
+    'settings.import.title': 'Importeren',
+    'settings.import.description': 'Kies een eerder gemaakte JSON-back-up. Je kunt daarna selecteren welke onderdelen teruggezet worden.',
+    'settings.import.placeholder': 'Plak hier eventueel de JSON-export als bestand kiezen niet werkt',
+    'settings.import.load_from_text': 'JSON laden uit tekstveld',
+    'settings.import.no_file': 'Nog geen bestand gekozen.',
+    'settings.import.apply': 'Import toepassen'
+  },
+  en: {
+    'settings.hero.description': 'Modes, zone rules, door/window contacts, schedules, sunrise/sunset, lux and automatic mode.',
+    'settings.current_mode.loading': 'Current mode: loading...',
+    'common.refresh': 'Refresh',
+    'common.save_all': 'Save all',
+    'common.expand_all': 'Expand all',
+    'common.collapse_all': 'Collapse all',
+    'common.select_all': 'Select all',
+    'tabs.modes': '🏠 Modes',
+    'tabs.zones': '🚶 Zones',
+    'tabs.temperature': '🌡️ Temperature',
+    'tabs.monitoring': '⚡ Monitoring',
+    'tabs.schedule': '🗓️ Schedule',
+    'tabs.import_export': '📦 Import/Export',
+    'tabs.automatic_mode': '✨ Automatic',
+    'settings.submodes.title': 'Sub modes',
+    'settings.submodes.description': 'Create extra choices under a main mode, for example Watch TV under Home.',
+    'settings.submodes.add': 'New sub mode',
+    'settings.zones.title': 'Zone rules',
+    'settings.zones.description': 'Motion, door/window contacts, subzones, lights, dimming and conditions.',
+    'settings.zones.add': 'New zone rule',
+    'settings.temperature.title': 'Temperature per mode and zone',
+    'settings.temperature.description': 'Set the desired temperature per mode and zone. Devices with target_temperature are updated automatically when the mode changes.',
+    'settings.temperature.add': 'New temperature rule',
+    'settings.display.title': 'Current mode display',
+    'settings.display.description': 'Choose which temperature device is shown in the top-right of Current mode and whether the Mode widget shows live context.',
+    'settings.display.temperature_device': 'Temperature in Current mode',
+    'settings.display.temperature_device_hint': 'Choose a device with temperature measurement. Empty = hide badge.',
+    'settings.display.live_context': 'Weather background on main modes',
+    'settings.display.live_context_hint': 'Automatically gives the main mode buttons a day/night background with sun, moon, clouds, rain, snow, fog or thunder. Uses the selected temperature/weather device where possible.',
+    'settings.appliances.title': 'Appliance notifications',
+    'settings.appliances.description': 'Detect start and ready status using power consumption from a smart plug or device with measure_power.',
+    'settings.appliances.add': 'New appliance',
+    'settings.schedule.title': 'Schedule',
+    'settings.schedule.description': 'Switch lights/devices on or off at a fixed time, random time, sunrise or sunset. Optionally use lux per zone.',
+    'settings.schedule.add': 'New schedule',
+    'settings.import_export.title': 'Import / export',
+    'settings.import_export.description': 'Create a backup of everything or choose which sections to include.',
+    'settings.export.title': 'Export',
+    'settings.export.description': 'Choose sections and copy a JSON backup.',
+    'settings.export.copy_json': 'Copy JSON',
+    'settings.import.title': 'Import',
+    'settings.import.description': 'Choose a previously created JSON backup. You can then select which sections to restore.',
+    'settings.import.placeholder': 'Paste the JSON export here if choosing a file does not work',
+    'settings.import.load_from_text': 'Load JSON from text field',
+    'settings.import.no_file': 'No file selected yet.',
+    'settings.import.apply': 'Apply import'
+  }
+};
+
+function getHomeyLang(){
+  // Prefer Homey's own translation engine. This reads the active Homey language
+  // from locales/nl.json or locales/en.json using a tiny marker key.
+  if(HomeyInstance && typeof HomeyInstance.__ === 'function'){
+    const marker = HomeyInstance.__('settings.__lang');
+    if(marker === 'en' || marker === 'nl') return marker;
+  }
+  const lang = (HomeyInstance && (HomeyInstance.__language || HomeyInstance.language || HomeyInstance.lang || (HomeyInstance.i18n && HomeyInstance.i18n.language))) || navigator.language || 'nl';
+  return String(lang).toLowerCase().startsWith('en') ? 'en' : 'nl';
+}
+function t(key){
+  const lang = APP_LANG || getHomeyLang();
+  if(HomeyInstance && typeof HomeyInstance.__ === 'function'){
+    const translated = HomeyInstance.__(key);
+    if(translated && translated !== key) return translated;
+  }
+  return (I18N[lang] && I18N[lang][key]) || (I18N.nl && I18N.nl[key]) || key;
+}
+const tt = (nl, en) => APP_LANG === 'en' ? en : nl;
+function applyStaticTranslations(){
+  APP_LANG = getHomeyLang();
+  document.documentElement.lang = APP_LANG;
+  document.querySelectorAll('[data-i18n]').forEach(node => { node.textContent = t(node.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(node => { node.setAttribute('placeholder', t(node.dataset.i18nPlaceholder)); });
+}
+
+let config;
+let environment = { zones: [], switchableDevices: [], lightDevices: [], motionDevices: [], contactDevices: [], luminanceDevices: [], presenceDevices: [], homeyUsers: [], nativePresenceUsers: [], sleepCandidateDevices: [], powerDevices: [], temperatureSensorDevices: [] };
+const openModeIds = new Set();
+const openSubModeIds = new Set();
+const openZoneIds = new Set();
+const openTempIds = new Set();
+const openApplianceIds = new Set();
+const openScheduleIds = new Set();
+const DAYS = APP_LANG === 'en' ? [{id:1,name:'Mon'}, {id:2,name:'Tue'}, {id:3,name:'Wed'}, {id:4,name:'Thu'}, {id:5,name:'Fri'}, {id:6,name:'Sat'}, {id:0,name:'Sun'}] : [{id:1,name:'Ma'}, {id:2,name:'Di'}, {id:3,name:'Wo'}, {id:4,name:'Do'}, {id:5,name:'Vr'}, {id:6,name:'Za'}, {id:0,name:'Zo'}];
+function el(tag, attrs = {}, children = []) { const n=document.createElement(tag); for(const [k,v] of Object.entries(attrs)){ if(k==='class') n.className=v; else if(k==='text') n.textContent=v; else n.setAttribute(k,v); } for(const c of children) n.appendChild(c); return n; }
+function showToast(m,t='ok'){ const x=document.getElementById('toast'); x.textContent=m; x.className=`toast show ${t}`; clearTimeout(showToast._t); showToast._t=setTimeout(()=>x.className='toast',3500); }
+function optionLabel(d){ return `${d.name}${d.zoneName?' - '+d.zoneName:''}`; }
+function buildSelect(options, selected, multiple=true){ const s=el('select', multiple?{multiple:'multiple'}:{}); const set=new Set((selected||[]).map(String)); if(!multiple) s.appendChild(el('option',{value:'',text:tt('Kies...', 'Choose...')})); for(const item of options||[]){ const o=el('option',{value:item.id,text:item.zoneName?optionLabel(item):(item.name||item.id)}); if(set.has(String(item.id))) o.selected=true; s.appendChild(o); } return s; }
+function selectedValues(s){ return Array.from(s.selectedOptions).map(o=>o.value).filter(Boolean); }
+function checkbox(field, checked, label){ const i=el('input',{type:'checkbox','data-field':field}); i.checked=!!checked; return el('label',{class:'check'},[i,document.createTextNode(label)]); }
+function fieldBlock(label,input,hint){ return el('div',{class:'field'},[el('label',{text:label}),input,el('div',{class:'hint',text:hint||''})]); }
+function setFieldVisible(scope, field, visible){ const node=scope?.querySelector?.(`[data-field="${field}"]`); if(!node) return; const wrap=node.closest('.field')||node.closest('.check')||node.parentElement; if(wrap) wrap.classList.toggle('is-hidden',!visible); }
+function isChecked(scope, field){ const node=scope?.querySelector?.(`[data-field="${field}"]`); return !!(node&&node.checked); }
+function fieldValue(scope, field){ const node=scope?.querySelector?.(`[data-field="${field}"]`); return node?node.value:''; }
+function addOptionNote(card, key, text){ if(card.querySelector(`[data-option-note="${key}"]`)) return; const body=card.querySelector('.fold-body')||card; const note=el('div',{class:'option-note','data-option-note':key,text}); body.insertBefore(note, body.firstChild); }
+function applyConditionalVisibility(){
+  document.querySelectorAll('#zoneRules [data-id]').forEach(card=>{ const usesMotion=isChecked(card,'turnOnOnMotion')||isChecked(card,'turnOffAfterNoMotion'); const usesContact=isChecked(card,'turnOnOnContact')||isChecked(card,'turnOffWhenContactClosed')||isChecked(card,'invertContactLogic'); setFieldVisible(card,'motionDeviceIds',usesMotion); setFieldVisible(card,'noMotionSeconds',isChecked(card,'turnOffAfterNoMotion')); setFieldVisible(card,'contactDeviceIds',usesContact); setFieldVisible(card,'timeFrom',isChecked(card,'timeEnabled')); setFieldVisible(card,'timeTo',isChecked(card,'timeEnabled')); setFieldVisible(card,'luxDeviceIds',isChecked(card,'onlyIfDark')); setFieldVisible(card,'luxBelow',isChecked(card,'onlyIfDark')); });
+  document.querySelectorAll('#temperatureRules [data-id]').forEach(card=>{ const wm=fieldValue(card,'windowMode'); const smart=isChecked(card,'smartWeatherEnabled'); setFieldVisible(card,'windowTemperature',wm==='setback'); setFieldVisible(card,'contactDeviceIds',wm!=='ignore'); ['weatherDeviceId','weatherColdBelow','weatherColdBoost','weatherWarmAbove','weatherWarmReduce','weatherMinTarget','weatherMaxTarget'].forEach(f=>setFieldVisible(card,f,smart)); });
+  document.querySelectorAll('#applianceRules [data-id]').forEach(card=>{ const rm=fieldValue(card,'resetMode'); setFieldVisible(card,'resetAfterReadySeconds',rm==='timer'); setFieldVisible(card,'resetMotionDeviceIds',rm==='activity'); setFieldVisible(card,'resetContactDeviceIds',rm==='activity'); setFieldVisible(card,'readyReminderSeconds',isChecked(card,'repeatReadyNotification')); });
+  document.querySelectorAll('#scheduleRules [data-id]').forEach(card=>{
+    const tm=fieldValue(card,'timeMode');
+    const lux=isChecked(card,'luxCondition');
+    const action=fieldValue(card,'action')||'on';
+    const canAutoOff=action==='on';
+    const canAutoOn=action==='off';
+    const offEnabled=canAutoOff && isChecked(card,'autoOffEnabled');
+    const offMode=fieldValue(card,'autoOffMode')||'hours';
+    const onEnabled=canAutoOn && isChecked(card,'autoOnEnabled');
+    const onMode=fieldValue(card,'autoOnMode')||'hours';
+
+    setFieldVisible(card,'fixedTime',tm==='fixed');
+    setFieldVisible(card,'randomFrom',tm==='random');
+    setFieldVisible(card,'randomTo',tm==='random');
+    setFieldVisible(card,'sunOffsetMinutes',tm==='sunrise'||tm==='sunset');
+
+    ['zoneId','includeSubzones','luxDeviceIds','luxOperator','luxThreshold'].forEach(f=>setFieldVisible(card,f,lux));
+
+    // Follow-up fields are action-aware:
+    // - When the schedule switches ON, only show automatic OFF settings.
+    // - When the schedule switches OFF, only show automatic ON settings.
+    setFieldVisible(card,'autoOffEnabled',canAutoOff);
+    setFieldVisible(card,'autoOffMode',offEnabled);
+    setFieldVisible(card,'autoOffAfterHours',offEnabled&&offMode==='hours');
+    setFieldVisible(card,'autoOffTime',offEnabled&&offMode==='time');
+    setFieldVisible(card,'autoOffRandomFromHours',offEnabled&&offMode==='random_hours');
+    setFieldVisible(card,'autoOffRandomToHours',offEnabled&&offMode==='random_hours');
+    setFieldVisible(card,'autoOffRandomFromTime',offEnabled&&offMode==='random_time');
+    setFieldVisible(card,'autoOffRandomToTime',offEnabled&&offMode==='random_time');
+
+    setFieldVisible(card,'autoOnEnabled',canAutoOn);
+    setFieldVisible(card,'autoOnMode',onEnabled);
+    setFieldVisible(card,'autoOnAfterHours',onEnabled&&onMode==='hours');
+    setFieldVisible(card,'autoOnTime',onEnabled&&onMode==='time');
+    setFieldVisible(card,'autoOnRandomFromHours',onEnabled&&onMode==='random_hours');
+    setFieldVisible(card,'autoOnRandomToHours',onEnabled&&onMode==='random_hours');
+    setFieldVisible(card,'autoOnRandomFromTime',onEnabled&&onMode==='random_time');
+    setFieldVisible(card,'autoOnRandomToTime',onEnabled&&onMode==='random_time');
+  });
+  const auto=document.getElementById('autoMode'); if(auto){ const src=fieldValue(auto,'presenceSource'); const sleep=isChecked(auto,'enableSleepMode'); setFieldVisible(auto,'homeyUserIds',src==='homey'||src==='both'); setFieldVisible(auto,'presenceDeviceIds',src==='devices'||src==='both'); setFieldVisible(auto,'sleepMotionDeviceIds',sleep); setFieldVisible(auto,'sleepContactDeviceIds',sleep); setFieldVisible(auto,'sleepPowerRules',sleep); }
+}
+
+function renderSubModes(){
+  const box=document.getElementById('subModeList');
+  if(!box) return;
+  config.subModes=(Array.isArray(config.subModes)?config.subModes:[]).map(s=>({...s,icon:s.icon||'',accentColor:s.accentColor||'#60a5fa',imageUrl:s.imageUrl||''}));
+  const subModes=config.subModes;
+  box.innerHTML='';
+  if(!subModes.length){ box.appendChild(el('p',{class:'hint',text:tt('Nog geen submodussen ingesteld.','No sub modes configured yet.')})); return; }
+  subModes.forEach((sub,i)=>{
+    const mainModes=(config.modes||[]).filter(m=>!m.parentMode).map(m=>({id:m.id,name:m.label}));
+    const parent=buildSelect(mainModes,[sub.parentMode||'home'],false); parent.dataset.field='subParent';
+    const label=el('input',{value:sub.label||'',placeholder:tt('Naam submodus','Sub mode name'),'data-field':'subLabel'});
+    const id=el('input',{value:sub.id||'',placeholder:'id',disabled:true,'data-field':'subId'});
+
+    const icon=el('input',{value:sub.icon||'',placeholder:'🎬','data-field':'subIcon'});
+    const accent=el('input',{type:'color',value:sub.accentColor||'#60a5fa','data-field':'subAccentColor'});
+    const imageUrl=el('input',{value:sub.imageUrl||'',placeholder:'https://...','data-field':'subImageUrl'});
+    const preview=el('div',{class:'theme-preview'});
+    const previewLabel=el('span',{text:`${sub.icon||'•'} ${sub.label||tt('Submodus','Sub mode')}`});
+    preview.appendChild(previewLabel);
+    preview.style.background = `${sub.imageUrl ? `linear-gradient(145deg,rgba(0,0,0,.20),rgba(0,0,0,.45)), url("${String(sub.imageUrl).replace(/"/g,'%22')}")` : `linear-gradient(145deg,${sub.accentColor||'#60a5fa'},rgba(255,255,255,.08))`}`;
+    accent.addEventListener('input',()=>{ preview.style.background=`linear-gradient(145deg,${accent.value},rgba(255,255,255,.08))`; });
+    imageUrl.addEventListener('input',()=>{ preview.style.background=imageUrl.value?`linear-gradient(145deg,rgba(0,0,0,.20),rgba(0,0,0,.45)), url("${String(imageUrl.value).replace(/"/g,'%22')}")`:`linear-gradient(145deg,${accent.value},rgba(255,255,255,.08))`; });
+    icon.addEventListener('input',()=>{ previewLabel.textContent=`${icon.value||'•'} ${label.value||tt('Submodus','Sub mode')}`; });
+    label.addEventListener('input',()=>{ previewLabel.textContent=`${icon.value||'•'} ${label.value||tt('Submodus','Sub mode')}`; });
+
+    const autoEnabled=checkbox('subAutoEnabled',sub.autoEnabled===true,tt('Auto via stroommeting','Auto by power'));
+    const autoDevice=buildSelect(environment.powerDevices||[],[sub.autoDeviceId||''],false); autoDevice.dataset.field='subAutoDeviceId';
+    const autoOperator=buildSelect([{id:'above',name:tt('boven','above')},{id:'below',name:tt('onder','below')}],[sub.autoOperator||'above'],false); autoOperator.dataset.field='subAutoOperator';
+    const autoWatt=el('input',{type:'number',min:'0',max:'5000',step:'1',value:String(sub.autoWatt??50),'data-field':'subAutoWatt'});
+    const autoDelay=el('input',{type:'number',min:'0',max:'3600',step:'5',value:String(sub.autoDelaySeconds??10),'data-field':'subAutoDelaySeconds'});
+    const autoReturnEnabled=checkbox('subAutoReturnEnabled',sub.autoReturnEnabled===true,tt('Auto terug naar hoofdmodus','Auto return to main mode'));
+    const autoReturnOperator=buildSelect([{id:'below',name:tt('onder','below')},{id:'above',name:tt('boven','above')}],[sub.autoReturnOperator||'below'],false); autoReturnOperator.dataset.field='subAutoReturnOperator';
+    const autoReturnWatt=el('input',{type:'number',min:'0',max:'5000',step:'1',value:String(sub.autoReturnWatt??15),'data-field':'subAutoReturnWatt'});
+    const autoReturnDelay=el('input',{type:'number',min:'0',max:'86400',step:'5',value:String(sub.autoReturnDelaySeconds??300),'data-field':'subAutoReturnDelaySeconds'});
+    const remove=el('button',{class:'btn-danger',type:'button',text:tt('Verwijderen','Delete')});
+    remove.addEventListener('click',()=>{ collectSubModes(); config.subModes.splice(i,1); openSubModeIds.delete(sub.id); renderSubModes(); renderModes(); });
+
+    const themeBox=el('section',{class:'theme-box'},[
+      preview,
+      el('div',{class:'submode-inline'},[
+        fieldBlock(tt('Icoon','Icon'),icon,tt('Bijv. 🎬 of 🎮','For example 🎬 or 🎮')),
+        fieldBlock(tt('Accentkleur','Accent color'),accent)
+      ]),
+      fieldBlock(tt('Achtergrond URL','Background URL'),imageUrl,tt('Leeg = gradient op accentkleur.','Empty = accent color gradient.'))
+    ]);
+
+    const body=[
+      el('div',{class:'submode-inline'},[fieldBlock(tt('Hoofdmodus','Main mode'),parent),fieldBlock(tt('Naam','Name'),label)]),
+      fieldBlock('ID',id,tt('Blijft gelijk voor bestaande regels.','Stays the same for existing rules.')),
+      themeBox,
+      autoEnabled,
+      el('div',{class:'submode-inline'},[
+        fieldBlock(tt('Apparaat','Device'),autoDevice,tt('Apparaat met measure_power.','Device with measure_power.')),
+        fieldBlock(tt('Voorwaarde','Condition'),autoOperator)
+      ]),
+      el('div',{class:'submode-inline'},[
+        fieldBlock(tt('Watt','Watt'),autoWatt),
+        fieldBlock(tt('Vertraging sec.','Delay sec.'),autoDelay)
+      ]),
+      autoReturnEnabled,
+      el('div',{class:'submode-inline'},[
+        fieldBlock(tt('Terug als','Return when'),autoReturnOperator),
+        fieldBlock(tt('Terug watt','Return watt'),autoReturnWatt)
+      ]),
+      fieldBlock(tt('Terug vertraging sec.','Return delay sec.'),autoReturnDelay),
+      el('div',{class:'compact-actions'},[remove])
+    ];
+
+    const parentLabel=mainModes.find(m=>m.id===(sub.parentMode||'home'))?.name||sub.parentMode||'home';
+    const autoText=sub.autoEnabled===true ? `${tt('auto','auto')} ${sub.autoOperator==='below'?'<':'>'} ${sub.autoWatt??50}W` : tt('handmatig','manual');
+    const summary=`${parentLabel} · ${autoText}${sub.autoReturnEnabled===true?' · '+tt('terug actief','return active'):''}`;
+    box.appendChild(foldCard(sub.id||`sub-${i}`,`${sub.icon||''} ${sub.label||tt('Submodus','Sub mode')}`.trim(),summary,openSubModeIds,body));
+  });
+}
+function makeSubModeId(parent,label){ return String(parent||'home').toLowerCase().replace(/[^a-z0-9_]+/g,'_')+'_'+String(label||'submodus').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,''); }
+function collectSubModes(){
+  const box=document.getElementById('subModeList');
+  if(!box) return config.subModes||[];
+  const cards=Array.from(box.querySelectorAll('.card'));
+  config.subModes=cards.map(card=>{
+    const parent=card.querySelector('[data-field="subParent"]')?.value||'home';
+    const label=(card.querySelector('[data-field="subLabel"]')?.value||'').trim();
+    const existing=(card.querySelector('[data-field="subId"]')?.value||'').trim();
+    return {
+      id:existing||makeSubModeId(parent,label),
+      parentMode:parent,
+      label,
+      icon:card.querySelector('[data-field="subIcon"]')?.value||'',
+      accentColor:card.querySelector('[data-field="subAccentColor"]')?.value||'#60a5fa',
+      imageUrl:card.querySelector('[data-field="subImageUrl"]')?.value||'',
+      autoEnabled:card.querySelector('[data-field="subAutoEnabled"]')?.checked===true,
+      autoDeviceId:card.querySelector('[data-field="subAutoDeviceId"]')?.value||'',
+      autoOperator:card.querySelector('[data-field="subAutoOperator"]')?.value||'above',
+      autoWatt:Number(card.querySelector('[data-field="subAutoWatt"]')?.value||50),
+      autoDelaySeconds:Number(card.querySelector('[data-field="subAutoDelaySeconds"]')?.value||10),
+      autoReturnEnabled:card.querySelector('[data-field="subAutoReturnEnabled"]')?.checked===true,
+      autoReturnOperator:card.querySelector('[data-field="subAutoReturnOperator"]')?.value||'below',
+      autoReturnWatt:Number(card.querySelector('[data-field="subAutoReturnWatt"]')?.value||15),
+      autoReturnDelaySeconds:Number(card.querySelector('[data-field="subAutoReturnDelaySeconds"]')?.value||300)
+    };
+  }).filter(s=>s.label);
+  return config.subModes;
+}
+function addSubMode(){
+  collectSubModes();
+  const parent='home';
+  const label=tt('Nieuwe submodus','New sub mode');
+  config.subModes=config.subModes||[];
+  const id=makeSubModeId(parent,label+' '+Date.now());
+  config.subModes.push({id,parentMode:parent,label,autoEnabled:false,autoDeviceId:'',autoOperator:'above',autoWatt:50,autoDelaySeconds:10,autoReturnEnabled:true,autoReturnOperator:'below',autoReturnWatt:15,autoReturnDelaySeconds:300,icon:'',accentColor:'#60a5fa',imageUrl:''});
+  openSubModeIds.add(id);
+  renderSubModes();
+  setTimeout(()=>openFoldModal(document.querySelector(`[data-id="${id}"]`)),0);
+}
+
+function getSelectedTemperatureDevice(){ const id=config?.displaySettings?.temperatureDeviceId||''; if(!id) return null; return (environment.temperatureSensorDevices||[]).find(d=>d.id===id)||null; }
+function formatTemperatureValue(device){ const raw=device?.capabilityValues?.measure_temperature ?? device?.measureTemperature ?? device?.temperature; const n=Number(raw); if(!Number.isFinite(n)) return null; return (Math.round(n*10)/10).toLocaleString(APP_LANG==='en'?'en-US':'nl-NL',{minimumFractionDigits: n%1===0?0:1, maximumFractionDigits:1})+'°C'; }
+function updateCurrentMode(mode){ const cur=config.modes.find(x=>x.id===mode); const node=document.getElementById('currentMode'); node.textContent=`${tt('Huidige modus', 'Current mode')}: ${cur?cur.label:mode}`; const dev=getSelectedTemperatureDevice(); const value=dev?formatTemperatureValue(dev):null; if(value){ const badge=el('span',{class:'temperature-badge',title:dev.name,text:'🌡️ '+value}); node.appendChild(badge); } }
+function tab(id){ document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===id)); ['modes','zones','appliances','schedule','export','auto'].forEach(t=>{ const panel=document.getElementById('tab-'+t); if(panel) panel.style.display=t===id?'':'none'; }); }
+function zoneAndSubZoneIds(zoneId, include){ const ids=new Set(); if(!zoneId) return ids; ids.add(zoneId); if(!include) return ids; let changed=true; while(changed){ changed=false; for(const z of environment.zones){ if(z.parent && ids.has(z.parent) && !ids.has(z.id)){ ids.add(z.id); changed=true; } } } return ids; }
+function devicesInZone(list, zoneId, include){ const ids=zoneAndSubZoneIds(zoneId, include); return (list||[]).filter(d=>ids.has(d.zone)); }
+function applianceZoneDevices(list, deviceId){
+  const selectedDevice=(environment.powerDevices||[]).find(d=>d.id===deviceId);
+  if(!selectedDevice || !selectedDevice.zone) return [];
+  const ids=zoneAndSubZoneIds(selectedDevice.zone,true);
+  return (list||[]).filter(d=>ids.has(d.zone));
+}
+
+function ensureModalBackdrop(){
+  let backdrop=document.getElementById('modalBackdrop');
+  if(!backdrop){
+    backdrop=el('div',{id:'modalBackdrop',class:'modal-backdrop'});
+    backdrop.addEventListener('click',closeFoldModal);
+    document.body.appendChild(backdrop);
+  }
+  return backdrop;
+}
+function closeFoldModal(){
+  const card=document.querySelector('.fold.modal-edit');
+  if(card){
+    card.classList.remove('modal-edit');
+    if(card.classList.contains('open')) {
+      const id=card.dataset.id;
+      // openSet is already updated by foldCard click logic; this only keeps the visual state.
+    }
+  }
+  document.getElementById('modalBackdrop')?.remove();
+  document.body.classList.remove('modal-open'); document.documentElement.classList.remove('modal-open');
+}
+function openFoldModal(card){
+  if(!card) return;
+  document.querySelector('.fold.modal-edit')?.classList.remove('modal-edit');
+  card.classList.add('open','modal-edit');
+  ensureModalBackdrop();
+  document.body.classList.add('modal-open'); document.documentElement.classList.add('modal-open');
+}
+function foldCard(id, title, summary, openSet, body){
+  const card=el('section',{class:`card fold ${openSet.has(id)?'open':''}`,'data-id':id},[]);
+  const editBtn=el('button',{class:'fold-edit',type:'button',title:tt('Bewerken in popup','Edit in popup'),text:'Bewerk'});
+  editBtn.addEventListener('click',(ev)=>{
+    ev.stopPropagation();
+    openSet.add(id);
+    openFoldModal(card);
+  });
+  const caret=el('span',{class:'caret',text:'⌄'});
+  const controls=el('div',{class:'fold-actions'},[editBtn]);
+  const head=el('div',{class:'fold-head',role:'button',tabindex:'0'},[
+    el('div',{},[el('strong',{text:title}),el('div',{class:'summary',text:summary})]),
+    controls
+  ]);
+  head.addEventListener('click',()=>{
+    openFoldModal(card);
+    openSet.add(id);
+  });
+  const bodyWrap=el('div',{class:'fold-body'},body);
+  const closeBtn=el('button',{class:'btn-secondary',type:'button',text:tt('Popup sluiten','Close popup')});
+  closeBtn.addEventListener('click',closeFoldModal);
+  bodyWrap.appendChild(el('div',{class:'actions',style:'justify-content:flex-end;margin-top:12px'},[closeBtn]));
+  card.appendChild(head);
+  card.appendChild(bodyWrap);
+  return card;
+}
+function summarizeModeRule(mode, r){ const onCount=(r.on||[]).length; const offCount=(r.off||[]).length; return `${onCount} ${tt('aan','on')} · ${offCount} ${tt('uit','off')}`; }
+function renderModes(){
+  const grid=document.getElementById('modeGrid');
+  grid.innerHTML='';
+  for(const mode of config.modes){
+    const r=config.rules[mode.id]||{on:[],off:[]};
+    const on=buildSelect(environment.switchableDevices,r.on);
+    on.dataset.mode=mode.id;
+    on.dataset.target='on';
+    const off=buildSelect(environment.switchableDevices,r.off);
+    off.dataset.mode=mode.id;
+    off.dataset.target='off';
+
+    const tempBox=el('div',{class:'mode-temperature-box','data-mode-temperature':mode.id});
+    renderModeTemperatureRules(mode.id,tempBox);
+
+    const addTemp=el('button',{class:'btn-secondary',type:'button',text:tt('Temperatuurregel toevoegen','Add temperature rule')});
+    addTemp.addEventListener('click',()=>{
+      collectTemperatureRules();
+      addTemperatureRuleForMode(mode.id);
+    });
+
+    const btn=el('button',{class:'btn-primary',type:'button',text:`${tt('Activeer', 'Activate')} ${mode.label}`});
+    btn.addEventListener('click',()=>applyMode(mode.id));
+
+    grid.appendChild(foldCard('mode-'+mode.id,mode.label,summarizeModeRule(mode,r),openModeIds,[
+      fieldBlock(tt('Apparaten aan', 'Devices on'),on,tt('Deze apparaten gaan aan bij deze modus.', 'These devices turn on in this mode.')),
+      fieldBlock(tt('Apparaten uit', 'Devices off'),off,tt('Deze apparaten gaan uit bij deze modus.', 'These devices turn off in this mode.')),
+      el('h3',{text:tt('Temperatuur','Temperature')}),
+      el('p',{class:'hint',text:tt('Voeg hier temperatuurregels toe die bij deze modus horen.','Add temperature rules here that belong to this mode.')}),
+      tempBox,
+      el('div',{class:'actions'},[addTemp,btn])
+    ]));
+  }
+}
+
+function renderModeTemperatureRules(modeId, container){
+  container.innerHTML='';
+  config.temperatureRules=config.temperatureRules||[];
+  const rules=config.temperatureRules
+    .map((rule,index)=>({rule,index}))
+    .filter(item=>item.rule.modeId===modeId);
+
+  if(!rules.length){
+    container.appendChild(el('div',{class:'option-note',text:tt('Geen temperatuurregels voor deze modus.','No temperature rules for this mode.')}));
+    return;
+  }
+
+  rules.forEach(({rule,index})=>{
+    container.appendChild(renderInlineTemperatureRule(rule,index,modeId));
+  });
+}
+
+function renderInlineTemperatureRule(r,i,modeId){
+  const zone=buildSelect(environment.zones,[r.zoneId],false);
+  zone.dataset.field='zoneId';
+  zone.addEventListener('change',()=>{ collectTemperatureRules(); renderModes(); applyConditionalVisibility(); });
+
+  const thermostats=buildSelect(devicesInZone(environment.thermostatDevices||[],r.zoneId,r.includeSubzones),r.thermostatDeviceIds||[]);
+  thermostats.dataset.field='thermostatDeviceIds';
+
+  const contacts=buildSelect(devicesInZone(environment.contactDevices||[],r.zoneId,r.includeSubzones),r.contactDeviceIds||[]);
+  contacts.dataset.field='contactDeviceIds';
+
+  const weatherDevices=buildSelect(environment.weatherDevices||environment.temperatureSensorDevices||[],[r.weatherDeviceId||''],false);
+  weatherDevices.dataset.field='weatherDeviceId';
+
+  const name=el('input',{value:r.name||'',placeholder:tt('Naam temperatuurregel','Temperature rule name'),'data-field':'name'});
+  const mode=el('input',{type:'hidden',value:modeId,'data-field':'modeId'});
+  const temp=el('input',{type:'number',min:'5',max:'35',step:'0.5',value:String(r.temperature||20),'data-field':'temperature'});
+
+  const windowMode=buildSelect([
+    {id:'ignore',name:tt('Raam/deur negeren','Ignore window/door')},
+    {id:'skip',name:tt('Niet verwarmen als open','Do not heat when open')},
+    {id:'setback',name:tt('Andere temperatuur als open','Different temperature when open')}
+  ],[r.windowMode||'ignore'],false);
+  windowMode.dataset.field='windowMode';
+
+  const windowTemp=el('input',{type:'number',min:'5',max:'35',step:'0.5',value:String(r.windowTemperature||15),'data-field':'windowTemperature'});
+  const include=checkbox('includeSubzones',r.includeSubzones,tt('Subzones meenemen', 'Include subzones'));
+  include.querySelector('input').addEventListener('change',()=>{ collectTemperatureRules(); renderModes(); applyConditionalVisibility(); });
+
+  const smart=checkbox('smartWeatherEnabled',r.smartWeatherEnabled,tt('Slim verwarmen via weerdevice','Smart heating using weather device'));
+  const coldBelow=el('input',{type:'number',min:'-40',max:'40',step:'0.5',value:String(r.weatherColdBelow??5),'data-field':'weatherColdBelow'});
+  const coldBoost=el('input',{type:'number',min:'0',max:'5',step:'0.5',value:String(r.weatherColdBoost??1),'data-field':'weatherColdBoost'});
+  const warmAbove=el('input',{type:'number',min:'-40',max:'40',step:'0.5',value:String(r.weatherWarmAbove??16),'data-field':'weatherWarmAbove'});
+  const warmReduce=el('input',{type:'number',min:'0',max:'5',step:'0.5',value:String(r.weatherWarmReduce??1),'data-field':'weatherWarmReduce'});
+  const minTarget=el('input',{type:'number',min:'5',max:'35',step:'0.5',value:String(r.weatherMinTarget??5),'data-field':'weatherMinTarget'});
+  const maxTarget=el('input',{type:'number',min:'5',max:'35',step:'0.5',value:String(r.weatherMaxTarget??25),'data-field':'weatherMaxTarget'});
+
+  const remove=el('button',{class:'btn-danger',type:'button',text:tt('Verwijderen','Delete')});
+  remove.addEventListener('click',()=>{
+    collectTemperatureRules();
+    const id=r.id;
+    config.temperatureRules=(config.temperatureRules||[]).filter((rule,idx)=>id ? rule.id!==id : idx!==i);
+    renderModes();
+    applyConditionalVisibility();
+  });
+
+  const card=foldCard(r.id||`temp-${i}`,r.name||tt('Temperatuurregel','Temperature rule'),summarizeTemperatureRule(r),openTempIds,[
+    mode,
+    fieldBlock(tt('Naam','Name'),name),
+    el('div',{class:'three'},[
+      fieldBlock(tt('Zone/kamer','Zone/room'),zone),
+      fieldBlock(tt('Temperatuur','Temperature'),temp),
+      el('div',{},[include,checkbox('enabled',r.enabled,tt('Regel actief','Rule active'))])
+    ]),
+    fieldBlock(tt('Thermostaten','Thermostats'),thermostats,tt('Leeg laten = alle thermostaten in deze zone.', 'Leave empty = all thermostats in this zone.')),
+    el('div',{class:'two'},[
+      fieldBlock(tt('Raam/deur open','Window/door open'),windowMode,tt('Kijkt naar contact-sensoren in dezelfde zone.', 'Uses contact sensors in the same zone.')),
+      fieldBlock(tt('Temperatuur bij open raam/deur','Temperature when window/door is open'),windowTemp)
+    ]),
+    fieldBlock(tt('Raam/deur sensoren','Window/door sensors'),contacts,tt('Leeg laten = alle contact-sensoren in deze zone.', 'Leave empty = all contact sensors in this zone.')),
+    el('section',{class:'card'},[
+      el('h3',{text:tt('Slim verwarmen','Smart heating')}),
+      smart,
+      fieldBlock(tt('Weerdevice / buitentemperatuur','Weather device / outdoor temperature'),weatherDevices),
+      el('div',{class:'two'},[
+        fieldBlock(tt('Koud onder °C','Cold below °C'),coldBelow),
+        fieldBlock(tt('Verhoog setpoint met °C','Increase setpoint by °C'),coldBoost)
+      ]),
+      el('div',{class:'two'},[
+        fieldBlock(tt('Warm boven °C','Warm above °C'),warmAbove),
+        fieldBlock(tt('Verlaag setpoint met °C','Decrease setpoint by °C'),warmReduce)
+      ]),
+      el('div',{class:'two'},[
+        fieldBlock(tt('Minimum setpoint','Minimum setpoint'),minTarget),
+        fieldBlock(tt('Maximum setpoint','Maximum setpoint'),maxTarget)
+      ])
+    ]),
+    remove
+  ]);
+  card.classList.add('inline-temperature-rule','fold');
+  return card;
+}
+
+function addTemperatureRuleForMode(modeId){
+  ensureTemperatureState();
+  const rule={
+    id:`temp-${Date.now()}`,
+    name:tt('Nieuwe temperatuurregel','New temperature rule'),
+    enabled:true,
+    modeId,
+    zoneId:(environment.zones&&environment.zones[0]&&environment.zones[0].id)||'',
+    includeSubzones:false,
+    thermostatDeviceIds:[],
+    temperature:20,
+    windowMode:'ignore',
+    windowTemperature:15,
+    contactDeviceIds:[],
+    smartWeatherEnabled:false,
+    weatherDeviceId:'',
+    weatherColdBelow:5,
+    weatherColdBoost:1,
+    weatherWarmAbove:16,
+    weatherWarmReduce:1,
+    weatherMinTarget:5,
+    weatherMaxTarget:25
+  };
+  config.temperatureRules.push(rule);
+  openTempIds.add(rule.id);
+  openModeIds.add('mode-'+modeId);
+  renderModes();
+  applyConditionalVisibility();
+  setTimeout(()=>openFoldModal(document.querySelector(`[data-id="${rule.id}"]`)),0);
+  showToast(tt('Temperatuurregel toegevoegd. Vergeet niet op Alles opslaan te klikken.', 'Temperature rule added. Do not forget to click Save all.'));
+}
+function summarizeZoneRule(r){ const zone=environment.zones.find(z=>z.id===r.zoneId)?.name||'Geen zone'; const modes=(r.modeIds||[]).map(id=>config.modes.find(m=>m.id===id)?.label||id).join(', ')||tt('geen modus','no mode'); const parts=[zone,modes]; if(r.includeSubzones) parts.push(tt('incl. subzones','incl. subzones')); if((r.motionDeviceIds||[]).length) parts.push(`${r.motionDeviceIds.length} ${tt('beweging','motion')}`); if((r.contactDeviceIds||[]).length) parts.push(`${r.contactDeviceIds.length} ${tt('deur/raam','door/window')}`); if((r.lightDeviceIds||[]).length) parts.push(`${r.lightDeviceIds.length} ${tt('lampen','lights')}`); return parts.join(' · '); }
+function renderZoneRules(){ const h=document.getElementById('zoneRules'); h.innerHTML=''; if(!config.zoneRules.length) h.appendChild(el('section',{class:'card'},[el('p',{text:tt('Nog geen zoneregels.', 'No zone rules yet.')})])); config.zoneRules.forEach((r,i)=>h.appendChild(renderZoneRule(r,i))); }
+function renderZoneRule(r,i){ const zone=buildSelect(environment.zones,[r.zoneId],false); zone.dataset.field='zoneId'; zone.addEventListener('change',()=>{ collectZoneRules(); renderZoneRules(); }); const modes=buildSelect(config.modes.map(m=>({id:m.id,name:m.label})),r.modeIds); modes.dataset.field='modeIds'; const include=checkbox('includeSubzones',r.includeSubzones,tt('Onderliggende subzones/kamers meenemen','Include subzones/rooms')); include.querySelector('input').addEventListener('change',()=>{ collectZoneRules(); renderZoneRules(); }); const motion=buildSelect(devicesInZone(environment.motionDevices,r.zoneId,r.includeSubzones),r.motionDeviceIds); motion.dataset.field='motionDeviceIds'; const contact=buildSelect(devicesInZone(environment.contactDevices,r.zoneId,r.includeSubzones),r.contactDeviceIds); contact.dataset.field='contactDeviceIds'; const lights=buildSelect(devicesInZone(environment.lightDevices,r.zoneId,r.includeSubzones),r.lightDeviceIds); lights.dataset.field='lightDeviceIds'; const lux=buildSelect(devicesInZone(environment.luminanceDevices,r.zoneId,r.includeSubzones),r.luxDeviceIds); lux.dataset.field='luxDeviceIds'; const name=el('input',{value:r.name||'','data-field':'name'}); const noMotion=el('input',{type:'number',min:'10',max:'86400',step:'10',value:String(r.noMotionSeconds||180),'data-field':'noMotionSeconds'}); const dim=el('input',{type:'number',min:'0',max:'1',step:'0.05',value:r.dimValue??'',placeholder:tt('Optioneel 0-1','Optional 0-1'),'data-field':'dimValue'}); const timeFrom=el('input',{type:'time',value:r.timeFrom||'18:00','data-field':'timeFrom'}); const timeTo=el('input',{type:'time',value:r.timeTo||'23:59','data-field':'timeTo'}); const luxBelow=el('input',{type:'number',min:'0',max:'100000',step:'1',value:String(r.luxBelow||30),'data-field':'luxBelow'}); const remove=el('button',{class:'btn-danger',type:'button',text:tt('Verwijderen', 'Delete')}); remove.addEventListener('click',()=>{ collectZoneRules(); config.zoneRules.splice(i,1); renderZoneRules(); }); const test=el('button',{class:'btn-secondary',type:'button',text:tt('Test zone','Test zone')}); test.addEventListener('click',async()=>{ await saveAll(); await api('POST','/run_zone',{zoneId:r.zoneId}); showToast(tt('Zoneregel getest','Zone rule tested')); }); return foldCard(r.id||`zone-${i}`,r.name||'Zoneregel',summarizeZoneRule(r),openZoneIds,[fieldBlock(tt('Naam','Name'),name),fieldBlock(tt('Modussen','Modes'),modes),fieldBlock(tt('Zone/kamer','Zone/room'),zone),include,fieldBlock(tt('Bewegingssensoren','Motion sensors'),motion),fieldBlock(tt('Deur-/raamsensoren','Door/window sensors'),contact),fieldBlock(tt('Lampen','Lights'),lights),el('div',{class:'two'},[el('div',{},[checkbox('enabled',r.enabled,tt('Regel actief','Rule active')),checkbox('turnOnOnMotion',r.turnOnOnMotion,tt('Lampen aan bij beweging','Turn lights on when motion is detected')),checkbox('turnOffAfterNoMotion',r.turnOffAfterNoMotion,tt('Lampen uit na geen beweging','Turn lights off after no motion')),checkbox('turnOnOnContact',r.turnOnOnContact,tt('Lampen aan bij contact-actief','Turn lights on when contact is active')),checkbox('turnOffWhenContactClosed',r.turnOffWhenContactClosed,tt('Lampen uit bij contact-inactief','Turn lights off when contact is inactive')),checkbox('invertContactLogic',r.invertContactLogic,tt('Deur-/raamcontact omkeren: dicht = aan, open = uit','Invert door/window contact: closed = on, open = off'))]),el('div',{},[fieldBlock(tt('Geen beweging na seconden','No motion after seconds'),noMotion),fieldBlock(tt('Dimwaarde','Dim value'),dim),checkbox('onlyIfLightsOff',r.onlyIfLightsOff,tt('Alleen inschakelen als gekozen lampen uit zijn','Only switch on if selected lights are off'))])]),el('h3',{text:tt('Voorwaarden','Conditions')}),el('div',{class:'two'},[el('div',{},[checkbox('timeEnabled',r.timeEnabled,tt('Alleen binnen tijdvenster','Only within time window')),fieldBlock(tt('Van','From'),timeFrom),fieldBlock(tt('Tot','Until'),timeTo)]),el('div',{},[checkbox('onlyIfDark',r.onlyIfDark,tt('Alleen als het donker genoeg is','Only when dark enough')),fieldBlock(tt('Luxsensoren','Lux sensors'),lux),fieldBlock(tt('Donker onder luxwaarde','Dark below lux value'),luxBelow)])]),el('div',{class:'actions'},[test,remove])]); }
+function collectModeRules(){ const out={}; for(const m of config.modes){ out[m.id]={on:selectedValues(document.querySelector(`select[data-mode="${m.id}"][data-target="on"]`)),off:selectedValues(document.querySelector(`select[data-mode="${m.id}"][data-target="off"]`))}; } return out; }
+function collectZoneRules(){ const cards=Array.from(document.querySelectorAll('#zoneRules [data-id]')); config.zoneRules=cards.map((card,i)=>{ const base=config.zoneRules[i]||{}; const get=f=>card.querySelector(`[data-field="${f}"]`); return {...base,name:get('name').value,enabled:get('enabled').checked,modeIds:selectedValues(get('modeIds')),zoneId:get('zoneId').value,includeSubzones:get('includeSubzones').checked,motionDeviceIds:selectedValues(get('motionDeviceIds')),contactDeviceIds:selectedValues(get('contactDeviceIds')),lightDeviceIds:selectedValues(get('lightDeviceIds')),turnOnOnMotion:get('turnOnOnMotion').checked,turnOnOnContact:get('turnOnOnContact').checked,turnOffAfterNoMotion:get('turnOffAfterNoMotion').checked,turnOffWhenContactClosed:get('turnOffWhenContactClosed').checked,invertContactLogic:get('invertContactLogic').checked,noMotionSeconds:Number(get('noMotionSeconds').value),dimValue:get('dimValue').value===''?null:Number(get('dimValue').value),onlyIfLightsOff:get('onlyIfLightsOff').checked,timeEnabled:get('timeEnabled').checked,timeFrom:get('timeFrom').value,timeTo:get('timeTo').value,onlyIfDark:get('onlyIfDark').checked,luxDeviceIds:selectedValues(get('luxDeviceIds')),luxBelow:Number(get('luxBelow').value)}; }); return config.zoneRules; }
+function addZoneRule(){ const rule={id:`rule-${Date.now()}`,name:tt('Nieuwe zoneregel','New zone rule'),enabled:true,modeIds:config.modes.map(m=>m.id),zoneId:environment.zones[0]?.id||'',includeSubzones:false,motionDeviceIds:[],contactDeviceIds:[],lightDeviceIds:[],turnOnOnMotion:true,turnOnOnContact:false,turnOffAfterNoMotion:true,turnOffWhenContactClosed:false,invertContactLogic:false,noMotionSeconds:180,dimValue:null,timeEnabled:false,timeFrom:'18:00',timeTo:'23:59',onlyIfLightsOff:false,onlyIfDark:false,luxDeviceIds:[],luxBelow:30}; config.zoneRules.push(rule); openZoneIds.add(rule.id); renderZoneRules(); setTimeout(()=>openFoldModal(document.querySelector(`[data-id="${rule.id}"]`)),0); }
+
+function summarizeTemperatureRule(r){ const mode=config.modes.find(m=>m.id===r.modeId)?.label||r.modeId||'modus'; const zone=(environment.zones||[]).find(z=>z.id===r.zoneId)?.name||tt('geen zone', 'no zone'); const count=(r.thermostatDeviceIds||[]).length; const windowText=r.windowMode==='skip'?tt('sla over bij open raam','skip when window open'):(r.windowMode==='setback'?tt('raam open '+(r.windowTemperature||15)+'°C', 'window open '+(r.windowTemperature||15)+'°C'):tt('raam negeren','ignore window')); const weatherText=r.smartWeatherEnabled?tt('weer-correctie aan','weather compensation on'):tt('weer-correctie uit','weather compensation off'); return `${mode} · ${zone} · ${r.temperature||20}°C · ${count||'alle'} thermostaten · ${windowText} · ${weatherText}`; }
+function renderTemperatureRules(){ const h=document.getElementById('temperatureRules'); h.innerHTML=''; config.temperatureRules=config.temperatureRules||[]; if(!config.temperatureRules.length) h.appendChild(el('section',{class:'card'},[el('p',{text:tt('Nog geen temperatuurregels.', 'No temperature rules yet.')})])); config.temperatureRules.forEach((r,i)=>h.appendChild(renderTemperatureRule(r,i))); }
+function renderTemperatureRule(r,i){ const zone=buildSelect(environment.zones,[r.zoneId],false); zone.dataset.field='zoneId'; zone.addEventListener('change',()=>{ collectTemperatureRules(); renderTemperatureRules(); }); const mode=buildSelect(config.modes.map(m=>({id:m.id,name:m.label})),[r.modeId||'home'],false); mode.dataset.field='modeId'; const thermostats=buildSelect(devicesInZone(environment.thermostatDevices||[],r.zoneId,r.includeSubzones),r.thermostatDeviceIds||[]); thermostats.dataset.field='thermostatDeviceIds'; const contacts=buildSelect(devicesInZone(environment.contactDevices||[],r.zoneId,r.includeSubzones),r.contactDeviceIds||[]); contacts.dataset.field='contactDeviceIds'; const weatherDevices=buildSelect(environment.weatherDevices||environment.temperatureSensorDevices||[],[r.weatherDeviceId||''],false); weatherDevices.dataset.field='weatherDeviceId'; const name=el('input',{value:r.name||'','data-field':'name'}); const temp=el('input',{type:'number',min:'5',max:'35',step:'0.5',value:String(r.temperature||20),'data-field':'temperature'}); const windowMode=buildSelect([{id:'ignore',name:tt('Raam/deur negeren','Ignore window/door')},{id:'skip',name:tt('Niet verwarmen als open','Do not heat when open')},{id:'setback',name:tt('Andere temperatuur als open','Different temperature when open')}],[r.windowMode||'ignore'],false); windowMode.dataset.field='windowMode'; const windowTemp=el('input',{type:'number',min:'5',max:'35',step:'0.5',value:String(r.windowTemperature||15),'data-field':'windowTemperature'}); const include=checkbox('includeSubzones',r.includeSubzones,tt('Onderliggende subzones/kamers meenemen', 'Include subzones/rooms')); include.querySelector('input').addEventListener('change',()=>{ collectTemperatureRules(); renderTemperatureRules(); }); const smart=checkbox('smartWeatherEnabled',r.smartWeatherEnabled,tt('Slim verwarmen via weerdevice','Smart heating using weather device')); const coldBelow=el('input',{type:'number',min:'-40',max:'40',step:'0.5',value:String(r.weatherColdBelow??5),'data-field':'weatherColdBelow'}); const coldBoost=el('input',{type:'number',min:'0',max:'5',step:'0.5',value:String(r.weatherColdBoost??1),'data-field':'weatherColdBoost'}); const warmAbove=el('input',{type:'number',min:'-40',max:'40',step:'0.5',value:String(r.weatherWarmAbove??16),'data-field':'weatherWarmAbove'}); const warmReduce=el('input',{type:'number',min:'0',max:'5',step:'0.5',value:String(r.weatherWarmReduce??1),'data-field':'weatherWarmReduce'}); const minTarget=el('input',{type:'number',min:'5',max:'35',step:'0.5',value:String(r.weatherMinTarget??5),'data-field':'weatherMinTarget'}); const maxTarget=el('input',{type:'number',min:'5',max:'35',step:'0.5',value:String(r.weatherMaxTarget??25),'data-field':'weatherMaxTarget'}); const remove=el('button',{class:'btn-danger',type:'button',text:tt('Verwijderen','Delete')}); remove.addEventListener('click',()=>{ collectTemperatureRules(); config.temperatureRules.splice(i,1); renderTemperatureRules(); }); return foldCard(r.id||`temp-${i}`,r.name||tt('Temperatuurregel','Temperature rule'),summarizeTemperatureRule(r),openTempIds,[fieldBlock(tt('Naam','Name'),name),el('div',{class:'three'},[fieldBlock(tt('Modus','Mode'),mode),fieldBlock(tt('Zone/kamer','Zone/room'),zone),fieldBlock(tt('Temperatuur','Temperature'),temp)]),include,fieldBlock(tt('Thermostaten','Thermostats'),thermostats,tt('Leeg laten = alle thermostaten in deze zone.', 'Leave empty = all thermostats in this zone.')),el('div',{class:'two'},[fieldBlock(tt('Raam/deur open','Window/door open'),windowMode,tt('Kijkt naar contact-sensoren in dezelfde zone.', 'Uses contact sensors in the same zone.')),fieldBlock(tt('Temperatuur bij open raam/deur','Temperature when window/door is open'),windowTemp,tt('Alleen gebruikt bij: Andere temperatuur als open.', 'Only used for: Different temperature when open.'))]),fieldBlock(tt('Raam/deur sensoren','Window/door sensors'),contacts,tt('Leeg laten = alle contact-sensoren in deze zone. Werkt ook met subzones als die optie aan staat.', 'Leave empty = all contact sensors in this zone. Also includes subzones when that option is enabled.')),el('section',{class:'card'},[el('h3',{text:tt('Slim verwarmen','Smart heating')}),smart,fieldBlock(tt('Weerdevice / buitentemperatuur','Weather device / outdoor temperature'),weatherDevices,tt('Kies een device met measure_temperature, bijvoorbeeld je weerapp.', 'Choose a device with measure_temperature, for example your weather app.')),el('div',{class:'two'},[fieldBlock(tt('Koud onder °C','Cold below °C'),coldBelow),fieldBlock(tt('Verhoog setpoint met °C','Increase setpoint by °C'),coldBoost)]),el('div',{class:'two'},[fieldBlock(tt('Warm boven °C','Warm above °C'),warmAbove),fieldBlock(tt('Verlaag setpoint met °C','Decrease setpoint by °C'),warmReduce)]),el('div',{class:'two'},[fieldBlock(tt('Minimum setpoint','Minimum setpoint'),minTarget),fieldBlock(tt('Maximum setpoint','Maximum setpoint'),maxTarget)])]),checkbox('enabled',r.enabled,tt('Regel actief','Rule active')),remove]); }
+function ensureTemperatureState(){ if(!config){ config={modes:[{id:'home',label:tt('Thuis','Home')}],currentMode:'home',rules:{},zoneRules:[],temperatureRules:[],scheduleRules:[],autoMode:{}}; } config.modes=config.modes&&config.modes.length?config.modes:[{id:'home',label:tt('Thuis','Home')}]; config.temperatureRules=Array.isArray(config.temperatureRules)?config.temperatureRules:[]; environment=environment||{}; environment.zones=Array.isArray(environment.zones)?environment.zones:[]; environment.thermostatDevices=Array.isArray(environment.thermostatDevices)?environment.thermostatDevices:[]; environment.contactDevices=Array.isArray(environment.contactDevices)?environment.contactDevices:[]; environment.weatherDevices=Array.isArray(environment.weatherDevices)?environment.weatherDevices:[]; environment.temperatureSensorDevices=Array.isArray(environment.temperatureSensorDevices)?environment.temperatureSensorDevices:[]; }
+function collectTemperatureRules(){
+  ensureTemperatureState();
+  const cards=Array.from(document.querySelectorAll('.inline-temperature-rule[data-id], #temperatureRules [data-id]'));
+  config.temperatureRules=cards.map((card,i)=>{
+    const base=config.temperatureRules.find(rule=>rule.id===card.dataset.id) || config.temperatureRules[i] || {};
+    const get=f=>card.querySelector(`[data-field="${f}"]`);
+    return {
+      ...base,
+      id:base.id || card.dataset.id || `temp-${Date.now()}-${i}`,
+      name:get('name')?.value||base.name||'',
+      enabled:get('enabled')?get('enabled').checked:true,
+      modeId:get('modeId')?.value||base.modeId||'home',
+      zoneId:get('zoneId')?.value||base.zoneId||'',
+      includeSubzones:get('includeSubzones')?get('includeSubzones').checked:false,
+      thermostatDeviceIds:get('thermostatDeviceIds')?selectedValues(get('thermostatDeviceIds')):[],
+      temperature:Number(get('temperature')?.value||base.temperature||20),
+      windowMode:get('windowMode')?.value||base.windowMode||'ignore',
+      windowTemperature:Number(get('windowTemperature')?.value||base.windowTemperature||15),
+      contactDeviceIds:get('contactDeviceIds')?selectedValues(get('contactDeviceIds')):[],
+      smartWeatherEnabled:get('smartWeatherEnabled')?get('smartWeatherEnabled').checked:false,
+      weatherDeviceId:get('weatherDeviceId')?.value||'',
+      weatherColdBelow:Number(get('weatherColdBelow')?.value||5),
+      weatherColdBoost:Number(get('weatherColdBoost')?.value||1),
+      weatherWarmAbove:Number(get('weatherWarmAbove')?.value||16),
+      weatherWarmReduce:Number(get('weatherWarmReduce')?.value||1),
+      weatherMinTarget:Number(get('weatherMinTarget')?.value||5),
+      weatherMaxTarget:Number(get('weatherMaxTarget')?.value||25)
+    };
+  });
+  return config.temperatureRules;
+}
+function ensureApplianceState(){ if(!config){ config={modes:[{id:'home',label:tt('Thuis','Home')}],currentMode:'home',rules:{},zoneRules:[],temperatureRules:[],applianceRules:[],applianceState:{},scheduleRules:[],autoMode:{}}; } config.applianceRules=Array.isArray(config.applianceRules)?config.applianceRules:[]; config.applianceState=config.applianceState&&typeof config.applianceState==='object'?config.applianceState:{}; environment=environment||{}; environment.powerDevices=Array.isArray(environment.powerDevices)?environment.powerDevices:[]; environment.motionDevices=Array.isArray(environment.motionDevices)?environment.motionDevices:[]; environment.contactDevices=Array.isArray(environment.contactDevices)?environment.contactDevices:[]; }
+function applianceTypeName(type){ const map={washing_machine:tt('Wasmachine','Washing machine'),dryer:tt('Droger','Dryer'),dishwasher:tt('Vaatwasser','Dishwasher'),airfryer:'Airfryer',other:tt('Apparaat','Appliance')}; return map[type]||map.other; }
+function defaultAppliance(type){ const d={washing_machine:{startThreshold:10,startDelaySeconds:30,readyThreshold:3,readyDelaySeconds:180},dryer:{startThreshold:50,startDelaySeconds:30,readyThreshold:5,readyDelaySeconds:180},dishwasher:{startThreshold:10,startDelaySeconds:30,readyThreshold:3,readyDelaySeconds:300},airfryer:{startThreshold:100,startDelaySeconds:5,readyThreshold:5,readyDelaySeconds:60},other:{startThreshold:10,startDelaySeconds:30,readyThreshold:3,readyDelaySeconds:180}}; return d[type]||d.other; }
+function formatApplianceKwh(v){
+  const n = Number(v);
+  if(!Number.isFinite(n) || n <= 0) return '';
+
+  return ` · ${n.toLocaleString(
+    APP_LANG === 'en' ? 'en-US' : 'nl-NL',
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 3
+    }
+  )} kWh`;
+}
+function formatApplianceDuration(ms){ const n=Number(ms); if(!Number.isFinite(n)||n<=0) return ''; const total=Math.max(0,Math.round(n/1000)); const h=Math.floor(total/3600); const m=Math.floor((total%3600)/60); const sec=total%60; const text=h>0?`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`:`${m}:${String(sec).padStart(2,'0')}`; return ` · ${tt('Duur','Duration')}: ${text}`; }
+function applianceStatusText(r){ const st=(config.applianceState&&config.applianceState[r.id])||{}; const status=st.status||'idle'; const power=typeof st.lastPower==='number'?` · ${Math.round(st.lastPower)}W`:''; const energy=formatApplianceKwh(st.finalEnergyKwh ?? st.energyKwh); const duration=formatApplianceDuration(st.finalDurationMs ?? st.durationMs); if(status==='running') return tt('Actief','Running')+power+duration+energy; if(status==='ready') return tt('Klaar / wacht op reset','Ready / waiting for reset')+power+duration+energy; return tt('Uit / idle','Off / idle')+power+energy; }
+function summarizeApplianceRule(r){ const dev=(environment.powerDevices||[]).find(d=>d.id===r.deviceId); return `${applianceTypeName(r.type)} · ${(dev&&dev.name)||tt('geen apparaat gekozen','no device selected')} · ${r.startThreshold||0}W → ${r.readyThreshold||0}W · ${applianceStatusText(r)}`; }
+function renderApplianceRules(){ ensureApplianceState(); const h=document.getElementById('applianceRules'); if(!h) return; h.innerHTML=''; if(!config.applianceRules.length) h.appendChild(el('section',{class:'card'},[el('p',{text:tt('Nog geen apparaatmeldingen.', 'No appliance notifications yet.')})])); config.applianceRules.forEach((r,i)=>h.appendChild(renderApplianceRule(r,i))); }
+function renderApplianceRule(r,i){ const type=buildSelect([{id:'washing_machine',name:tt('Wasmachine','Washing machine')},{id:'dryer',name:tt('Droger','Dryer')},{id:'dishwasher',name:tt('Vaatwasser','Dishwasher')},{id:'airfryer',name:'Airfryer'},{id:'other',name:tt('Overig','Other')}],[r.type||'washing_machine'],false); type.dataset.field='type'; type.addEventListener('change',()=>{ const d=defaultAppliance(type.value); r.type=type.value; r.startThreshold=d.startThreshold; r.startDelaySeconds=d.startDelaySeconds; r.readyThreshold=d.readyThreshold; r.readyDelaySeconds=d.readyDelaySeconds; renderApplianceRules(); }); const name=el('input',{value:r.name||'','data-field':'name'}); const device=buildSelect(environment.powerDevices||[],[r.deviceId||''],false); device.dataset.field='deviceId'; device.addEventListener('change',()=>{ collectApplianceRules(); renderApplianceRules(); }); const availableMotion=applianceZoneDevices(environment.motionDevices||[],r.deviceId); const availableContact=applianceZoneDevices(environment.contactDevices||[],r.deviceId); const availableLights=applianceZoneDevices(environment.lightDevices||[],r.deviceId).filter(d=>d.id!==r.deviceId); const selectedMotion=(r.resetMotionDeviceIds||[]).filter(id=>availableMotion.some(d=>d.id===id)); const selectedContact=(r.resetContactDeviceIds||[]).filter(id=>availableContact.some(d=>d.id===id)); const selectedLights=(r.resetLightDeviceIds||[]).filter(id=>availableLights.some(d=>d.id===id)); const statusInfo=el('p',{text:applianceStatusText(r)}); const start=el('input',{type:'number',min:'1',max:'5000',step:'1',value:String(r.startThreshold||10),'data-field':'startThreshold'}); const startDelay=el('input',{type:'number',min:'0',max:'600',step:'5',value:String(r.startDelaySeconds||30),'data-field':'startDelaySeconds'}); const ready=el('input',{type:'number',min:'0',max:'1000',step:'1',value:String(r.readyThreshold||3),'data-field':'readyThreshold'}); const readyDelay=el('input',{type:'number',min:'10',max:'7200',step:'10',value:String(r.readyDelaySeconds||180),'data-field':'readyDelaySeconds'}); const resetMode=buildSelect([{id:'manual',name:tt('Handmatig / bij nieuwe start','Manual / on new run')},{id:'activity',name:tt('Na activiteit','After activity')},{id:'timer',name:tt('Na vaste tijd','After fixed time')}],[r.resetMode||((r.resetAfterReadySeconds||0)>0?'timer':'manual')],false); resetMode.dataset.field='resetMode'; const reset=el('input',{type:'number',min:'0',max:'86400',step:'60',value:String(r.resetAfterReadySeconds||0),'data-field':'resetAfterReadySeconds'}); const resetMotion=buildSelect(availableMotion,selectedMotion,true); resetMotion.dataset.field='resetMotionDeviceIds'; const resetContact=buildSelect(availableContact,selectedContact,true); resetContact.dataset.field='resetContactDeviceIds'; const resetLights=buildSelect(availableLights,selectedLights,true); resetLights.dataset.field='resetLightDeviceIds'; const reminder=el('input',{type:'number',min:'60',max:'86400',step:'60',value:String(r.readyReminderSeconds||1800),'data-field':'readyReminderSeconds'}); const remove=el('button',{class:'btn-danger',type:'button',text:tt('Verwijderen','Delete')}); remove.addEventListener('click',()=>{ collectApplianceRules(); config.applianceRules.splice(i,1); renderApplianceRules(); }); return foldCard(r.id||`appliance-${i}`,r.name||applianceTypeName(r.type),summarizeApplianceRule(r),openApplianceIds,[fieldBlock(tt('Status','Status'),statusInfo),fieldBlock(tt('Naam','Name'),name),el('div',{class:'two'},[fieldBlock(tt('Type','Type'),type),fieldBlock(tt('Slimme stekker / apparaat','Smart plug / device'),device,tt('Kies een apparaat met stroommeting (measure_power).','Choose a device with power measurement (measure_power).'))]),el('div',{class:'three'},[fieldBlock(tt('Start boven watt','Start above watts'),start),fieldBlock(tt('Startvertraging sec.','Start delay sec.'),startDelay),fieldBlock(tt('Klaar onder watt','Ready below watts'),ready)]),el('div',{class:'two'},[fieldBlock(tt('Klaarvertraging sec.','Ready delay sec.'),readyDelay),fieldBlock(tt('Reset na klaar','Reset after ready'),resetMode,tt('Reset pas nadat het apparaat klaar is.','Reset only after the appliance is ready.'))]),el('div',{class:'three'},[fieldBlock(tt('Reset na sec.','Reset after sec.'),reset,tt('Alleen gebruikt bij vaste tijd. 0 = niet automatisch.','Only used for fixed time. 0 = no automatic reset.')),fieldBlock(tt('Reset bij beweging','Reset on motion'),resetMotion,tt('Alleen sensoren in dezelfde zone als het gekozen apparaat en onderliggende zones.','Only sensors in the same zone as the selected appliance and child zones.')),fieldBlock(tt('Reset bij deur open','Reset on door opened'),resetContact,tt('Alleen sensoren in dezelfde zone als het gekozen apparaat en onderliggende zones.','Only sensors in the same zone as the selected appliance and child zones.')),fieldBlock(tt('Reset bij lamp aan','Reset on light on'),resetLights,tt('Kies specifieke lampen in dezelfde zone als het gekozen apparaat en onderliggende zones.','Choose specific lights in the same zone as the selected appliance and child zones.'))]),checkbox('enabled',r.enabled,tt('Monitoring actief','Monitoring active')),checkbox('notifyOnStart',r.notifyOnStart,tt('Flow-trigger bij starten','Flow trigger when started')),checkbox('notifyOnReady',r.notifyOnReady!==false,tt('Flow-trigger als klaar','Flow trigger when ready')),checkbox('repeatReadyNotification',r.repeatReadyNotification,tt('Herhaal klaar-trigger tot reset','Repeat ready trigger until reset')),fieldBlock(tt('Herhaal elke sec.','Repeat every sec.'),reminder),checkbox('useTimelineNotification',r.useTimelineNotification,tt('Ook op Activiteiten-tijdlijn zetten','Also add to Activity timeline')),remove]); }
+function collectApplianceRules(){ ensureApplianceState(); const cards=Array.from(document.querySelectorAll('#applianceRules [data-id]')); config.applianceRules=cards.map((card,i)=>{ const base=config.applianceRules[i]||{}; const get=f=>card.querySelector(`[data-field="${f}"]`); const selected=f=>Array.from(card.querySelectorAll(`[data-field="${f}"] option:checked`)).map(o=>o.value).filter(Boolean); return {...base,name:get('name')?.value||base.name||'',enabled:get('enabled')?get('enabled').checked:true,type:get('type')?.value||base.type||'washing_machine',deviceId:get('deviceId')?.value||base.deviceId||'',startThreshold:Number(get('startThreshold')?.value||base.startThreshold||10),startDelaySeconds:Number(get('startDelaySeconds')?.value||base.startDelaySeconds||30),readyThreshold:Number(get('readyThreshold')?.value||base.readyThreshold||3),readyDelaySeconds:Number(get('readyDelaySeconds')?.value||base.readyDelaySeconds||180),resetMode:get('resetMode')?.value||base.resetMode||'manual',resetAfterReadySeconds:Number(get('resetAfterReadySeconds')?.value||base.resetAfterReadySeconds||0),resetMotionDeviceIds:selected('resetMotionDeviceIds'),resetContactDeviceIds:selected('resetContactDeviceIds'),resetLightDeviceIds:selected('resetLightDeviceIds'),resetZoneActivity:false,repeatReadyNotification:get('repeatReadyNotification')?get('repeatReadyNotification').checked:false,readyReminderSeconds:Number(get('readyReminderSeconds')?.value||base.readyReminderSeconds||1800),notifyOnStart:get('notifyOnStart')?get('notifyOnStart').checked:false,notifyOnReady:get('notifyOnReady')?get('notifyOnReady').checked:true,useTimelineNotification:get('useTimelineNotification')?get('useTimelineNotification').checked:false}; }); return config.applianceRules; }
+function addApplianceRule(){ ensureApplianceState(); const type='washing_machine'; const d=defaultAppliance(type); const rule={id:`appliance-${Date.now()}`,name:applianceTypeName(type),enabled:true,type,deviceId:(environment.powerDevices&&environment.powerDevices[0]&&environment.powerDevices[0].id)||'',...d,resetMode:'manual',resetAfterReadySeconds:0,resetMotionDeviceIds:[],resetContactDeviceIds:[],resetLightDeviceIds:[],resetZoneActivity:false,repeatReadyNotification:false,readyReminderSeconds:1800,notifyOnStart:false,notifyOnReady:true,useTimelineNotification:false}; config.applianceRules.push(rule); openApplianceIds.add(rule.id); renderApplianceRules(); setTimeout(()=>openFoldModal(document.querySelector(`[data-id="${rule.id}"]`)),0); showToast(tt('Apparaatmelding toegevoegd. Vergeet niet op Alles opslaan te klikken.', 'Appliance notification added. Do not forget to click Save all.')); }
+
+function summarizeSchedule(r){ const modes=(r.modeIds||[]).map(id=>config.modes.find(m=>m.id===id)?.label||id).join(', ')||tt('alle modi','all modes'); let time=tt('om ','at ')+(r.fixedTime||'19:00'); if(r.timeMode==='random') time='random '+(r.randomFrom||'18:30')+'-'+(r.randomTo||'23:00'); if(r.timeMode==='sunrise') time=tt('zonsopkomst','sunrise')+formatOffset(r.sunOffsetMinutes||0); if(r.timeMode==='sunset') time=tt('zonsondergang','sunset')+formatOffset(r.sunOffsetMinutes||0); const lux=r.luxCondition?(' · lux '+(r.luxOperator==='above'?'>=':'<=')+' '+(r.luxThreshold||30)):''; const follow=(r.action==='on'&&r.autoOffEnabled)?(' · '+tt('uit:','off:')+' '+(r.autoOffMode==='time'?(r.autoOffTime||'23:00'):(r.autoOffAfterHours||1)+'h')):(r.action==='off'&&r.autoOnEnabled)?(' · '+tt('aan:','on:')+' '+(r.autoOnMode==='time'?(r.autoOnTime||'07:00'):(r.autoOnAfterHours||1)+'h')):''; return `${r.action==='on'?tt('aan','on'):tt('uit','off')} · ${time}${follow}${lux} · ${modes} · ${(r.deviceIds||[]).length} ${tt('apparaten','devices')}`; }
+function formatOffset(min){ min=Number(min||0); if(!min) return ''; return ' '+(min>0?'+':'')+min+' min'; }
+function renderScheduleRules(){ const h=document.getElementById('scheduleRules'); h.innerHTML=''; if(!config.scheduleRules.length) h.appendChild(el('section',{class:'card'},[el('p',{text:tt('Nog geen planningen.', 'No schedules yet.')})])); config.scheduleRules.forEach((r,i)=>h.appendChild(renderScheduleRule(r,i))); }
+function renderScheduleRule(r,i){ const name=el('input',{value:r.name||'','data-field':'name'}); const devices=buildSelect(environment.switchableDevices,r.deviceIds); devices.dataset.field='deviceIds'; const modes=buildSelect(config.modes.map(m=>({id:m.id,name:m.label})),r.modeIds); modes.dataset.field='modeIds'; const action=buildSelect([{id:'on',name:tt('Aan','On')},{id:'off',name:tt('Uit','Off')}],[r.action||'on'],false); action.dataset.field='action'; const timeMode=buildSelect([{id:'fixed',name:tt('Vaste tijd','Fixed time')},{id:'random',name:tt('Random tussen tijden','Random between times')},{id:'sunrise',name:tt('Zonsopkomst','Sunrise')},{id:'sunset',name:tt('Zonsondergang','Sunset')}],[r.timeMode||'fixed'],false); timeMode.dataset.field='timeMode'; const fixed=el('input',{type:'time',value:r.fixedTime||'19:00','data-field':'fixedTime'}); const randomFrom=el('input',{type:'time',value:r.randomFrom||'18:30','data-field':'randomFrom'}); const randomTo=el('input',{type:'time',value:r.randomTo||'23:00','data-field':'randomTo'}); const offset=el('input',{type:'number',min:'-720',max:'720',step:'1',value:String(r.sunOffsetMinutes||0),'data-field':'sunOffsetMinutes'}); const zone=buildSelect(environment.zones||[],[r.zoneId||''],false); zone.dataset.field='zoneId'; zone.addEventListener('change',()=>{ collectScheduleRules(); renderScheduleRules(); }); const include=checkbox('includeSubzones',r.includeSubzones,tt('Onderliggende subzones/kamers meenemen','Include subzones/rooms')); include.querySelector('input').addEventListener('change',()=>{ collectScheduleRules(); renderScheduleRules(); }); const luxDevices=buildSelect(devicesInZone(environment.luminanceDevices||[],r.zoneId,r.includeSubzones),r.luxDeviceIds||[]); luxDevices.dataset.field='luxDeviceIds'; const luxOperator=buildSelect([{id:'below',name:tt('lager dan of gelijk aan','below or equal to')},{id:'above',name:tt('hoger dan of gelijk aan','above or equal to')}],[r.luxOperator||'below'],false); luxOperator.dataset.field='luxOperator'; const luxThreshold=el('input',{type:'number',min:'0',max:'100000',step:'1',value:String(r.luxThreshold||30),'data-field':'luxThreshold'}); const days=buildSelect(DAYS,r.days||[0,1,2,3,4,5,6]); days.dataset.field='days'; const autoOffMode=buildSelect([{id:'hours',name:tt('Na X uur','After X hours')},{id:'time',name:tt('Op vaste tijd','At fixed time')},{id:'random_hours',name:tt('Random na X-Y uur','Random after X-Y hours')},{id:'random_time',name:tt('Random tussen tijden','Random between times')}],[r.autoOffMode||'hours'],false); autoOffMode.dataset.field='autoOffMode'; const autoOffHours=el('input',{type:'number',min:'0.1',max:'48',step:'0.1',value:String(r.autoOffAfterHours||1),'data-field':'autoOffAfterHours'}); const autoOffTime=el('input',{type:'time',value:r.autoOffTime||'23:00','data-field':'autoOffTime'}); const autoOffRandomFromHours=el('input',{type:'number',min:'0.1',max:'48',step:'0.1',value:String(r.autoOffRandomFromHours||0.5),'data-field':'autoOffRandomFromHours'}); const autoOffRandomToHours=el('input',{type:'number',min:'0.1',max:'48',step:'0.1',value:String(r.autoOffRandomToHours||2),'data-field':'autoOffRandomToHours'}); const autoOffRandomFromTime=el('input',{type:'time',value:r.autoOffRandomFromTime||'22:00','data-field':'autoOffRandomFromTime'}); const autoOffRandomToTime=el('input',{type:'time',value:r.autoOffRandomToTime||'23:30','data-field':'autoOffRandomToTime'}); const autoOnMode=buildSelect([{id:'hours',name:tt('Na X uur','After X hours')},{id:'time',name:tt('Op vaste tijd','At fixed time')},{id:'random_hours',name:tt('Random na X-Y uur','Random after X-Y hours')},{id:'random_time',name:tt('Random tussen tijden','Random between times')}],[r.autoOnMode||'hours'],false); autoOnMode.dataset.field='autoOnMode'; const autoOnHours=el('input',{type:'number',min:'0.1',max:'48',step:'0.1',value:String(r.autoOnAfterHours||1),'data-field':'autoOnAfterHours'}); const autoOnTime=el('input',{type:'time',value:r.autoOnTime||'07:00','data-field':'autoOnTime'}); const autoOnRandomFromHours=el('input',{type:'number',min:'0.1',max:'48',step:'0.1',value:String(r.autoOnRandomFromHours||0.5),'data-field':'autoOnRandomFromHours'}); const autoOnRandomToHours=el('input',{type:'number',min:'0.1',max:'48',step:'0.1',value:String(r.autoOnRandomToHours||2),'data-field':'autoOnRandomToHours'}); const autoOnRandomFromTime=el('input',{type:'time',value:r.autoOnRandomFromTime||'06:30','data-field':'autoOnRandomFromTime'}); const autoOnRandomToTime=el('input',{type:'time',value:r.autoOnRandomToTime||'08:00','data-field':'autoOnRandomToTime'}); const remove=el('button',{class:'btn-danger',type:'button',text:tt('Verwijderen', 'Delete')}); remove.addEventListener('click',()=>{ collectScheduleRules(); config.scheduleRules.splice(i,1); renderScheduleRules(); }); return foldCard(r.id||`schedule-${i}`,r.name||tt('Planning','Schedule'),summarizeSchedule(r),openScheduleIds,[fieldBlock(tt('Naam','Name'),name),el('div',{class:'two'},[fieldBlock(tt('Actie','Action'),action),fieldBlock(tt('Alleen in modussen','Only in modes'),modes)]),fieldBlock(tt('Apparaten/lampen','Devices/lights'),devices),el('div',{class:'three'},[fieldBlock(tt('Tijdtype','Time type'),timeMode),fieldBlock(tt('Vaste tijd','Fixed time'),fixed),fieldBlock(tt('Offset bij zon','Sun offset'),offset,tt('Minuten voor/na zonsopkomst of zonsondergang. Bijvoorbeeld -30 of 15.', 'Minutes before/after sunrise or sunset. For example -30 or 15.'))]),el('div',{class:'two'},[fieldBlock(tt('Random vanaf','Random from'),randomFrom),fieldBlock(tt('Random tot','Random until'),randomTo)]),fieldBlock(tt('Dagen','Days'),days,tt('Leeg betekent: alle dagen.', 'Empty means: every day.')),el('h3',{text:tt('Vervolgactie na uitvoeren','Follow-up action after running')}),checkbox('autoOffEnabled',r.autoOffEnabled,tt('Als deze planning inschakelt: automatisch weer uitzetten','When this schedule turns on: automatically switch off')),el('div',{class:'three'},[fieldBlock(tt('Uitzetten via','Switch off by'),autoOffMode),fieldBlock(tt('Na aantal uur uit','Switch off after hours'),autoOffHours),fieldBlock(tt('Uit om tijdstip','Switch off at time'),autoOffTime)]),el('div',{class:'two'},[fieldBlock(tt('Random na vanaf uur','Random after from hours'),autoOffRandomFromHours),fieldBlock(tt('Random na tot uur','Random after until hours'),autoOffRandomToHours)]),el('div',{class:'two'},[fieldBlock(tt('Random uit vanaf','Random off from'),autoOffRandomFromTime),fieldBlock(tt('Random uit tot','Random off until'),autoOffRandomToTime)]),checkbox('autoOnEnabled',r.autoOnEnabled,tt('Als deze planning uitschakelt: automatisch weer aanzetten','When this schedule turns off: automatically switch on')),el('div',{class:'three'},[fieldBlock(tt('Aanzetten via','Switch on by'),autoOnMode),fieldBlock(tt('Na aantal uur aan','Switch on after hours'),autoOnHours),fieldBlock(tt('Aan om tijdstip','Switch on at time'),autoOnTime)]),el('div',{class:'two'},[fieldBlock(tt('Random aan na vanaf uur','Random on after from hours'),autoOnRandomFromHours),fieldBlock(tt('Random aan na tot uur','Random on after until hours'),autoOnRandomToHours)]),el('div',{class:'two'},[fieldBlock(tt('Random aan vanaf','Random on from'),autoOnRandomFromTime),fieldBlock(tt('Random aan tot','Random on until'),autoOnRandomToTime)]),el('p',{class:'hint',text:tt('Automatisch uitzetten verschijnt alleen bij actie Aan. Automatisch aanzetten verschijnt alleen bij actie Uit.', 'Automatic switch-off is only shown for action On. Automatic switch-on is only shown for action Off.')}),el('h3',{text:tt('Lux voorwaarde','Lux condition')}),checkbox('luxCondition',r.luxCondition,tt('Alleen uitvoeren bij luxvoorwaarde','Only run when lux condition matches')),el('div',{class:'two'},[fieldBlock(tt('Zone/kamer voor lux','Zone/room for lux'),zone),el('div',{},[include])]),fieldBlock(tt('Luxsensoren','Lux sensors'),luxDevices,tt('Leeg laten = alle luxsensoren in deze zone.', 'Leave empty = all lux sensors in this zone.')),el('div',{class:'two'},[fieldBlock(tt('Voorwaarde','Condition'),luxOperator),fieldBlock(tt('Luxwaarde','Lux value'),luxThreshold)]),el('div',{},[checkbox('enabled',r.enabled,tt('Planning actief','Schedule active'))]),remove]); }
+function collectScheduleRules(){ const cards=Array.from(document.querySelectorAll('#scheduleRules [data-id]')); config.scheduleRules=cards.map((card,i)=>{ const base=config.scheduleRules[i]||{}; const get=f=>card.querySelector(`[data-field="${f}"]`); return {...base,name:get('name')?.value||'',enabled:get('enabled')?get('enabled').checked:true,modeIds:get('modeIds')?selectedValues(get('modeIds')):[],deviceIds:get('deviceIds')?selectedValues(get('deviceIds')):[],action:get('action')?.value||'on',timeMode:get('timeMode')?.value||'fixed',fixedTime:get('fixedTime')?.value||'19:00',randomFrom:get('randomFrom')?.value||'18:30',randomTo:get('randomTo')?.value||'23:00',sunOffsetMinutes:Number(get('sunOffsetMinutes')?.value||0),autoOffEnabled:get('autoOffEnabled')?get('autoOffEnabled').checked:false,autoOffMode:get('autoOffMode')?.value||'hours',autoOffAfterHours:Number(get('autoOffAfterHours')?.value||1),autoOffTime:get('autoOffTime')?.value||'23:00',autoOffRandomFromHours:Number(get('autoOffRandomFromHours')?.value||0.5),autoOffRandomToHours:Number(get('autoOffRandomToHours')?.value||2),autoOffRandomFromTime:get('autoOffRandomFromTime')?.value||'22:00',autoOffRandomToTime:get('autoOffRandomToTime')?.value||'23:30',autoOnEnabled:get('autoOnEnabled')?get('autoOnEnabled').checked:false,autoOnMode:get('autoOnMode')?.value||'hours',autoOnAfterHours:Number(get('autoOnAfterHours')?.value||1),autoOnTime:get('autoOnTime')?.value||'07:00',autoOnRandomFromHours:Number(get('autoOnRandomFromHours')?.value||0.5),autoOnRandomToHours:Number(get('autoOnRandomToHours')?.value||2),autoOnRandomFromTime:get('autoOnRandomFromTime')?.value||'06:30',autoOnRandomToTime:get('autoOnRandomToTime')?.value||'08:00',zoneId:get('zoneId')?.value||'',includeSubzones:get('includeSubzones')?get('includeSubzones').checked:false,luxCondition:get('luxCondition')?get('luxCondition').checked:false,luxDeviceIds:get('luxDeviceIds')?selectedValues(get('luxDeviceIds')):[],luxOperator:get('luxOperator')?.value||'below',luxThreshold:Number(get('luxThreshold')?.value||30),days:get('days')?selectedValues(get('days')).map(Number):[0,1,2,3,4,5,6]}; }); return config.scheduleRules; }
+function addScheduleRule(){ const rule={id:`schedule-${Date.now()}`,name:tt('Nieuwe planning','New schedule'),enabled:true,modeIds:config.modes.map(m=>m.id),deviceIds:[],action:'on',timeMode:'fixed',fixedTime:'19:00',randomFrom:'18:30',randomTo:'23:00',sunOffsetMinutes:0,autoOffEnabled:false,autoOffMode:'hours',autoOffAfterHours:1,autoOffTime:'23:00',autoOffRandomFromHours:0.5,autoOffRandomToHours:2,autoOffRandomFromTime:'22:00',autoOffRandomToTime:'23:30',autoOnEnabled:false,autoOnMode:'hours',autoOnAfterHours:1,autoOnTime:'07:00',autoOnRandomFromHours:0.5,autoOnRandomToHours:2,autoOnRandomFromTime:'06:30',autoOnRandomToTime:'08:00',zoneId:(environment.zones&&environment.zones[0]&&environment.zones[0].id)||'',includeSubzones:true,luxCondition:false,luxDeviceIds:[],luxOperator:'below',luxThreshold:30,days:[0,1,2,3,4,5,6]}; config.scheduleRules.push(rule); openScheduleIds.add(rule.id); renderScheduleRules(); setTimeout(()=>openFoldModal(document.querySelector(`[data-id="${rule.id}"]`)),0); }
+
+
+const EXPORT_SECTIONS=[{id:'subModes',labelNl:'Submodussen',labelEn:'Sub modes'},{id:'rules',labelNl:'Modusregels',labelEn:'Mode rules'},{id:'zoneRules',labelNl:'Zoneregels',labelEn:'Zone rules'},{id:'temperatureRules',labelNl:'Temperatuurregels',labelEn:'Temperature rules'},{id:'applianceRules',labelNl:'Monitoring',labelEn:'Monitoring'},{id:'scheduleRules',labelNl:'Planning',labelEn:'Schedule'},{id:'autoMode',labelNl:'Automatische modus',labelEn:'Automatic mode'}];
+let pendingImportData=null;
+function sectionLabel(section){ return tt(section.labelNl,section.labelEn); }
+function renderExportImport(){ const exportBox=document.getElementById('exportSectionList'); const importBox=document.getElementById('importSectionList'); if(exportBox&&!exportBox.dataset.rendered){ exportBox.dataset.rendered='1'; EXPORT_SECTIONS.forEach(section=>exportBox.appendChild(checkbox('export_'+section.id,true,sectionLabel(section)))); } if(importBox&&!importBox.dataset.rendered){ importBox.dataset.rendered='1'; EXPORT_SECTIONS.forEach(section=>importBox.appendChild(checkbox('import_'+section.id,true,sectionLabel(section)))); } }
+function selectedSectionIds(prefix){ return EXPORT_SECTIONS.filter(section=>document.querySelector('[data-field="'+prefix+section.id+'"]')?.checked).map(section=>section.id); }
+function cloneData(value){ return JSON.parse(JSON.stringify(value)); }
+function buildExportData(sectionIds){ collectSubModes(); collectZoneRules(); collectTemperatureRules(); collectApplianceRules(); collectScheduleRules(); collectAutoMode(); const data={meta:{app:'com.eevoosten.modeswitch',name:'Mode Switch',version: '2.6.30',exportedAt:new Date().toISOString()},sections:{}}; sectionIds.forEach(id=>{ data.sections[id]=cloneData(config[id] ?? (id==='rules'?{}:[])); }); return data; }
+async function copyExportJson(){
+  renderExportImport();
+  const sectionIds=selectedSectionIds('export_');
+  if(!sectionIds.length){ showToast(tt('Kies minimaal 1 onderdeel om te exporteren.','Select at least 1 section to export.'),'error'); return; }
+  const json=JSON.stringify(buildExportData(sectionIds),null,2);
+  const area=document.getElementById('exportDownloadArea');
+  if(area){
+    area.innerHTML='';
+    const hint=document.createElement('div');
+    hint.className='hint';
+    hint.textContent=tt('JSON staat klaar. Kopieer via de knop of handmatig vanuit het tekstveld hieronder.','JSON is ready. Copy it with the button or manually from the text field below.');
+    area.appendChild(hint);
+    const box=document.createElement('textarea');
+    box.value=json;
+    box.readOnly=true;
+    box.style.display='block';
+    box.style.width='100%';
+    box.style.minHeight='260px';
+    box.style.marginTop='10px';
+    area.appendChild(box);
+    box.focus();
+    box.select();
+    try{ await navigator.clipboard.writeText(json); showToast(tt('JSON gekopieerd naar klembord.','JSON copied to clipboard.')); }catch(e){ showToast(tt('Selecteer en kopieer de JSON handmatig.','Select and copy the JSON manually.')); }
+  }
+}
+
+function updateImportPreview(data){ const preview=document.getElementById('importPreview'); const keys=Object.keys(data?.sections||{}); if(preview) preview.textContent=keys.length ? tt('Gevonden onderdelen: ','Found sections: ')+keys.map(id=>sectionLabel(EXPORT_SECTIONS.find(s=>s.id===id)||{labelNl:id,labelEn:id})).join(', ') : tt('Geen geldige onderdelen gevonden.','No valid sections found.'); EXPORT_SECTIONS.forEach(section=>{ const cb=document.querySelector('[data-field="import_'+section.id+'"]'); if(cb){ cb.disabled=!keys.includes(section.id); cb.checked=keys.includes(section.id); } }); }
+function readFileAsText(file){ return new Promise((resolve,reject)=>{ try{ if(file && typeof file.text==='function'){ file.text().then(resolve).catch(()=>{ const reader=new FileReader(); reader.onload=()=>resolve(String(reader.result||'')); reader.onerror=()=>reject(reader.error||new Error('Kan bestand niet lezen.')); reader.readAsText(file); }); return; } const reader=new FileReader(); reader.onload=()=>resolve(String(reader.result||'')); reader.onerror=()=>reject(reader.error||new Error('Kan bestand niet lezen.')); reader.readAsText(file); }catch(e){ reject(e); } }); }
+function loadImportJsonText(text){ const data=JSON.parse(String(text||'')); if(!data||typeof data!=='object'||!data.sections||typeof data.sections!=='object') throw new Error(tt('Geen geldig Mode Switch exportbestand.','Not a valid Mode Switch export file.')); pendingImportData=data; updateImportPreview(data); return data; }
+async function handleImportFile(event){ const file=event.target.files&&event.target.files[0]; if(!file) return; try{ const text=await readFileAsText(file); const ta=document.getElementById('importJsonText'); if(ta) ta.value=text; loadImportJsonText(text); showToast(tt('Importbestand geladen. Kies onderdelen en klik op import toepassen.','Import file loaded. Select sections and apply import.')); }catch(e){ pendingImportData=null; updateImportPreview(null); showToast(e.message||String(e),'error'); } }
+async function applyImport(){
+  const btn=document.getElementById('importBtn');
+  if(btn) btn.disabled=true;
+  try{
+    if(!pendingImportData){
+      const text=(document.getElementById('importJsonText')?.value||'').trim();
+      if(text) loadImportJsonText(text);
+    }
+    if(!pendingImportData){ showToast(tt('Kies eerst een importbestand of plak JSON.','Choose an import file first or paste JSON.'),'error'); return; }
+    const ids=selectedSectionIds('import_').filter(id=>Object.prototype.hasOwnProperty.call(pendingImportData.sections,id));
+    if(!ids.length){ showToast(tt('Kies minimaal 1 onderdeel om te importeren.','Select at least 1 section to import.'),'error'); return; }
+    const preview=document.getElementById('importPreview');
+    if(preview) preview.textContent=tt('Import wordt toegepast...','Applying import...');
+    const result=await api('POST','/import',{ids,sections:pendingImportData.sections});
+    await loadData();
+    if(preview) preview.textContent=tt('Import toegepast: ','Import applied: ')+(result.imported||ids).map(id=>sectionLabel(EXPORT_SECTIONS.find(s=>s.id===id)||{labelNl:id,labelEn:id})).join(', ');
+    showToast(tt('Import toegepast.','Import applied.'));
+  }catch(e){
+    showToast(e.message||String(e),'error');
+    const preview=document.getElementById('importPreview');
+    if(preview) preview.textContent=tt('Import mislukt: ','Import failed: ')+(e.message||String(e));
+  }finally{
+    if(btn) btn.disabled=false;
+  }
+}
+function normalizeSleepPowerRules(auto){
+  const s=auto||{};
+  const existing=Array.isArray(s.sleepPowerRules)?s.sleepPowerRules:[];
+  if(existing.length){
+    return existing.map(r=>({
+      id:r.id||('spr_'+Date.now()+'_'+Math.random().toString(16).slice(2)),
+      deviceId:r.deviceId||'',
+      operator:r.operator==='above'?'above':'below',
+      watt:Number(r.watt ?? (r.operator==='above'?s.sleepPowerAbove:s.sleepPowerBelow) ?? 0)
+    }));
+  }
+  const ids=Array.isArray(s.sleepPowerDeviceIds)?s.sleepPowerDeviceIds:[];
+  if(ids.length){
+    const rules=[];
+    const below=Number(s.sleepPowerBelow||0);
+    const above=Number(s.sleepPowerAbove||0);
+    ids.forEach(id=>{
+      if(below>0) rules.push({id:'spr_'+id+'_below',deviceId:id,operator:'below',watt:below});
+      if(above>0) rules.push({id:'spr_'+id+'_above',deviceId:id,operator:'above',watt:above});
+    });
+    return rules;
+  }
+  return [];
+}
+function renderSleepPowerRules(auto){
+  const rules=normalizeSleepPowerRules(auto);
+  const wrap=el('div',{id:'sleepPowerRules','data-field':'sleepPowerRules'});
+  const list=el('div',{class:'rule-list compact'});
+  if(!rules.length){
+    list.appendChild(el('div',{class:'hint',text:tt('Nog geen stopcontactregels. Voeg per stopcontact onder/boven + wattage toe.','No socket rules yet. Add below/above + wattage per socket.')}));
+  }
+  rules.forEach(rule=>{
+    const row=el('div',{class:'rule-row sleep-power-rule','data-rule-id':rule.id});
+    const device=buildSelect(environment.powerDevices||[],[rule.deviceId],false); device.dataset.field='sleepPowerDeviceId';
+    const op=buildSelect([{id:'below',name:tt('onder','below')},{id:'above',name:tt('boven','above')}],[rule.operator||'below'],false); op.dataset.field='sleepPowerOperator';
+    const watt=el('input',{type:'number',min:'0',max:'5000',step:'0.1',value:String(rule.watt||0),'data-field':'sleepPowerWatt'});
+    const del=el('button',{type:'button',class:'secondary',text:tt('Verwijder','Delete')});
+    del.addEventListener('click',()=>{ collectAutoMode(); config.autoMode.sleepPowerRules=(config.autoMode.sleepPowerRules||[]).filter(r=>r.id!==rule.id); renderAutoMode(); applyConditionalVisibility(); });
+    row.appendChild(fieldBlock(tt('Stopcontact','Socket'),device));
+    row.appendChild(fieldBlock(tt('Voorwaarde','Condition'),op));
+    row.appendChild(fieldBlock(tt('Wattage','Wattage'),watt));
+    row.appendChild(el('div',{class:'field'},[el('label',{text:' '}),del,el('div',{class:'hint',text:''})]));
+    list.appendChild(row);
+  });
+  const add=el('button',{type:'button',class:'secondary',text:tt('Stopcontactregel toevoegen','Add socket rule')});
+  add.addEventListener('click',()=>{
+    collectAutoMode();
+    config.autoMode.sleepPowerRules=config.autoMode.sleepPowerRules||[];
+    config.autoMode.sleepPowerRules.push({id:'spr_'+Date.now(),deviceId:'',operator:'below',watt:2});
+    renderAutoMode(); applyConditionalVisibility();
+  });
+  wrap.appendChild(list); wrap.appendChild(add); return wrap;
+}
+function collectSleepPowerRules(scope){
+  return Array.from(scope.querySelectorAll('.sleep-power-rule')).map(row=>({
+    id:row.dataset.ruleId||('spr_'+Date.now()),
+    deviceId:row.querySelector('[data-field="sleepPowerDeviceId"]')?.value||'',
+    operator:row.querySelector('[data-field="sleepPowerOperator"]')?.value==='above'?'above':'below',
+    watt:Number(row.querySelector('[data-field="sleepPowerWatt"]')?.value||0)
+  }));
+}
+function renderAutoMode(){
+  const s=config.autoMode||{};
+  s.sleepPowerRules=normalizeSleepPowerRules(s);
+  const h=document.getElementById('autoMode'); h.innerHTML='';
+  const source=buildSelect([{id:'devices',name:tt('Presence apparaten','Presence devices')},{id:'homey',name:tt('Homey gebruikers','Homey users')},{id:'both',name:tt('Beide bronnen','Both sources')}],[s.presenceSource||'devices'],false); source.dataset.field='presenceSource';
+  const presence=buildSelect(environment.presenceDevices||[],s.presenceDeviceIds||[]); presence.dataset.field='presenceDeviceIds';
+  const users=buildSelect((environment.homeyUsers||[]).map(u=>({id:u.id,name:(u.name||u.id)+(u.present===true?tt(' - thuis',' - home'):u.present===false?tt(' - afwezig',' - away'):'')+(u.asleep===true?tt(' - slaapt',' - asleep'):u.asleep===false?tt(' - wakker',' - awake'):'')})),s.homeyUserIds||[]); users.dataset.field='homeyUserIds';
+  const sleepMotion=buildSelect(environment.motionDevices||[],s.sleepMotionDeviceIds||[]); sleepMotion.dataset.field='sleepMotionDeviceIds';
+  const sleepContact=buildSelect(environment.contactDevices||[],s.sleepContactDeviceIds||[]); sleepContact.dataset.field='sleepContactDeviceIds';
+  const min=el('input',{type:'number',min:'1',max:'20',value:String(s.minPeopleHome||1),'data-field':'minPeopleHome'});
+  const vacation=el('input',{type:'number',min:'1',max:'720',value:String(s.vacationAfterHours||72),'data-field':'vacationAfterHours'});
+  const homeyHint=(environment.homeyUsers||[]).length?tt('Leeg laten = alle Homey gebruikers meenemen. Als jouw Homey geen presence-data teruggeeft, gebruik dan Presence apparaten of Beide.','Leave empty = include all Homey users. If your Homey does not return presence data, use Presence devices or Both.'):tt('Geen Homey gebruikers/presence gevonden. Gebruik Presence apparaten of probeer Beide.','No Homey users/presence found. Use Presence devices or try Both.');
+  h.appendChild(el('section',{class:'card'},[
+    el('h2',{text:tt('Automatische modus','Automatic mode')}),
+    el('p',{text:tt('Gebruik Homey gebruikers, presence-apparaten of beide. Slaap kan met samengestelde indicaties.','Use Homey users, presence devices or both. Sleep mode can use combined indicators.')}),
+    checkbox('enabled',s.enabled,tt('Automatische modus actief','Automatic mode active')),
+    fieldBlock(tt('Aanwezigheidsbron','Presence source'),source,tt('Kies Homey gebruikers voor native Homey Presence, of Beide als veilige fallback.','Choose Homey users for native Homey Presence, or Both as a safe fallback.')),
+    fieldBlock(tt('Homey gebruikers','Homey users'),users,homeyHint),
+    fieldBlock(tt('Presence apparaten/personen','Presence devices/people'),presence,tt('Alleen nodig bij bron Presence apparaten of Beide.','Only needed when using Presence devices or Both.')),
+    fieldBlock(tt('Minimaal aantal thuis voor modus Thuis','Minimum number at home for Home mode'),min),
+    fieldBlock(tt('Na hoeveel uur afwezig naar Vakantie','After how many hours away switch to Vacation'),vacation),
+    checkbox('enableSleepMode',s.enableSleepMode,tt('Automatisch naar Slapen inschakelen','Automatically enable Sleep mode')),
+    checkbox('enableWakeHomeMode',s.enableWakeHomeMode!==false,tt('Automatisch terug naar Thuis als iemand wakker én thuis is','Automatically return to Home when someone is awake and at home')),
+    el('h3',{text:tt('Slaapindicaties','Sleep indicators')}),
+    checkbox('sleepRequireAll',s.sleepRequireAll===true,tt('Alle gekozen slaapindicaties moeten waar zijn','All selected sleep indicators must be true')),
+    fieldBlock(tt('Bewegingssensoren zonder beweging','Motion sensors without motion'),sleepMotion,tt('Waar als alle gekozen bewegingssensoren geen beweging melden.','True when all selected motion sensors report no motion.')),
+    fieldBlock(tt('Deur-/raamcontacten gesloten','Door/window contacts closed'),sleepContact,tt('Waar als alle gekozen contacten dicht/inactief zijn.','True when all selected contacts are closed/inactive.')),
+    fieldBlock(tt('Stopcontactregels','Socket rules'),renderSleepPowerRules(s),tt('Per stopcontact kies je onder/boven en de wattagewaarde.','For each socket, choose below/above and the wattage value.'))
+  ]));
+}
+function renderDisplaySettings(){ const h=document.getElementById('displaySettings'); if(!h) return; config.displaySettings=config.displaySettings||{temperatureDeviceId:'',liveContextEnabled:false}; const devices=environment.temperatureSensorDevices||[]; const sel=buildSelect(devices,[config.displaySettings.temperatureDeviceId||''],false); sel.dataset.field='temperatureDeviceId'; sel.addEventListener('change',()=>{ collectDisplaySettings(); updateCurrentMode(config.currentMode); }); const live=checkbox('liveContextEnabled',config.displaySettings.liveContextEnabled===true,t('settings.display.live_context')); live.querySelector('input').addEventListener('change',()=>{ collectDisplaySettings(); updateCurrentMode(config.currentMode); }); h.innerHTML=''; h.appendChild(fieldBlock(t('settings.display.temperature_device'),sel,t('settings.display.temperature_device_hint'))); h.appendChild(fieldBlock(t('settings.display.live_context'),live,t('settings.display.live_context_hint'))); }
+function collectDisplaySettings(){ config.displaySettings=config.displaySettings||{temperatureDeviceId:'',liveContextEnabled:false}; return config.displaySettings; }
+
+function collectAutoMode(){
+  const h=document.getElementById('autoMode'); const get=f=>h.querySelector(`[data-field="${f}"]`);
+  config.autoMode={
+    enabled:get('enabled').checked,
+    presenceSource:get('presenceSource').value,
+    homeyUserIds:selectedValues(get('homeyUserIds')),
+    presenceDeviceIds:selectedValues(get('presenceDeviceIds')),
+    minPeopleHome:Number(get('minPeopleHome').value),
+    enableSleepMode:get('enableSleepMode').checked,
+    enableWakeHomeMode:get('enableWakeHomeMode').checked,
+    sleepMotionDeviceIds:selectedValues(get('sleepMotionDeviceIds')),
+    sleepContactDeviceIds:selectedValues(get('sleepContactDeviceIds')),
+    sleepPowerRules:collectSleepPowerRules(h),
+    sleepRequireAll:get('sleepRequireAll').checked,
+    vacationAfterHours:Number(get('vacationAfterHours').value)
+  };
+  return config.autoMode;
+}
+async function loadData(){ const [c,e]=await Promise.all([api('GET','/config'),api('GET','/environment')]); config=c; environment=e; config.subModes=config.subModes||[]; config.temperatureRules=config.temperatureRules||[]; config.applianceRules=config.applianceRules||[]; config.applianceState=config.applianceState||{}; config.displaySettings=config.displaySettings||{temperatureDeviceId:'',liveContextEnabled:false}; updateCurrentMode(config.currentMode); renderSubModes(); renderModes(); renderZoneRules(); renderApplianceRules(); renderScheduleRules(); renderAutoMode(); renderExportImport(); applyConditionalVisibility(); }
+async function saveAll(){ collectSubModes(); collectZoneRules(); collectTemperatureRules(); collectApplianceRules(); collectScheduleRules(); collectDisplaySettings(); collectAutoMode(); const subModeResult=await api('PUT','/sub_modes',{subModes:config.subModes}); config.subModes=subModeResult.subModes; config.modes=subModeResult.modes; const modeResult=await api('PUT','/rules',{rules:collectModeRules()}); const zoneResult=await api('PUT','/zone_rules',{zoneRules:config.zoneRules}); const tempResult=await api('PUT','/temperature_rules',{temperatureRules:config.temperatureRules}); const applianceResult=await api('PUT','/appliance_rules',{applianceRules:config.applianceRules}); const scheduleResult=await api('PUT','/schedule_rules',{scheduleRules:config.scheduleRules}); const autoResult=await api('PUT','/auto_mode',{autoMode:config.autoMode}); const displayResult=await api('PUT','/display_settings',{displaySettings:config.displaySettings}); config.rules=modeResult.rules; config.zoneRules=zoneResult.zoneRules; config.temperatureRules=tempResult.temperatureRules; config.applianceRules=applianceResult.applianceRules; config.applianceState=config.applianceState||{}; config.scheduleRules=scheduleResult.scheduleRules; config.autoMode=autoResult.autoMode; config.displaySettings=displayResult.displaySettings; updateCurrentMode(config.currentMode); showToast(tt('Instellingen opgeslagen', 'Settings saved')); }
+async function applyMode(mode){ await saveAll(); const r=await api('POST','/mode',{mode}); config.currentMode=r.mode; updateCurrentMode(r.mode); showToast(tt('Modus toegepast', 'Mode applied')); }
+function normaliseError(error){ if(!error) return new Error(tt('Onbekende fout', 'Unknown error')); if(typeof error==='string') return new Error(error); if(error.message) return error; try{return new Error(JSON.stringify(error));}catch(_){return new Error(String(error));} }
+function api(method,path,body){ return new Promise((resolve,reject)=>{ if(!HomeyInstance || typeof HomeyInstance.api!=='function') return reject(new Error(tt('Homey settings API is nog niet klaar. Heropen de instellingenpagina.', 'The Homey settings API is not ready yet. Reopen the settings page.'))); HomeyInstance.api(method,path,body||null,(err,res)=>err?reject(normaliseError(err)):resolve(res)); }); }
+function bindOnce(id, event, handler){ const node=document.getElementById(id); if(!node) return; const key='bound'+event; if(node.dataset[key]) return; node.dataset[key]='1'; node.addEventListener(event, handler); }
+function bindSettingsEvents(){
+  bindOnce('reloadBtn','click',async()=>{try{closeFoldModal();await loadData();showToast(tt('Opnieuw geladen', 'Reloaded'));}catch(e){showToast(e.message||String(e),'error');}});
+  bindOnce('saveBtn','click',async()=>{try{closeFoldModal();await saveAll();}catch(e){showToast(e.message||String(e),'error');}});
+  document.querySelectorAll('[data-tab]').forEach(b=>{
+    if(!b.dataset.boundClick){
+      b.dataset.boundClick='1';
+      b.addEventListener('click',()=>{
+        tab(b.dataset.tab);
+        document.getElementById('fabMenu')?.classList.remove('open');
+      });
+    }
+  });
+
+  bindOnce('fabToggle','click',()=>{
+    document.getElementById('fabMenu')?.classList.toggle('open');
+  });
+  if(!document.body.dataset.conditionalBound){ document.body.dataset.conditionalBound='1'; document.addEventListener('change',(ev)=>{ const f=ev.target&&ev.target.dataset&&ev.target.dataset.field; if(['turnOnOnMotion','turnOffAfterNoMotion','turnOnOnContact','turnOffWhenContactClosed','invertContactLogic','timeEnabled','onlyIfDark','windowMode','smartWeatherEnabled','resetMode','repeatReadyNotification','timeMode','luxCondition','autoOffEnabled','autoOffMode','autoOnEnabled','autoOnMode','action','presenceSource','enableSleepMode'].includes(f)){ applyConditionalVisibility(); } }); }
+  bindOnce('addSubModeBtn','click',addSubMode);
+  bindOnce('addZoneBtn','click',addZoneRule);  bindOnce('addApplianceBtn','click',addApplianceRule);  bindOnce('addScheduleBtn','click',addScheduleRule);  bindOnce('selectAllExportBtn','click',()=>{ renderExportImport(); EXPORT_SECTIONS.forEach(section=>{ const cb=document.querySelector('[data-field="export_'+section.id+'"]'); if(cb) cb.checked=true; }); });
+  bindOnce('copyExportJsonBtn','click',copyExportJson);
+  bindOnce('importFileInput','change',handleImportFile);
+  bindOnce('loadImportTextBtn','click',()=>{ try{ loadImportJsonText(document.getElementById('importJsonText')?.value||''); showToast(tt('JSON geladen. Kies onderdelen en klik op import toepassen.','JSON loaded. Select sections and apply import.')); }catch(e){ pendingImportData=null; updateImportPreview(null); showToast(e.message||String(e),'error'); } });
+  bindOnce('importBtn','click',async()=>{ try{ await applyImport(); }catch(e){ showToast(e.message||String(e),'error'); } });
+}
+
+window.addEventListener('error',event=>showToast(event.message||String(event.error||event),'error'));
+window.addEventListener('keydown',event=>{ if(event.key==='Escape') closeFoldModal(); });
+document.addEventListener('DOMContentLoaded',()=>{ applyStaticTranslations(); bindSettingsEvents(); });
+window.onHomeyReady=async function(Homey){ HomeyInstance=Homey; applyStaticTranslations(); Homey.ready(); bindSettingsEvents(); try{await loadData();}catch(e){showToast(e.message||String(e),'error');} };
+</script>
+</body>
+</html>
