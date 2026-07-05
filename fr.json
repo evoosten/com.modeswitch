@@ -1,0 +1,125 @@
+{
+  "mode": {
+    "home": "Thuis",
+    "away": "Afwezig",
+    "sleep": "Slapen",
+    "vacation": "Vakantie",
+    "home_tv": "TV kijken",
+    "home_romantic": "Romantisch",
+    "home_game": "Game",
+    "home_movie": "Film kijken"
+  },
+  "driver": {
+    "mode_controller": {
+      "default_name": "Modus Controller"
+    }
+  },
+  "settings": {
+    "__lang": "nl",
+    "hero": {
+      "description": "Modussen, zoneregels, deur/raamcontacten, planning, zon/zonsondergang, lux en automatische modus."
+    },
+    "current_mode": {
+      "loading": "Huidige modus: laden..."
+    },
+    "submodes": {
+      "title": "Submodussen",
+      "description": "Maak extra keuzes onder een hoofdmodus, bijvoorbeeld TV kijken onder Thuis.",
+      "add": "Nieuwe submodus"
+    },
+    "zones": {
+      "title": "Zoneregels",
+      "description": "Beweging, deur/raamcontacten, subzones, lampen, dimmen en voorwaarden.",
+      "add": "Nieuwe zoneregel"
+    },
+    "temperature": {
+      "title": "Temperatuur per modus en zone",
+      "description": "Stel per modus en zone de gewenste temperatuur in. Apparaten met target_temperature worden automatisch aangepast bij een moduswissel.",
+      "add": "Nieuwe temperatuurregel"
+    },
+    "appliances": {
+      "title": "Apparaatmeldingen",
+      "description": "Detecteer starten en klaar zijn via stroomverbruik van een slimme stekker of apparaat met measure_power.",
+      "add": "Nieuw apparaat"
+    },
+    "schedule": {
+      "title": "Planning",
+      "description": "Zet lampen/apparaten aan of uit op vaste tijd, random tijd, zonsopkomst of zonsondergang. Gebruik eventueel lux per zone.",
+      "add": "Nieuwe planning"
+    },
+    "import_export": {
+      "title": "Importeren / exporteren",
+      "description": "Maak een back-up van alles of kies welke onderdelen je wilt meenemen."
+    },
+    "export": {
+      "title": "Exporteren",
+      "description": "Kies onderdelen en kopieer een JSON-back-up.",
+      "copy_json": "Kopieer JSON"
+    },
+    "import": {
+      "title": "Importeren",
+      "description": "Kies een eerder gemaakte JSON-back-up. Je kunt daarna selecteren welke onderdelen teruggezet worden.",
+      "placeholder": "Plak hier eventueel de JSON-export als bestand kiezen niet werkt",
+      "load_from_text": "JSON laden uit tekstveld",
+      "no_file": "Nog geen bestand gekozen.",
+      "apply": "Import toepassen"
+    },
+    "activities": {
+      "title": "Activiteit monitoring",
+      "add": "Nieuwe activiteit"
+    }
+  },
+  "common": {
+    "refresh": "Ververs",
+    "save_all": "Alles opslaan",
+    "expand_all": "Alles open",
+    "collapse_all": "Alles dicht",
+    "select_all": "Alles selecteren"
+  },
+  "tabs": {
+    "modes": "Modussen",
+    "zones": "Zones & sensoren",
+    "temperature": "Temperatuur",
+    "monitoring": "Monitoring",
+    "schedule": "Planning",
+    "import_export": "Import/Export",
+    "automatic_mode": "Automatische modus"
+  },
+  "widgets": {
+    "common": {
+      "current_mode": "Huidige modus",
+      "refresh": "Vernieuwen",
+      "running": "Bezig",
+      "ready": "Klaar",
+      "standby": "Stand-by",
+      "duration": "Duur",
+      "appliances": "Apparaten",
+      "no_appliances": "Geen apparaten",
+      "no_appliances_configured": "Geen apparaten ingesteld.",
+      "appliance": "Apparaat",
+      "could_not_load_widget_data": "Kan widgetdata niet laden.",
+      "could_not_load_status": "Kan status niet laden.",
+      "could_not_change_mode": "Kan modus niet wijzigen.",
+      "monitoring": "Monitoring",
+      "mode": "Modus",
+      "appliance_monitoring": "Apparaat monitoring",
+      "no_sub_mode": "Geen submodus",
+      "activities": "Activiteiten",
+      "activity": "Activiteit",
+      "activity_monitoring": "Activiteit monitoring",
+      "active": "Actief",
+      "history": "Geschiedenis",
+      "no_history": "Geen historie"
+    },
+    "modes": {
+      "home": "Thuis",
+      "away": "Afwezig",
+      "sleep": "Slapen",
+      "vacation": "Vakantie",
+      "home_tv": "TV kijken",
+      "home_movie": "Film kijken",
+      "home_game": "Game",
+      "home_romantic": "Romantisch"
+    }
+  }
+}
