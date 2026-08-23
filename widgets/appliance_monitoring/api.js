@@ -25,8 +25,12 @@ function fallbackModeLabel(mode, locale) {
   const labels = {
     nl: { home: 'Thuis', sleep: 'Slapen', away: 'Afwezig', vacation: 'Vakantie' },
     en: { home: 'Home', sleep: 'Sleep', away: 'Away', vacation: 'Vacation' },
+    de: { home: 'Zuhause', sleep: 'Schlafen', away: 'Abwesend', vacation: 'Urlaub' },
+    fr: { home: 'Maison', sleep: 'Sommeil', away: 'Absent', vacation: 'Vacances' },
+    es: { home: 'Casa', sleep: 'Dormir', away: 'Fuera', vacation: 'Vacaciones' },
   };
-  const lang = String(locale || 'nl').toLowerCase().startsWith('en') ? 'en' : 'nl';
+  const raw = String(locale || 'nl').toLowerCase();
+  const lang = raw.startsWith('de') ? 'de' : raw.startsWith('fr') ? 'fr' : raw.startsWith('es') ? 'es' : raw.startsWith('en') ? 'en' : 'nl';
   return (labels[lang] && labels[lang][mode]) || mode || '';
 }
 
@@ -50,7 +54,11 @@ function getApplianceName(app, rule) {
     const locale = getLanguage(app);
     if (app && typeof app._getApplianceTypeLabel === 'function') return app._getApplianceTypeLabel(rule && rule.type, locale);
   } catch (err) {}
-  return getLanguage(app) === 'en' ? 'Appliance' : 'Apparaat';
+  const lang = String(getLanguage(app) || 'nl').toLowerCase();
+  if (lang.startsWith('de')) return 'Gerät';
+  if (lang.startsWith('fr')) return 'Appareil';
+  if (lang.startsWith('es')) return 'Dispositivo';
+  return lang.startsWith('en') ? 'Appliance' : 'Apparaat';
 }
 
 function normalizeStatus(status) {
@@ -72,6 +80,7 @@ async function buildStatus(homey) {
   }
 
   const applianceState = callSafe(app && typeof app.getApplianceState === 'function' ? app.getApplianceState.bind(app) : null, {}) || {};
+  const applianceHistory = callSafe(app && typeof app.getApplianceHistory === 'function' ? app.getApplianceHistory.bind(app) : null, {}) || {};
   const rulesRaw = callSafe(app && typeof app.getApplianceRules === 'function' ? app.getApplianceRules.bind(app) : null, []);
   const activityState = callSafe(app && typeof app.getActivityState === 'function' ? app.getActivityState.bind(app) : null, {}) || {};
   const activityHistory = callSafe(app && typeof app.getActivityHistory === 'function' ? app.getActivityHistory.bind(app) : null, {}) || {};
@@ -97,6 +106,8 @@ async function buildStatus(homey) {
       updatedAt: state.updatedAt || null,
       readyAt: state.readyAt || null,
       startedAt: state.startedAt || null,
+      history: rule.id && applianceHistory ? toArray(applianceHistory[rule.id]).slice(0, Math.max(1, Math.min(50, Number(rule.historyLimit || 20)))) : [],
+      lastSession: rule.id && applianceHistory && toArray(applianceHistory[rule.id]).length ? toArray(applianceHistory[rule.id])[0] : null,
     });
   }
 
@@ -106,7 +117,7 @@ async function buildStatus(homey) {
     const history = rule.id && activityHistory ? toArray(activityHistory[rule.id]) : [];
     activities.push({
       id: rule.id || '',
-      name: rule.name || (locale === 'en' ? 'Activity' : 'Activiteit'),
+      name: rule.name || (String(locale).toLowerCase().startsWith('de') ? 'Aktivität' : String(locale).toLowerCase().startsWith('fr') ? 'Activité' : String(locale).toLowerCase().startsWith('es') ? 'Actividad' : String(locale).toLowerCase().startsWith('en') ? 'Activity' : 'Activiteit'),
       status: state.status === 'active' ? 'active' : 'standby',
       trueConditions: Number(state.trueConditions || 0),
       requiredConditions: Number(state.requiredConditions || rule.minConditions || 1),

@@ -3,7 +3,6 @@
 const Homey = require('homey');
 
 const MAIN_MODES = ['home', 'sleep', 'away', 'vacation'];
-const STATIC_SUB_MODES = ['none', 'home_tv', 'home_romantic', 'home_game', 'home_movie'];
 
 class ModeControllerDevice extends Homey.Device {
   getDefaultList() {
@@ -15,6 +14,7 @@ class ModeControllerDevice extends Homey.Device {
 
   async onInit() {
     await this._ensureDefaultListLast();
+    await this.refreshModeOptions();
 
     if (this.hasCapability('mode_selector')) {
       this.registerCapabilityListener('mode_selector', async value => {
@@ -79,6 +79,38 @@ class ModeControllerDevice extends Homey.Device {
     }
   }
 
+
+  async refreshModeOptions() {
+    const mainValues = MAIN_MODES.map(id => ({
+      id,
+      title: { en: this.homey.app.getModeLabel(id), nl: this.homey.app.getModeLabel(id) },
+    }));
+    const subModes = typeof this.homey.app.getSubModes === 'function' ? this.homey.app.getSubModes() : [];
+    const allValues = [
+      ...mainValues,
+      ...subModes.map(item => ({ id: item.id, title: { en: item.label, nl: item.label } })),
+    ];
+    const subValues = [
+      { id: 'none', title: { en: 'None', nl: 'Geen' } },
+      ...subModes.map(item => ({ id: item.id, title: { en: item.label, nl: item.label } })),
+    ];
+
+    const options = {
+      mode_selector: { values: allValues },
+      main_mode_selector: { values: mainValues },
+      sub_mode_selector: { values: subValues },
+    };
+    for (const [capabilityId, capabilityOptions] of Object.entries(options)) {
+      if (!this.hasCapability(capabilityId) || typeof this.setCapabilityOptions !== 'function') continue;
+      try {
+        await this.setCapabilityOptions(capabilityId, capabilityOptions);
+      } catch (error) {
+        this.error(`Failed to update options for ${capabilityId}`, error);
+      }
+    }
+    await this.syncMode(this.homey.app.getCurrentMode());
+  }
+
   async _setCapabilityIfSupported(capabilityId, value, allowedValues = null) {
     if (!this.hasCapability(capabilityId)) return;
     if (allowedValues && !allowedValues.includes(value)) return;
@@ -99,7 +131,7 @@ class ModeControllerDevice extends Homey.Device {
     const capabilitySync = {
       mode_selector: () => this._setCapabilityIfSupported('mode_selector', mode),
       main_mode_selector: () => this._setCapabilityIfSupported('main_mode_selector', parentMode, MAIN_MODES),
-      sub_mode_selector: () => this._setCapabilityIfSupported('sub_mode_selector', subMode, STATIC_SUB_MODES),
+      sub_mode_selector: () => this._setCapabilityIfSupported('sub_mode_selector', subMode, ['none', ...this.homey.app.getSubModes().map(item => item.id)]),
     };
 
     const defaultList = this.getDefaultList();

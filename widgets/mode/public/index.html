@@ -53,7 +53,7 @@ body{padding:8px!important}
   color:rgba(226,232,240,.72)!important;
   margin-bottom:5px!important;
 }
-.mode{
+.source-context{margin-top:6px;font-size:10px;font-weight:700;color:rgba(226,232,240,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mode{
   font-size:23px!important;
   font-weight:900!important;
   line-height:1.05!important;
@@ -225,13 +225,26 @@ button.mode-btn.active{
 }
 .widget.weather-bg>*{position:relative;z-index:1}
 
-</style></head><body><div class="widget"><div class="header"><div class="title">Modus</div><span style="font-size:10px;opacity:.35">2.7.4</span><button class="sync" id="refresh" title="Vernieuwen">↻</button></div><div class="current"><div class="label">Huidige modus</div><div class="mode" id="currentMode">...</div></div><div class="mode-buttons" id="modeButtons"></div><div class="submode-wrap" id="subModeWrap" style="display:none"><div class="submode-buttons" id="subModeButtons"></div></div><div class="section-line"><div class="section-title">Apparaten</div><div class="count" id="deviceCount"></div></div><div class="devices" id="devices"></div></div>
+
+.switch-section{display:none;margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,.10)}
+.switch-section.visible{display:block}
+.switch-title{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:rgba(226,232,240,.68);margin-bottom:5px}
+.switch-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.switch-btn{min-height:34px;border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:5px 8px;background:rgba(255,255,255,.065);color:#e5e7eb;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:6px;cursor:pointer;overflow:hidden}
+.switch-btn span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.switch-indicator{width:25px;height:15px;border-radius:999px;background:rgba(148,163,184,.35);position:relative;flex:0 0 auto;transition:.15s}
+.switch-indicator:after{content:"";position:absolute;width:11px;height:11px;border-radius:50%;background:#fff;left:2px;top:2px;transition:.15s}
+.switch-btn.on{background:var(--accent-soft);border-color:rgba(255,255,255,.18)}
+.switch-btn.on .switch-indicator{background:var(--accent)}
+.switch-btn.on .switch-indicator:after{transform:translateX(10px)}
+.switch-btn:disabled{opacity:.55;cursor:wait}
+</style></head><body><div class="widget"><div class="header"><div class="title">Modus</div><span style="font-size:10px;opacity:.35">3.0.0</span><button class="sync" id="refresh" title="Vernieuwen">↻</button></div><div class="current"><div class="label" id="currentLabel">Huidige modus</div><div class="mode" id="currentMode">...</div><div class="source-context" id="sourceContext"></div></div><div class="mode-buttons" id="modeButtons"></div><div class="submode-wrap" id="subModeWrap" style="display:none"><div class="submode-buttons" id="subModeButtons"></div></div><div class="switch-section" id="switchSection"><div class="switch-title" id="switchTitle">Aan/uit-knoppen</div><div class="switch-buttons" id="switchButtons"></div></div><div class="section-line"><div class="section-title">Apparaten</div><div class="count" id="deviceCount"></div></div><div class="devices" id="devices"></div></div>
 <script>var api=null,currentMode=null,busy=false,statusTimer=null,configuredHeight=260,SHOW_MODES=true,SHOW_APPLIANCES=false;var WIDGET_LANG='nl';
 function detectWidgetLang(Homey){
   var candidates=[];
   try{ if(Homey){ candidates.push(Homey.language, Homey.lang, Homey.locale); } }catch(e){}
-  try{ candidates.push(document.documentElement.lang); }catch(e){}
   try{ candidates.push(navigator.language, (navigator.languages&&navigator.languages[0])); }catch(e){}
+  try{ candidates.push(document.documentElement.lang); }catch(e){}
   for(var i=0;i<candidates.length;i++){
     var v=String(candidates[i]||'').toLowerCase();
     if(v.indexOf('de')===0)return 'de';
@@ -292,23 +305,20 @@ function applyWidgetTranslations(){
   if(label)label.textContent=tr('Huidige modus','Current mode','Aktueller Modus','Mode actuel','Modo actual');
   var section=document.querySelector('.section-title');
   if(section)section.textContent=tr('Apparaten','Appliances','Geräte','Appareils','Dispositivos');
+  var switchTitle=document.getElementById('switchTitle');
+  if(switchTitle)switchTitle.textContent=tr('Aan/uit-knoppen','On/off buttons','Ein/Aus-Schaltflächen','Boutons marche/arrêt','Botones de encendido/apagado');
   var refresh=document.getElementById('refresh');
   if(refresh)refresh.setAttribute('title',tr('Vernieuwen','Refresh','Aktualisieren','Actualiser','Actualizar'));
 }
-function clampNumber(v,min,max,f){var n=Number(v);if(!Number.isFinite(n))return f;return Math.max(min,Math.min(max,Math.round(n)))}function readConfiguredHeight(Homey){var s={};try{s=Homey&&typeof Homey.getSettings==='function'?(Homey.getSettings()||{}):{}}catch(e){s={}}return clampNumber(s.widgetHeight,220,900,260)}function applyConfiguredHeight(Homey){configuredHeight=readConfiguredHeight(Homey);document.documentElement.style.setProperty('--widget-height',configuredHeight+'px');if(Homey&&typeof Homey.setHeight==='function')Homey.setHeight(configuredHeight)}function formatEnergyKwh(v){var n=Number(v);if(!Number.isFinite(n)||n<=0)return '';return n.toLocaleString(WIDGET_LANG==='nl'?'nl-NL':(WIDGET_LANG==='de'?'de-DE':(WIDGET_LANG==='fr'?'fr-FR':(WIDGET_LANG==='es'?'es-ES':'en-US'))),{minimumFractionDigits:2,maximumFractionDigits:3})+' kWh'}function statusLabel(s){if(s==='running')return tr('Bezig','Running','Läuft','En cours','En marcha');if(s==='ready')return tr('Klaar','Ready','Fertig','Terminé','Listo');return tr('Stand-by','Standby','Bereitschaft','Veille','En espera')}function formatDurationMs(ms){var n=Number(ms);if(!Number.isFinite(n)||n<=0)return '';var total=Math.max(0,Math.round(n/1000));var h=Math.floor(total/3600);var m=Math.floor((total%3600)/60);var sec=total%60;return h>0?(h+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')):(m+':'+String(sec).padStart(2,'0'))}function durationText(device){if(!device)return '';var ms=(device.status==='ready'&&typeof device.finalDurationMs==='number')?device.finalDurationMs:device.durationMs;if((!Number.isFinite(Number(ms))||Number(ms)<=0)&&typeof device.durationSeconds==='number')ms=device.durationSeconds*1000;var text=formatDurationMs(ms);return text?tr('Duur','Duration','Dauer','Durée','Duración')+': '+text:''}function modeText(m){if(m==='home')return tr('Thuis','Home','Zuhause','Maison','Casa');if(m==='sleep')return tr('Slapen','Sleep','Schlafen','Sommeil','Dormir');if(m==='away')return tr('Afwezig','Away','Abwesend','Absent','Fuera');if(m==='vacation')return tr('Vakantie','Vacation','Urlaub','Vacances','Vacaciones');return m}
+function clampNumber(v,min,max,f){var n=Number(v);if(!Number.isFinite(n))return f;return Math.max(min,Math.min(max,Math.round(n)))}function readConfiguredHeight(Homey){var s={};try{s=Homey&&typeof Homey.getSettings==='function'?(Homey.getSettings()||{}):{}}catch(e){s={}}return clampNumber(s.widgetHeight,220,900,260)}function applyConfiguredHeight(Homey){configuredHeight=readConfiguredHeight(Homey);document.documentElement.style.setProperty('--widget-height',configuredHeight+'px');if(Homey&&typeof Homey.setHeight==='function')Homey.setHeight(configuredHeight)}function formatEnergyKwh(v){var n=Number(v);if(!Number.isFinite(n)||n<=0)return '';return n.toLocaleString(WIDGET_LANG==='nl'?'nl-NL':(WIDGET_LANG==='de'?'de-DE':(WIDGET_LANG==='fr'?'fr-FR':(WIDGET_LANG==='es'?'es-ES':'en-US'))),{minimumFractionDigits:2,maximumFractionDigits:3})+' kWh'}function statusLabel(s){if(s==='running')return tr('Bezig','Running','Läuft','En cours','En funcionamiento');if(s==='ready')return tr('Klaar','Ready','Bereit','Prêt','Listo');return tr('Stand-by','Standby','Standby','En veille','En espera')}function formatDurationMs(ms){var n=Number(ms);if(!Number.isFinite(n)||n<=0)return '';var total=Math.max(0,Math.round(n/1000));var h=Math.floor(total/3600);var m=Math.floor((total%3600)/60);var sec=total%60;return h>0?(h+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')):(m+':'+String(sec).padStart(2,'0'))}function durationText(device){if(!device)return '';var ms=(device.status==='ready'&&typeof device.finalDurationMs==='number')?device.finalDurationMs:device.durationMs;if((!Number.isFinite(Number(ms))||Number(ms)<=0)&&typeof device.durationSeconds==='number')ms=device.durationSeconds*1000;var text=formatDurationMs(ms);return text?tr('Duur','Duration','Dauer','Durée','Duración')+': '+text:''}function modeText(m){if(m==='home')return tr('Thuis','Home','Zuhause','Maison','Casa');if(m==='sleep')return tr('Slapen','Sleep','Schlafen','Sommeil','Dormir');if(m==='away')return tr('Afwezig','Away','Abwesend','Absent','Fuera');if(m==='vacation')return tr('Vakantie','Vacation','Urlaub','Vacances','Vacaciones');return m}
 function translatedModeLabel(item){
   var id=String((item&&item.id)||'').toLowerCase();
   var raw=String((item&&(item.label||item.title||item.name))||'');
   var key=raw.toLowerCase().trim();
-  if(id==='home'||key==='home'||key==='thuis')return tr('Thuis','Home','Zuhause','Maison','Casa');
-  if(id==='away'||key==='away'||key==='afwezig')return tr('Afwezig','Away','Abwesend','Absent','Fuera');
-  if(id==='sleep'||key==='sleep'||key==='slapen')return tr('Slapen','Sleep','Schlafen','Sommeil','Dormir');
-  if(id==='vacation'||key==='vacation'||key==='vakantie')return tr('Vakantie','Vacation','Urlaub','Vacances','Vacaciones');
+  // The API already returns the configured display name for main modes.
+  // Keep the stable IDs for logic, but never replace a user-defined label here.
+  if(id==='home'||id==='away'||id==='sleep'||id==='vacation')return raw||modeText(id);
   if(id==='none'||key==='none'||key==='geen submodus'||key==='no sub mode')return tr('Geen submodus','No sub mode','Kein Untermodus','Aucun sous-mode','Sin submodo');
-  if(id.indexOf('home_tv')===0||key==='watch tv'||key==='tv kijken')return tr('TV kijken','Watch TV','Fernsehen','Regarder la TV','Ver TV');
-  if(id.indexOf('home_movie')===0||key==='watch movie'||key==='film kijken')return tr('Film kijken','Watch movie','Film ansehen','Regarder un film','Ver película');
-  if(id.indexOf('home_game')===0||key==='game'||key==='gamen')return tr('Game','Game','Gaming','Jeu','Juego');
-  if(id.indexOf('home_romantic')===0||key==='romantic'||key==='romantisch')return tr('Romantisch','Romantic','Romantisch','Romantique','Romántico');
   return raw||modeText(id);
 }
 function modeIcon(m){if(m==='home')return '🏠';if(m==='sleep')return '🌙';if(m==='away')return '🚶';if(m==='vacation')return '🏖️';return '•'}
@@ -323,6 +333,7 @@ function getWidgetSelectedTemperatureDeviceId(data){
   return data&&data.displaySettings?String(data.displaySettings.temperatureDeviceId||''):'';
 }
 function getWidgetShowTemperature(){var s=getWidgetLocalSettings();return s.showTemperature!==false}
+function getWidgetShowSubModes(){var s=getWidgetLocalSettings();return s.showSubModes!==false&&s.showSubModes!=='false'&&s.showSubModes!==0&&s.showSubModes!=='0'}
 function getWidgetLiveWeatherBackground(data){var s=getWidgetLocalSettings();if(typeof s.liveWeatherBackground==='boolean')return s.liveWeatherBackground;return !!(data&&data.displaySettings&&data.displaySettings.liveContextEnabled===true)}
 function applyWeatherIntensity(){var s=getWidgetLocalSettings();var n=Number(s.weatherBackgroundIntensity);if(!Number.isFinite(n))n=80;n=Math.max(0,Math.min(100,Math.round(n)));document.documentElement.style.setProperty('--weather-opacity',(0.18+(n/100)*0.74).toFixed(2));}
 
@@ -330,7 +341,7 @@ function readTempValue(data){if(!getWidgetShowTemperature())return null;var temp
 function formatTempShort(n){return (Math.round(n*10)/10).toFixed(n%1===0?0:1)+'°'}
 function normalizeWeatherCondition(w){var c=String((w&&w.condition)||'').toLowerCase();var raw=String((w&&(w.rawCondition||w.icon||w.code||w.weatherCode||w.description||w.summary))||'').toLowerCase();var text=(c+' '+raw).trim();if(['cloudy','rain','snow','fog','storm','clear'].indexOf(c)>=0)return c;if(/thunder|storm|onweer|bliksem|^11/.test(text))return 'storm';if(/snow|sneeuw|hail|hagel|^13/.test(text))return 'snow';if(/rain|drizzle|regen|bui|shower|^09|^10/.test(text))return 'rain';if(/fog|mist|nevel|haze|^50/.test(text))return 'fog';if(/cloud|bewolkt|wolken|overcast|zwaar|^02|^03|^04/.test(text))return 'cloudy';return 'cloudy'}
 function getWeatherInfo(data){var w=data&&data.environment?data.environment.weather:null;var condition=normalizeWeatherCondition(w);var isDay=w&&typeof w.isDay==='boolean'?w.isDay:(new Date().getHours()>=7&&new Date().getHours()<18);return {condition:condition,isDay:isDay};}
-function applyWeatherWidgetBackground(data){var widget=document.querySelector('.widget');if(!widget)return;widget.className=widget.className.replace(/\bweather-bg\b|\bweather-(clear|cloudy|rain|snow|fog|storm|day|night)\b/g,'').replace(/\s+/g,' ').trim();applyWeatherIntensity();if(!getWidgetLiveWeatherBackground(data))return;var info=getWeatherInfo(data);widget.className+=' weather-bg weather-'+(info.isDay?'day':'night')+' weather-'+info.condition;}function setBusy(b){busy=b;document.querySelectorAll('.mode-btn').forEach(function(btn){btn.disabled=busy})}function showError(m){document.getElementById('devices').innerHTML='<div class="error">'+m+'</div>'}
+function applyWeatherWidgetBackground(data){var widget=document.querySelector('.widget');if(!widget)return;widget.className=widget.className.replace(/\bweather-bg\b|\bweather-(clear|cloudy|rain|snow|fog|storm|day|night)\b/g,'').replace(/\s+/g,' ').trim();applyWeatherIntensity();if(!getWidgetLiveWeatherBackground(data))return;var info=getWeatherInfo(data);widget.className+=' weather-bg weather-'+(info.isDay?'day':'night')+' weather-'+info.condition;}function setBusy(b){busy=b;document.querySelectorAll('.mode-btn,.submode-btn,.switch-btn').forEach(function(btn){btn.disabled=busy})}function showError(m){document.getElementById('devices').innerHTML='<div class="error">'+m+'</div>'}
 function applyWidgetTheme(data,parentMode,currentMode,subModes){
   var active=(subModes||[]).find(function(s){return s.id===currentMode}) || {};
   var accent=(active&&typeof active.accentColor==='string'&&active.accentColor)||active.color||active.accent||'#60a5fa';
@@ -369,7 +380,21 @@ function findParentMode(current,subModes){
 function render(data){if(data&&data.language){var dl=String(data.language).toLowerCase();WIDGET_LANG=dl.indexOf('de')===0?'de':dl.indexOf('fr')===0?'fr':dl.indexOf('es')===0?'es':dl.indexOf('en')===0?'en':dl.indexOf('nl')===0?'nl':WIDGET_LANG;document.documentElement.lang=WIDGET_LANG;applyWidgetTranslations();}if(!data||typeof data!=='object'||Array.isArray(data)){showError(tr('Kan widgetdata niet laden.','Could not load widget data.','Widgetdaten konnten nicht geladen werden.','Impossible de charger les données du widget.','No se pudieron cargar los datos del widget.'));return}
 var modes=Array.isArray(data.modes)?data.modes:[];
 var subModes=normalizeSubModes(data,modes);
-currentMode=data.currentMode||'home';
+currentMode=data.currentMode||((modes[0]&&modes[0].id)||'home');
+var source=data.source||{};
+var currentLabel=document.getElementById('currentLabel');
+var sourceContext=document.getElementById('sourceContext');
+if(currentLabel){
+  currentLabel.textContent=source.type==='mode_switch'
+    ? (source.name||'Mode & Switch')
+    : tr('Huidige modus','Current mode','Aktueller Modus','Mode actuel','Modo actual');
+}
+if(sourceContext){
+  sourceContext.textContent=source.type==='mode_switch'
+    ? (source.listName||'')
+    : '';
+  sourceContext.style.display=sourceContext.textContent?'block':'none';
+}
 var parentMode=findParentMode(currentMode,subModes);
 applyWidgetTheme(data,parentMode,currentMode,subModes);
 applyWeatherWidgetBackground(data);
@@ -410,10 +435,13 @@ if(SHOW_MODES){
   })
 }
 
+var localSource=readModeSourceSettings(window.Homey);
 var subWrap=document.getElementById('subModeWrap');
 var subButtons=document.getElementById('subModeButtons');
 if(subWrap&&subButtons){
-  var relevant=subModes.filter(function(s){return s.parentMode===parentMode});
+  var relevant=localSource.showSubModes
+    ? subModes.filter(function(s){return s.parentMode===parentMode})
+    : [];
   subButtons.innerHTML='';
   if(relevant.length){
     subWrap.style.display='';
@@ -431,13 +459,35 @@ if(subWrap&&subButtons){
   }
 }
 
+
+var switchSection=document.getElementById('switchSection');
+var switchButtons=document.getElementById('switchButtons');
+var allSwitches=Array.isArray(data.switches)?data.switches:[];
+var selectedSwitches=localSource.switchIds.length?allSwitches.filter(function(item){return localSource.switchIds.indexOf(String(item.id))>=0}):[];
+if(switchSection&&switchButtons){
+  switchButtons.innerHTML='';
+  if(localSource.showSwitches&&source.type==='mode_switch'&&selectedSwitches.length){
+    switchSection.classList.add('visible');
+    selectedSwitches.forEach(function(item){
+      var btn=document.createElement('button');
+      btn.className='switch-btn'+(item.on?' on':'');
+      btn.disabled=busy;
+      var name=document.createElement('span');name.textContent=item.name||item.id;
+      var indicator=document.createElement('span');indicator.className='switch-indicator';
+      btn.appendChild(name);btn.appendChild(indicator);
+      btn.addEventListener('click',function(){changeSwitch(item.id,!item.on)});
+      switchButtons.appendChild(btn);
+    });
+  }else switchSection.classList.remove('visible');
+}
+
 var devices=Array.isArray(data.appliances)?data.appliances:[];
 var running=devices.filter(function(i){return i.status==='running'}).length;
 var ready=devices.filter(function(i){return i.status==='ready'}).length;
 document.getElementById('deviceCount').textContent=devices.length?(running+' '+tr('bezig','running','läuft','en cours','en marcha')+' · '+ready+' '+tr('klaar','ready','fertig','terminé','listo')):tr('Geen apparaten','No appliances','Keine Geräte','Aucun appareil','Sin dispositivos');
 var c=document.getElementById('devices');c.innerHTML='';
 if(!SHOW_APPLIANCES)return;
-if(!devices.length){c.innerHTML='<div class="empty">'+tr('Geen apparaten ingesteld.','No appliances configured.','Keine Geräte konfiguriert.','Aucun appareil configuré.','No hay dispositivos configurados.')+'</div>';return}
+if(!devices.length){c.innerHTML='<div class="empty">'+tr('Geen apparaten ingesteld.','No appliances configured.','Keine Geräte eingerichtet.','Aucun appareil configuré.','No hay dispositivos configurados.')+'</div>';return}
 devices.forEach(function(device){
   var row=document.createElement('div');row.className='device';
   var left=document.createElement('div');
@@ -446,4 +496,4 @@ devices.forEach(function(device){
   var state=document.createElement('div');state.className='state '+(device.status==='running'?'running':device.status==='ready'?'ready':'idle');state.textContent=statusLabel(device.status);
   row.appendChild(left);row.appendChild(state);c.appendChild(row)
 })}
-function loadStatus(){if(!api)return;api('GET','/',{}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan status niet laden.','Could not load status.','Status konnte nicht geladen werden.','Impossible de charger l’état.','No se pudo cargar el estado.'))})}function changeMode(mode){if(!api||mode===currentMode||busy)return;setBusy(true);if(window.Homey&&typeof window.Homey.hapticFeedback==='function')window.Homey.hapticFeedback();api('POST','/mode',{mode:mode}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan modus niet wijzigen.','Could not change mode.','Modus konnte nicht geändert werden.','Impossible de modifier le mode.','No se pudo cambiar el modo.'))}).finally(function(){setBusy(false)})}function onHomeyReady(Homey){window.Homey=Homey;WIDGET_LANG=detectWidgetLang(Homey);document.documentElement.lang=WIDGET_LANG;api=Homey.api.bind(Homey);applyWidgetTranslations();applyConfiguredHeight(Homey);document.getElementById('refresh').addEventListener('click',loadStatus);Homey.ready({height:configuredHeight});loadStatus();statusTimer=setInterval(loadStatus,10000)}document.addEventListener('DOMContentLoaded',function(){WIDGET_LANG=detectWidgetLang(window.Homey);document.documentElement.lang=WIDGET_LANG;applyWidgetTranslations();});</script></body></html>
+function readAutocompleteId(value,fallback){if(!value)return fallback||'';if(typeof value==='string')return value;if(value.id)return String(value.id);if(value.deviceId)return String(value.deviceId);if(value.data&&value.data.id)return String(value.data.id);if(value.data&&value.data.deviceId)return String(value.data.deviceId);return fallback||''}function readModeSourceSettings(Homey){var s={};try{s=Homey&&typeof Homey.getSettings==='function'?(Homey.getSettings()||{}):{}}catch(e){s={}}var switchIds=[];for(var i=1;i<=6;i++){var id=readAutocompleteId(s['switchButton'+i],'');if(id&&switchIds.indexOf(id)<0)switchIds.push(id)}return {sourceDeviceId:readAutocompleteId(s.modeSource,'controller')||'controller',sourceListId:readAutocompleteId(s.modeList,''),showSubModes:s.showSubModes!==false&&s.showSubModes!=='false'&&s.showSubModes!==0&&s.showSubModes!=='0',showSwitches:s.showSwitches!==false&&s.showSwitches!=='false'&&s.showSwitches!==0&&s.showSwitches!=='0',switchIds:switchIds}}function buildStatusPath(source){var q=[];if(source&&source.sourceDeviceId)q.push('sourceDeviceId='+encodeURIComponent(source.sourceDeviceId));if(source&&source.sourceListId)q.push('sourceListId='+encodeURIComponent(source.sourceListId));return '/'+(q.length?'?'+q.join('&'):'')}function loadStatus(){if(!api)return;var source=readModeSourceSettings(window.Homey);api('GET',buildStatusPath(source),{}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan status niet laden.','Could not load status.','Status konnte nicht geladen werden.','Impossible de charger l’état.','No se pudo cargar el estado.'))})}function changeMode(mode){if(!api||mode===currentMode||busy)return;setBusy(true);if(window.Homey&&typeof window.Homey.hapticFeedback==='function')window.Homey.hapticFeedback();var source=readModeSourceSettings(window.Homey);api('POST','/mode',{mode:mode,sourceDeviceId:source.sourceDeviceId,sourceListId:source.sourceListId}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan modus niet wijzigen.','Could not change mode.','Modus konnte nicht geändert werden.','Impossible de modifier le mode.','No se pudo cambiar el modo.'))}).finally(function(){setBusy(false)})}function changeSwitch(buttonId,isOn){if(!api||busy)return;setBusy(true);if(window.Homey&&typeof window.Homey.hapticFeedback==='function')window.Homey.hapticFeedback();var source=readModeSourceSettings(window.Homey);api('POST','/switch',{buttonId:buttonId,isOn:!!isOn,sourceDeviceId:source.sourceDeviceId,sourceListId:source.sourceListId}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan knop niet wijzigen.','Could not change button.','Schaltfläche konnte nicht geändert werden.','Impossible de modifier le bouton.','No se pudo cambiar el botón.'))}).finally(function(){setBusy(false)})}function onHomeyReady(Homey){window.Homey=Homey;WIDGET_LANG=detectWidgetLang(Homey);document.documentElement.lang=WIDGET_LANG;api=Homey.api.bind(Homey);applyWidgetTranslations();applyConfiguredHeight(Homey);document.getElementById('refresh').addEventListener('click',loadStatus);Homey.ready({height:configuredHeight});loadStatus();statusTimer=setInterval(loadStatus,10000)}document.addEventListener('DOMContentLoaded',function(){WIDGET_LANG=detectWidgetLang(window.Homey);document.documentElement.lang=WIDGET_LANG;applyWidgetTranslations();});</script></body></html>

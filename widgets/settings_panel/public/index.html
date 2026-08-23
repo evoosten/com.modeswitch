@@ -261,8 +261,8 @@ var WIDGET_LANG='nl';
 function detectWidgetLang(Homey){
   var candidates=[];
   try{ if(Homey){ candidates.push(Homey.language, Homey.lang, Homey.locale); } }catch(e){}
-  try{ candidates.push(document.documentElement.lang); }catch(e){}
   try{ candidates.push(navigator.language, (navigator.languages&&navigator.languages[0])); }catch(e){}
+  try{ candidates.push(document.documentElement.lang); }catch(e){}
   for(var i=0;i<candidates.length;i++){
     var v=String(candidates[i]||'').toLowerCase();
     if(v.indexOf('de')===0)return 'de';
@@ -323,7 +323,65 @@ var I18N={
   'Renderfout':{en:'Render error',de:'Renderfehler',fr:'Erreur d’affichage',es:'Error de renderizado'},
   'Opslaan...':{en:'Saving...',de:'Speichern...',fr:'Enregistrement...',es:'Guardando...'},
   'Opgeslagen':{en:'Saved',de:'Gespeichert',fr:'Enregistré',es:'Guardado'},
-  'Opslaan mislukt':{en:'Save failed',de:'Speichern fehlgeschlagen',fr:'Échec de l’enregistrement',es:'Error al guardar'}
+  'Opslaan mislukt':{en:'Save failed',de:'Speichern fehlgeschlagen',fr:'Échec de l’enregistrement',es:'Error al guardar'},
+  'Zoneregels bevatten bestaande instellingen zoals beweging, deur/raamcontacten, lampen, lux en tijden.':{en:'Zone rules contain existing settings such as motion, door/window contacts, lights, lux and times.',de:'Zonenregeln enthalten vorhandene Einstellungen wie Bewegung, Tür-/Fensterkontakte, Lichter, Lux und Zeiten.',fr:'Les règles de zone contiennent les réglages existants tels que le mouvement, les contacts porte/fenêtre, les lumières, les lux et les horaires.',es:'Las reglas de zona contienen ajustes existentes como movimiento, contactos de puertas/ventanas, luces, lux y horarios.'},
+  'Gebruikt bestaande temperatuurregels per modus/zone, inclusief raam- en slimme weerinstellingen waar aanwezig.':{en:'Uses existing temperature rules per mode/zone, including window and smart weather settings where available.',de:'Verwendet vorhandene Temperaturregeln pro Modus/Zone, einschließlich Fenster- und intelligenter Wettereinstellungen, sofern vorhanden.',fr:'Utilise les règles de température existantes par mode/zone, y compris les réglages de fenêtre et météo intelligente lorsqu’ils sont disponibles.',es:'Usa las reglas de temperatura existentes por modo/zona, incluidos los ajustes de ventana y clima inteligente cuando estén disponibles.'},
+  'Gebruikt bestaande monitoringregels op basis van stroomverbruik.':{en:'Uses existing monitoring rules based on power consumption.',de:'Verwendet vorhandene Überwachungsregeln basierend auf dem Stromverbrauch.',fr:'Utilise les règles de surveillance existantes basées sur la consommation électrique.',es:'Usa las reglas de monitorización existentes basadas en el consumo eléctrico.'},
+  '+ Nieuwe planning':{en:'+ New schedule',de:'+ Neuer Zeitplan',fr:'+ Nouveau planning',es:'+ Nuevo horario'},
+  'Planning gebruikt bestaande opties: vaste tijd, random tijd, zonsopkomst/-ondergang, auto aan/uit en luxcondities.':{en:'Schedule uses existing options: fixed time, random time, sunrise/sunset, auto on/off and lux conditions.',de:'Der Zeitplan verwendet vorhandene Optionen: feste Zeit, Zufallszeit, Sonnenaufgang/-untergang, Auto Ein/Aus und Lux-Bedingungen.',fr:'Le planning utilise les options existantes : heure fixe, heure aléatoire, lever/coucher du soleil, activation/désactivation automatique et conditions de lux.',es:'El horario usa las opciones existentes: hora fija, hora aleatoria, amanecer/atardecer, encendido/apagado automático y condiciones de lux.'},
+  'Bestaande autoMode.enabled':{en:'Existing autoMode.enabled',de:'Vorhandenes autoMode.enabled',fr:'autoMode.enabled existant',es:'autoMode.enabled existente'},
+  'Bestaande autoMode.vacationAfterHours':{en:'Existing autoMode.vacationAfterHours',de:'Vorhandenes autoMode.vacationAfterHours',fr:'autoMode.vacationAfterHours existant',es:'autoMode.vacationAfterHours existente'},
+  'Alleen bestaande automatische-modus velden worden bewaard; onbekende velden blijven ongemoeid.':{en:'Only existing automatic-mode fields are saved; unknown fields remain unchanged.',de:'Nur vorhandene Felder des automatischen Modus werden gespeichert; unbekannte Felder bleiben unverändert.',fr:'Seuls les champs existants du mode automatique sont enregistrés ; les champs inconnus restent inchangés.',es:'Solo se guardan los campos existentes del modo automático; los campos desconocidos permanecen sin cambios.'},
+  'Import/Export':{en:'Import/Export',de:'Import/Export',fr:'Import/Export',es:'Importar/Exportar'},
+  'Importeren blijft bewust in de normale instellingenpagina, zodat je preview/controle houdt.':{en:'Import intentionally remains on the normal settings page so you keep the preview/check step.',de:'Der Import bleibt bewusst auf der normalen Einstellungsseite, damit die Vorschau/Kontrolle erhalten bleibt.',fr:'L’import reste volontairement sur la page de paramètres normale afin de conserver l’étape d’aperçu/contrôle.',es:'La importación permanece deliberadamente en la página normal de ajustes para mantener el paso de vista previa/comprobación.'},
+  'Naam':{en:'Name',de:'Name',fr:'Nom',es:'Nombre'},
+  'Icoon':{en:'Icon',de:'Symbol',fr:'Icône',es:'Icono'},
+  'Accentkleur':{en:'Accent color',de:'Akzentfarbe',fr:'Couleur d’accent',es:'Color de acento'},
+  'Modus':{en:'Mode',de:'Modus',fr:'Mode',es:'Modo'},
+  'Temperatuur °C':{en:'Temperature °C',de:'Temperatur °C',fr:'Température °C',es:'Temperatura °C'},
+  'Raam open':{en:'Window open',de:'Fenster offen',fr:'Fenêtre ouverte',es:'Ventana abierta'},
+  'Negeren':{en:'Ignore',de:'Ignorieren',fr:'Ignorer',es:'Ignorar'},
+  'Overslaan':{en:'Skip',de:'Überspringen',fr:'Ignorer la règle',es:'Omitir'},
+  'Raam temp. °C':{en:'Window temp. °C',de:'Fenstertemp. °C',fr:'Temp. fenêtre °C',es:'Temp. ventana °C'},
+  'Apparaat':{en:'Appliance',de:'Gerät',fr:'Appareil',es:'Dispositivo'},
+  'Type':{en:'Type',de:'Typ',fr:'Type',es:'Tipo'},
+  'Wasmachine':{en:'Washing machine',de:'Waschmaschine',fr:'Lave-linge',es:'Lavadora'},
+  'Droger':{en:'Dryer',de:'Trockner',fr:'Sèche-linge',es:'Secadora'},
+  'Vaatwasser':{en:'Dishwasher',de:'Geschirrspüler',fr:'Lave-vaisselle',es:'Lavavajillas'},
+  'Custom':{en:'Custom',de:'Benutzerdefiniert',fr:'Personnalisé',es:'Personalizado'},
+  'Start boven W':{en:'Start above W',de:'Start über W',fr:'Démarrage au-dessus de W',es:'Inicio por encima de W'},
+  'Klaar onder W':{en:'Ready below W',de:'Bereit unter W',fr:'Prêt sous W',es:'Listo por debajo de W'},
+  'Klaar delay sec.':{en:'Ready delay sec.',de:'Bereit-Verzögerung Sek.',fr:'Délai prêt (s)',es:'Retardo de listo (s)'},
+  'Actie':{en:'Action',de:'Aktion',fr:'Action',es:'Acción'},
+  'Aan':{en:'On',de:'Ein',fr:'Activé',es:'Encendido'},
+  'Uit':{en:'Off',de:'Aus',fr:'Désactivé',es:'Apagado'},
+  'Toggle':{en:'Toggle',de:'Umschalten',fr:'Basculer',es:'Alternar'},
+  'Tijdmodus':{en:'Time mode',de:'Zeitmodus',fr:'Mode horaire',es:'Modo de tiempo'},
+  'Vaste tijd':{en:'Fixed time',de:'Feste Zeit',fr:'Heure fixe',es:'Hora fija'},
+  'Random':{en:'Random',de:'Zufällig',fr:'Aléatoire',es:'Aleatorio'},
+  'Zonsopkomst':{en:'Sunrise',de:'Sonnenaufgang',fr:'Lever du soleil',es:'Amanecer'},
+  'Zonsondergang':{en:'Sunset',de:'Sonnenuntergang',fr:'Coucher du soleil',es:'Atardecer'},
+  'Onbekend apparaat':{en:'Unknown device',de:'Unbekanntes Gerät',fr:'Appareil inconnu',es:'Dispositivo desconocido'},
+  'Submodi':{en:'Sub modes',de:'Untermodi',fr:'Sous-modes',es:'Submodos'},
+  'Zoneregel':{en:'Zone rule',de:'Zonenregel',fr:'Règle de zone',es:'Regla de zona'},
+  'Temperatuurregel':{en:'Temperature rule',de:'Temperaturregel',fr:'Règle de température',es:'Regla de temperatura'},
+  'meer':{en:'more',de:'mehr',fr:'de plus',es:'más'},
+  'meer in normale instellingen':{en:'more in normal settings',de:'mehr in den normalen Einstellungen',fr:'de plus dans les paramètres normaux',es:'más en los ajustes normales'},
+  'instellingen':{en:'settings',de:'Einstellungen',fr:'paramètres',es:'ajustes'},
+  'tijd':{en:'time',de:'Zeit',fr:'heure',es:'hora'},
+  'Vakantie na':{en:'Vacation after',de:'Urlaub nach',fr:'Vacances après',es:'Vacaciones después de'},
+  'Bijladen...':{en:'Loading more...',de:'Weitere Daten werden geladen...',fr:'Chargement supplémentaire...',es:'Cargando más datos...'},
+  'Homey API niet klaar':{en:'Homey API not ready',de:'Homey-API nicht bereit',fr:'API Homey non prête',es:'La API de Homey no está lista'},
+  'Thuis':{en:'Home',de:'Zuhause',fr:'Maison',es:'Casa'},
+  'Slapen':{en:'Sleep',de:'Schlafen',fr:'Sommeil',es:'Dormir'},
+  'Afwezig':{en:'Away',de:'Abwesend',fr:'Absent',es:'Fuera'},
+  'Vakantie':{en:'Vacation',de:'Urlaub',fr:'Vacances',es:'Vacaciones'},
+  'Nieuwe submodus':{en:'New sub mode',de:'Neuer Untermodus',fr:'Nouveau sous-mode',es:'Nuevo submodo'},
+  'Submodus':{en:'Sub mode',de:'Untermodus',fr:'Sous-mode',es:'Submodo'},
+  'Apparaatmelding':{en:'Appliance notification',de:'Gerätebenachrichtigung',fr:'Notification d’appareil',es:'Notificación de dispositivo'},
+  'Nieuwe zoneregel':{en:'New zone rule',de:'Neue Zonenregel',fr:'Nouvelle règle de zone',es:'Nueva regla de zona'},
+  'Nieuwe temperatuurregel':{en:'New temperature rule',de:'Neue Temperaturregel',fr:'Nouvelle règle de température',es:'Nueva regla de temperatura'},
+  'Nieuwe planning':{en:'New schedule',de:'Neuer Zeitplan',fr:'Nouveau planning',es:'Nuevo horario'},
 };
 function tt(s){var v=I18N[s];return (v&&v[WIDGET_LANG])||s;}
 function translateDom(){document.documentElement.lang=WIDGET_LANG;var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null);var nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(function(n){var raw=n.nodeValue;var key=raw.trim();if(I18N[key])n.nodeValue=raw.replace(key,tt(key));});var refresh=document.getElementById('refresh');if(refresh)refresh.setAttribute('title',tt('Vernieuwen'));}
@@ -366,10 +424,11 @@ function safeInitialRender(){
   try{render();setStatus('Basis geladen');}catch(e){setStatus('Renderfout');}
 }
 
-function modeLabel(id){var m=(config?.modes||[]).find(x=>x.id===id);return (m&&m.label)||({home:'Thuis',sleep:'Slapen',away:'Afwezig',vacation:'Vakantie'}[id]||id||'')}
+function temperatureModeIds(r){if(r&&Array.isArray(r.modeIds))return r.modeIds.map(String);if(r&&r.modeId)return [String(r.modeId)];return [String(config.currentMode||(config.modes&&config.modes[0]&&config.modes[0].id)||'home')]}
+function modeLabel(id){var m=(config?.modes||[]).find(x=>x.id===id);return (m&&m.label)||({home:tt('Thuis'),sleep:tt('Slapen'),away:tt('Afwezig'),vacation:tt('Vakantie')}[id]||id||'')}
 function modeIcon(id){return {home:'🏠',sleep:'🌙',away:'🚶',vacation:'🏖️'}[id]||'•'}
-function zoneName(id){var z=(environment?.zones||[]).find(x=>x.id===id);return (z&&z.name)||id||'Geen zone'}
-function deviceName(id){var pools=[environment?.switchableDevices,environment?.lightDevices,environment?.powerDevices,environment?.thermostatDevices,environment?.motionDevices,environment?.contactDevices,environment?.luminanceDevices,environment?.presenceDevices].flat().filter(Boolean);var d=pools.find(x=>x.id===id);return (d&&d.name)||'Onbekend apparaat'}
+function zoneName(id){var z=(environment?.zones||[]).find(x=>x.id===id);return (z&&z.name)||id||tt('Geen zone')}
+function deviceName(id){var pools=[environment?.switchableDevices,environment?.lightDevices,environment?.powerDevices,environment?.thermostatDevices,environment?.motionDevices,environment?.contactDevices,environment?.luminanceDevices,environment?.presenceDevices].flat().filter(Boolean);var d=pools.find(x=>x.id===id);return (d&&d.name)||tt('Onbekend apparaat')}
 function allDevices(){
   var arr=[];
   ['switchableDevices','lightDevices','powerDevices','thermostatDevices','motionDevices','contactDevices','luminanceDevices','presenceDevices'].forEach(function(k){
@@ -386,7 +445,7 @@ function deviceOptions(type){
 }
 function zoneOptions(){
   var list=(environment&&Array.isArray(environment.zones))?environment.zones:[];
-  return '<option value="">Geen zone</option>'+list.map(function(z){return '<option value="'+esc(z.id)+'">'+esc(z.name||z.id)+'</option>'}).join('');
+  return '<option value="">'+tt('Geen zone')+'</option>'+list.map(function(z){return '<option value="'+esc(z.id)+'">'+esc(z.name||z.id)+'</option>'}).join('');
 }
 function modeOptions(){
   return (config&&Array.isArray(config.modes)?config.modes:[]).map(function(m){return '<option value="'+esc(m.id)+'">'+esc((modeIcon(m.id)+' '+(m.label||m.id)).trim())+'</option>'}).join('');
@@ -396,15 +455,15 @@ var editor={type:null,index:null};
 function openEditor(type,index){
   editor={type:type,index:index==null?null:index};
   var existing=getEditorExisting(type,index);
-  $('editorTitle').textContent=(index==null?'Nieuw ':'Bewerk ')+editorTitle(type);
+  $('editorTitle').textContent=(index==null?tt('Nieuw')+' ':tt('Bewerk')+' ')+editorTitle(type);
   $('editorFields').innerHTML=editorFields(type,existing);
-  $('editorApply').textContent=index==null?'Toevoegen':'Opslaan';
+  $('editorApply').textContent=index==null?tt('Toevoegen'):tt('Opslaan');
   setSelectValues(type,existing);
   $('editorModal').classList.add('show');
 }
 function closeEditor(){ $('editorModal').classList.remove('show'); editor={type:null,index:null}; }
 function editorTitle(type){
-  return ({sub:'submodus',zone:'zoneregel',temp:'temperatuurregel',appliance:'apparaatmelding',schedule:'planning'})[type]||'regel';
+  return ({sub:tt('Submodus'),zone:tt('Zoneregel'),temp:tt('Temperatuurregel'),appliance:tt('Apparaatmelding'),schedule:tt('Planning')})[type]||tt('Regel');
 }
 function getEditorExisting(type,index){
   if(index==null)return {};
@@ -421,42 +480,42 @@ function selectField(name,label,value,options){
 }
 function editorFields(type,r){
   if(type==='sub'){
-    return field('label','Naam',r.label||'Nieuwe submodus')+
-      '<div class="field"><label>Hoofdmodus</label><select data-edit="parentMode">'+modeOptions()+'</select></div>'+
-      field('icon','Icoon',r.icon||'')+
-      field('accentColor','Accentkleur',r.accentColor||'#60a5fa','color')+
-      '<div class="field full"><label>Achtergrond URL</label><input data-edit="imageUrl" value="'+esc(r.imageUrl||'')+'"></div>';
+    return field('label',tt('Naam'),r.label||tt('Nieuwe submodus'))+
+      '<div class="field"><label>'+tt('Hoofdmodus')+'</label><select data-edit="parentMode">'+modeOptions()+'</select></div>'+
+      field('icon',tt('Icoon'),r.icon||'')+
+      field('accentColor',tt('Accentkleur'),r.accentColor||'#60a5fa','color')+
+      '<div class="field full"><label>'+tt('Achtergrond URL')+'</label><input data-edit="imageUrl" value="'+esc(r.imageUrl||'')+'"></div>';
   }
   if(type==='zone'){
-    return field('name','Naam',r.name||'Nieuwe zoneregel')+
-      '<div class="field"><label>Zone</label><select data-edit="zoneId">'+zoneOptions()+'</select></div>'+
-      '<div class="field"><label>Geen beweging na sec.</label><input data-edit="noMotionSeconds" type="number" value="'+esc(r.noMotionSeconds||180)+'"></div>'+
-      '<div class="field"><label>Lux onder</label><input data-edit="luxBelow" type="number" value="'+esc(r.luxBelow||30)+'"></div>'+
-      '<div class="field full"><label>Actief</label><select data-edit="enabled"><option value="true">Ja</option><option value="false">Nee</option></select></div>';
+    return field('name',tt('Naam'),r.name||tt('Nieuwe zoneregel'))+
+      '<div class="field"><label>'+tt('Zone')+'</label><select data-edit="zoneId">'+zoneOptions()+'</select></div>'+
+      '<div class="field"><label>'+tt('Geen beweging na sec.')+'</label><input data-edit="noMotionSeconds" type="number" value="'+esc(r.noMotionSeconds||180)+'"></div>'+
+      '<div class="field"><label>'+tt('Lux onder')+'</label><input data-edit="luxBelow" type="number" value="'+esc(r.luxBelow||30)+'"></div>'+
+      '<div class="field full"><label>'+tt('Actief')+'</label><select data-edit="enabled"><option value="true">'+tt('Ja')+'</option><option value="false">'+tt('Nee')+'</option></select></div>';
   }
   if(type==='temp'){
-    return field('name','Naam',r.name||'Nieuwe temperatuurregel')+
-      '<div class="field"><label>Modus</label><select data-edit="modeId">'+modeOptions()+'</select></div>'+
-      '<div class="field"><label>Zone</label><select data-edit="zoneId">'+zoneOptions()+'</select></div>'+
-      '<div class="field"><label>Temperatuur °C</label><input data-edit="temperature" type="number" step="0.5" value="'+esc(r.temperature||20)+'"></div>'+
-      '<div class="field"><label>Raam open</label><select data-edit="windowMode"><option value="ignore">Negeren</option><option value="skip">Overslaan</option><option value="setback">Setback</option></select></div>'+
-      '<div class="field"><label>Raam temp. °C</label><input data-edit="windowTemperature" type="number" step="0.5" value="'+esc(r.windowTemperature||15)+'"></div>';
+    return field('name',tt('Naam'),r.name||tt('Nieuwe temperatuurregel'))+
+      '<div class="field"><label>'+tt('Modussen')+'</label><select data-edit="modeIds" multiple size="4">'+modeOptions()+'</select></div>'+
+      '<div class="field"><label>'+tt('Zone')+'</label><select data-edit="zoneId">'+zoneOptions()+'</select></div>'+
+      '<div class="field"><label>'+tt('Temperatuur °C')+'</label><input data-edit="temperature" type="number" step="0.5" value="'+esc(r.temperature||20)+'"></div>'+
+      '<div class="field"><label>'+tt('Raam open')+'</label><select data-edit="windowMode"><option value="ignore">'+tt('Negeren')+'</option><option value="skip">'+tt('Overslaan')+'</option><option value="setback">Setback</option></select></div>'+
+      '<div class="field"><label>'+tt('Raam temp. °C')+'</label><input data-edit="windowTemperature" type="number" step="0.5" value="'+esc(r.windowTemperature||15)+'"></div>';
   }
   if(type==='appliance'){
-    return field('name','Naam',r.name||'Wasmachine')+
-      '<div class="field"><label>Apparaat</label><select data-edit="deviceId">'+deviceOptions('powerDevices')+'</select></div>'+
-      '<div class="field"><label>Type</label><select data-edit="type"><option value="washing_machine">Wasmachine</option><option value="dryer">Droger</option><option value="dishwasher">Vaatwasser</option><option value="custom">Custom</option></select></div>'+
-      '<div class="field"><label>Start boven W</label><input data-edit="startAboveWatt" type="number" value="'+esc(r.startAboveWatt||10)+'"></div>'+
-      '<div class="field"><label>Klaar onder W</label><input data-edit="readyBelowWatt" type="number" value="'+esc(r.readyBelowWatt||5)+'"></div>'+
-      '<div class="field"><label>Klaar delay sec.</label><input data-edit="readyDelaySeconds" type="number" value="'+esc(r.readyDelaySeconds||180)+'"></div>';
+    return field('name',tt('Naam'),r.name||tt('Wasmachine'))+
+      '<div class="field"><label>'+tt('Apparaat')+'</label><select data-edit="deviceId">'+deviceOptions('powerDevices')+'</select></div>'+
+      '<div class="field"><label>'+tt('Type')+'</label><select data-edit="type"><option value="washing_machine">'+tt('Wasmachine')+'</option><option value="dryer">'+tt('Droger')+'</option><option value="dishwasher">'+tt('Vaatwasser')+'</option><option value="custom">'+tt('Custom')+'</option></select></div>'+
+      '<div class="field"><label>'+tt('Start boven W')+'</label><input data-edit="startAboveWatt" type="number" value="'+esc(r.startAboveWatt||10)+'"></div>'+
+      '<div class="field"><label>'+tt('Klaar onder W')+'</label><input data-edit="readyBelowWatt" type="number" value="'+esc(r.readyBelowWatt||5)+'"></div>'+
+      '<div class="field"><label>'+tt('Klaar delay sec.')+'</label><input data-edit="readyDelaySeconds" type="number" value="'+esc(r.readyDelaySeconds||180)+'"></div>';
   }
   if(type==='schedule'){
-    return field('name','Naam',r.name||'Nieuwe planning')+
-      '<div class="field"><label>Actie</label><select data-edit="action"><option value="on">Aan</option><option value="off">Uit</option><option value="toggle">Toggle</option></select></div>'+
-      '<div class="field"><label>Tijdmodus</label><select data-edit="timeMode"><option value="fixed">Vaste tijd</option><option value="random">Random</option><option value="sunrise">Zonsopkomst</option><option value="sunset">Zonsondergang</option></select></div>'+
-      '<div class="field"><label>Vaste tijd</label><input data-edit="fixedTime" type="time" value="'+esc(r.fixedTime||'19:00')+'"></div>'+
-      '<div class="field"><label>Zone</label><select data-edit="zoneId">'+zoneOptions()+'</select></div>'+
-      '<div class="field"><label>Lux onder</label><input data-edit="luxThreshold" type="number" value="'+esc(r.luxThreshold||30)+'"></div>';
+    return field('name',tt('Naam'),r.name||tt('Nieuwe planning'))+
+      '<div class="field"><label>'+tt('Actie')+'</label><select data-edit="action"><option value="on">'+tt('Aan')+'</option><option value="off">'+tt('Uit')+'</option><option value="toggle">'+tt('Toggle')+'</option></select></div>'+
+      '<div class="field"><label>'+tt('Tijdmodus')+'</label><select data-edit="timeMode"><option value="fixed">'+tt('Vaste tijd')+'</option><option value="random">'+tt('Random')+'</option><option value="sunrise">'+tt('Zonsopkomst')+'</option><option value="sunset">'+tt('Zonsondergang')+'</option></select></div>'+
+      '<div class="field"><label>'+tt('Vaste tijd')+'</label><input data-edit="fixedTime" type="time" value="'+esc(r.fixedTime||'19:00')+'"></div>'+
+      '<div class="field"><label>'+tt('Zone')+'</label><select data-edit="zoneId">'+zoneOptions()+'</select></div>'+
+      '<div class="field"><label>'+tt('Lux onder')+'</label><input data-edit="luxThreshold" type="number" value="'+esc(r.luxThreshold||30)+'"></div>';
   }
   return '';
 }
@@ -466,6 +525,11 @@ function setSelectValues(type,r){
     var el=modal.querySelector('[data-edit="'+k+'"]');
     if(el&&r&&r[k]!=null)el.value=String(r[k]);
   });
+  var modeIdsEl=modal.querySelector('[data-edit="modeIds"]');
+  if(modeIdsEl){
+    var selected=temperatureModeIds(r);
+    Array.from(modeIdsEl.options).forEach(function(o){o.selected=selected.includes(o.value)});
+  }
 }
 function applyEditor(){
   var type=editor.type, idx=editor.index;
@@ -473,7 +537,7 @@ function applyEditor(){
   var data=Object.assign({},r);
   $('editorFields').querySelectorAll('[data-edit]').forEach(function(el){
     var k=el.dataset.edit;
-    var v=el.value;
+    var v=el.multiple?Array.from(el.selectedOptions).map(function(o){return o.value}):el.value;
     if(el.type==='number')v=Number(v);
     if(v==='true')v=true;
     if(v==='false')v=false;
@@ -487,28 +551,28 @@ function makeId(prefix){return prefix+'-'+Date.now()}
 function saveEditorData(type,idx,data){
   if(type==='sub'){
     config.subModes=config.subModes||[];
-    var item=Object.assign({id:'sub-'+Date.now(),parentMode:'home',label:'Nieuwe submodus',autoEnabled:false,autoDeviceId:'',autoOperator:'above',autoWatt:50,autoDelaySeconds:10,autoReturnEnabled:true,autoReturnOperator:'below',autoReturnWatt:15,autoReturnDelaySeconds:300,icon:'',accentColor:'#60a5fa',imageUrl:''},data);
+    var item=Object.assign({id:'sub-'+Date.now(),parentMode:'home',label:tt('Nieuwe submodus'),autoEnabled:false,autoDeviceId:'',autoOperator:'above',autoWatt:50,autoDelaySeconds:10,autoReturnEnabled:true,autoReturnOperator:'below',autoReturnWatt:15,autoReturnDelaySeconds:300,icon:'',accentColor:'#60a5fa',imageUrl:''},data);
     if(!item.id)item.id=makeId('sub');
     if(idx==null)config.subModes.push(item);else config.subModes[idx]=item;
   }
   if(type==='zone'){
     config.zoneRules=config.zoneRules||[];
-    var item=Object.assign({id:makeId('rule'),name:'Nieuwe zoneregel',enabled:true,modeIds:(config.modes||[]).map(m=>m.id),zoneId:'',includeSubzones:false,motionDeviceIds:[],contactDeviceIds:[],lightDeviceIds:[],turnOnOnMotion:true,turnOnOnContact:false,turnOffAfterNoMotion:true,turnOffWhenContactClosed:false,invertContactLogic:false,noMotionSeconds:180,dimValue:null,timeEnabled:false,timeFrom:'18:00',timeTo:'23:59',onlyIfLightsOff:false,onlyIfDark:false,luxDeviceIds:[],luxBelow:30},data);
+    var item=Object.assign({id:makeId('rule'),name:tt('Nieuwe zoneregel'),enabled:true,modeIds:(config.modes||[]).map(m=>m.id),zoneId:'',includeSubzones:false,motionDeviceIds:[],contactDeviceIds:[],lightDeviceIds:[],turnOnOnMotion:true,turnOnOnContact:false,turnOffAfterNoMotion:true,turnOffWhenContactClosed:false,invertContactLogic:false,noMotionSeconds:180,dimValue:null,timeEnabled:false,timeFrom:'18:00',timeTo:'23:59',onlyIfLightsOff:false,onlyIfDark:false,luxDeviceIds:[],luxBelow:30},data);
     if(idx==null)config.zoneRules.push(item);else config.zoneRules[idx]=item;
   }
   if(type==='temp'){
     config.temperatureRules=config.temperatureRules||[];
-    var item=Object.assign({id:makeId('temp'),name:'Nieuwe temperatuurregel',enabled:true,modeId:config.currentMode||'home',zoneId:'',includeSubzones:false,thermostatDeviceIds:[],temperature:20,windowMode:'ignore',windowTemperature:15,contactDeviceIds:[],smartWeatherEnabled:false,weatherDeviceId:'',weatherColdBelow:5,weatherColdBoost:1,weatherWarmAbove:16,weatherWarmReduce:1,weatherMinTarget:5,weatherMaxTarget:25},data);
+    var item=Object.assign({id:makeId('temp'),name:tt('Nieuwe temperatuurregel'),enabled:true,modeIds:[config.currentMode||'home'],zoneId:'',includeSubzones:false,thermostatDeviceIds:[],temperature:20,windowMode:'ignore',windowTemperature:15,contactDeviceIds:[],smartWeatherEnabled:false,weatherDeviceId:'',weatherColdBelow:5,weatherColdBoost:1,weatherWarmAbove:16,weatherWarmReduce:1,weatherMinTarget:5,weatherMaxTarget:25},data);
     if(idx==null)config.temperatureRules.push(item);else config.temperatureRules[idx]=item;
   }
   if(type==='appliance'){
     config.applianceRules=config.applianceRules||[];
-    var item=Object.assign({id:makeId('appliance'),name:'Wasmachine',enabled:true,type:'washing_machine',deviceId:'',startAboveWatt:10,readyBelowWatt:5,minRunSeconds:120,readyDelaySeconds:180,resetMode:'manual',resetAfterReadySeconds:0,resetMotionDeviceIds:[],resetContactDeviceIds:[],repeatReadyNotification:false,readyReminderSeconds:1800,notifyOnStart:false,notifyOnReady:true,useTimelineNotification:false},data);
+    var item=Object.assign({id:makeId('appliance'),name:tt('Wasmachine'),enabled:true,type:'washing_machine',deviceId:'',startAboveWatt:10,readyBelowWatt:5,minRunSeconds:120,readyDelaySeconds:180,resetMode:'manual',resetAfterReadySeconds:0,resetMotionDeviceIds:[],resetContactDeviceIds:[],repeatReadyNotification:false,readyReminderSeconds:1800,notifyOnStart:false,notifyOnReady:true,useTimelineNotification:false},data);
     if(idx==null)config.applianceRules.push(item);else config.applianceRules[idx]=item;
   }
   if(type==='schedule'){
     config.scheduleRules=config.scheduleRules||[];
-    var item=Object.assign({id:makeId('schedule'),name:'Nieuwe planning',enabled:true,modeIds:(config.modes||[]).map(m=>m.id),deviceIds:[],action:'on',timeMode:'fixed',fixedTime:'19:00',randomFrom:'18:30',randomTo:'23:00',sunOffsetMinutes:0,autoOffEnabled:false,autoOffMode:'hours',autoOffAfterHours:1,autoOffTime:'23:00',autoOffRandomFromHours:0.5,autoOffRandomToHours:2,autoOffRandomFromTime:'22:00',autoOffRandomToTime:'23:30',autoOnEnabled:false,autoOnMode:'hours',autoOnAfterHours:1,autoOnTime:'07:00',autoOnRandomFromHours:0.5,autoOnRandomToHours:2,autoOnRandomFromTime:'06:30',autoOnRandomToTime:'08:00',zoneId:'',includeSubzones:true,luxCondition:false,luxDeviceIds:[],luxOperator:'below',luxThreshold:30,days:[0,1,2,3,4,5,6]},data);
+    var item=Object.assign({id:makeId('schedule'),name:tt('Nieuwe planning'),enabled:true,modeIds:(config.modes||[]).map(m=>m.id),deviceIds:[],action:'on',timeMode:'fixed',fixedTime:'19:00',randomFrom:'18:30',randomTo:'23:00',sunOffsetMinutes:0,autoOffEnabled:false,autoOffMode:'hours',autoOffAfterHours:1,autoOffTime:'23:00',autoOffRandomFromHours:0.5,autoOffRandomToHours:2,autoOffRandomFromTime:'22:00',autoOffRandomToTime:'23:30',autoOnEnabled:false,autoOnMode:'hours',autoOnAfterHours:1,autoOnTime:'07:00',autoOnRandomFromHours:0.5,autoOnRandomToHours:2,autoOnRandomFromTime:'06:30',autoOnRandomToTime:'08:00',zoneId:'',includeSubzones:true,luxCondition:false,luxDeviceIds:[],luxOperator:'below',luxThreshold:30,days:[0,1,2,3,4,5,6]},data);
     if(idx==null)config.scheduleRules.push(item);else config.scheduleRules[idx]=item;
   }
 }
@@ -558,54 +622,54 @@ function render(){
 
   $('currentModeText').textContent=modeIcon(config.currentMode)+' '+modeLabel(config.currentMode);
   $('countChips').innerHTML=[
-    ['Submodi',config.subModes.length],['Modusregels',Object.keys(config.rules).length],['Zones',config.zoneRules.length],
-    ['Temp.',config.temperatureRules.length],['Monitoring',config.applianceRules.length],['Planning',config.scheduleRules.length]
+    [tt('Submodi'),config.subModes.length],[tt('Modusregels'),Object.keys(config.rules).length],[tt('Zones'),config.zoneRules.length],
+    [tt('Temp.'),config.temperatureRules.length],[tt('Monitoring'),config.applianceRules.length],[tt('Planning'),config.scheduleRules.length]
   ].map(x=>'<span class="chip">'+x[0]+': '+x[1]+'</span>').join('');
   $('overviewChips').innerHTML=(config.modes||[]).slice(0,4).map(m=>'<span class="chip '+(m.id===config.currentMode?'active':'')+'">'+modeIcon(m.id)+' '+(m.label||m.id)+'</span>').join('');
 
   $('subModeList').innerHTML='';
   config.subModes.slice(0,6).forEach((r,i)=>$('subModeList').appendChild(item((r.icon?r.icon+' ':'')+(r.label||r.id), modeLabel(r.parentMode), true, null, ()=>openEditor('sub',i))));
-  if(config.subModes.length>6) $('subModeList').insertAdjacentHTML('beforeend','<div class="note">+'+(config.subModes.length-6)+' meer in normale instellingen</div>');
+  if(config.subModes.length>6) $('subModeList').insertAdjacentHTML('beforeend','<div class="note">+'+(config.subModes.length-6)+' '+tt('meer in normale instellingen')+'</div>');
 
   $('modeRuleList').innerHTML='';
-  Object.keys(config.rules||{}).slice(0,6).forEach(k=>{var r=config.rules[k]||{};$('modeRuleList').appendChild(item(modeLabel(k), Object.keys(r).length+' instellingen', true, null));});
+  Object.keys(config.rules||{}).slice(0,6).forEach(k=>{var r=config.rules[k]||{};$('modeRuleList').appendChild(item(modeLabel(k), Object.keys(r).length+' '+tt('instellingen'), true, null));});
 
   $('zoneRuleList').innerHTML='';
-  config.zoneRules.slice(0,7).forEach((r,i)=>$('zoneRuleList').appendChild(item(r.name||'Zoneregel', zoneName(r.zoneId)+' · '+(r.modeIds||[]).map(modeLabel).join(', '), r.enabled, v=>{r.enabled=v}, ()=>openEditor('zone',i))));
-  if(config.zoneRules.length>7) $('zoneRuleList').insertAdjacentHTML('beforeend','<div class="note">+'+(config.zoneRules.length-7)+' meer</div>');
+  config.zoneRules.slice(0,7).forEach((r,i)=>$('zoneRuleList').appendChild(item(r.name||tt('Zoneregel'), zoneName(r.zoneId)+' · '+(r.modeIds||[]).map(modeLabel).join(', '), r.enabled, v=>{r.enabled=v}, ()=>openEditor('zone',i))));
+  if(config.zoneRules.length>7) $('zoneRuleList').insertAdjacentHTML('beforeend','<div class="note">+'+(config.zoneRules.length-7)+' '+tt('meer')+'</div>');
 
   $('tempRuleList').innerHTML='';
-  config.temperatureRules.slice(0,7).forEach((r,i)=>$('tempRuleList').appendChild(item(r.name||'Temperatuurregel', modeLabel(r.modeId)+' · '+zoneName(r.zoneId)+' · '+(r.temperature??20)+'°C', r.enabled, v=>{r.enabled=v}, ()=>openEditor('temp',i))));
+  config.temperatureRules.slice(0,7).forEach((r,i)=>$('tempRuleList').appendChild(item(r.name||tt('Temperatuurregel'), (temperatureModeIds(r).map(modeLabel).join(', '))+' · '+zoneName(r.zoneId)+' · '+(r.temperature??20)+'°C', r.enabled, v=>{r.enabled=v}, ()=>openEditor('temp',i))));
 
   $('applianceRuleList').innerHTML='';
-  config.applianceRules.slice(0,7).forEach((r,i)=>$('applianceRuleList').appendChild(item(r.name||'Apparaat', deviceName(r.deviceId), r.enabled, v=>{r.enabled=v}, ()=>openEditor('appliance',i))));
+  config.applianceRules.slice(0,7).forEach((r,i)=>$('applianceRuleList').appendChild(item(r.name||tt('Apparaat'), deviceName(r.deviceId), r.enabled, v=>{r.enabled=v}, ()=>openEditor('appliance',i))));
 
   $('scheduleRuleList').innerHTML='';
-  config.scheduleRules.slice(0,7).forEach((r,i)=>{var time=r.timeMode==='fixed'?(r.fixedTime||'19:00'):r.timeMode||'tijd';$('scheduleRuleList').appendChild(item(r.name||'Planning', time+' · '+(r.action||'on'), r.enabled, v=>{r.enabled=v}, ()=>openEditor('schedule',i)))});
+  config.scheduleRules.slice(0,7).forEach((r,i)=>{var time=r.timeMode==='fixed'?(r.fixedTime||'19:00'):r.timeMode||tt('tijd');$('scheduleRuleList').appendChild(item(r.name||tt('Planning'), time+' · '+(r.action||'on'), r.enabled, v=>{r.enabled=v}, ()=>openEditor('schedule',i)))});
 
   $('autoEnabled').checked=!!config.autoMode.enabled;
   $('vacationAfterHours').value=Number(config.autoMode.vacationAfterHours||72);
-  $('autoChips').innerHTML='<span class="chip '+(config.autoMode.enabled?'active':'')+'">'+(config.autoMode.enabled?'Actief':'Uit')+'</span><span class="chip">Vakantie na '+(config.autoMode.vacationAfterHours||72)+'u</span>';
+  $('autoChips').innerHTML='<span class="chip '+(config.autoMode.enabled?'active':'')+'">'+(config.autoMode.enabled?tt('Actief'):tt('Uit'))+'</span><span class="chip">'+tt('Vakantie na')+' '+(config.autoMode.vacationAfterHours||72)+'u</span>';
   $('exportText').value=JSON.stringify({subModes:config.subModes,rules:config.rules,zoneRules:config.zoneRules,temperatureRules:config.temperatureRules,applianceRules:config.applianceRules,scheduleRules:config.scheduleRules,autoMode:config.autoMode},null,2);
 }
 function addSubMode(){
-  config.subModes.push({id:'sub-'+Date.now(),parentMode:'home',label:'Nieuwe submodus',autoEnabled:false,autoDeviceId:'',autoOperator:'above',autoWatt:50,autoDelaySeconds:10,autoReturnEnabled:true,autoReturnOperator:'below',autoReturnWatt:15,autoReturnDelaySeconds:300,icon:'',accentColor:'#60a5fa',imageUrl:''});
+  config.subModes.push({id:'sub-'+Date.now(),parentMode:'home',label:tt('Nieuwe submodus'),autoEnabled:false,autoDeviceId:'',autoOperator:'above',autoWatt:50,autoDelaySeconds:10,autoReturnEnabled:true,autoReturnOperator:'below',autoReturnWatt:15,autoReturnDelaySeconds:300,icon:'',accentColor:'#60a5fa',imageUrl:''});
   render();
 }
 function addZoneRule(){
-  config.zoneRules.push({id:'rule-'+Date.now(),name:'Nieuwe zoneregel',enabled:true,modeIds:(config.modes||[]).map(m=>m.id),zoneId:(environment?.zones?.[0]?.id)||'',includeSubzones:false,motionDeviceIds:[],contactDeviceIds:[],lightDeviceIds:[],turnOnOnMotion:true,turnOnOnContact:false,turnOffAfterNoMotion:true,turnOffWhenContactClosed:false,invertContactLogic:false,noMotionSeconds:180,dimValue:null,timeEnabled:false,timeFrom:'18:00',timeTo:'23:59',onlyIfLightsOff:false,onlyIfDark:false,luxDeviceIds:[],luxBelow:30});
+  config.zoneRules.push({id:'rule-'+Date.now(),name:tt('Nieuwe zoneregel'),enabled:true,modeIds:(config.modes||[]).map(m=>m.id),zoneId:(environment?.zones?.[0]?.id)||'',includeSubzones:false,motionDeviceIds:[],contactDeviceIds:[],lightDeviceIds:[],turnOnOnMotion:true,turnOnOnContact:false,turnOffAfterNoMotion:true,turnOffWhenContactClosed:false,invertContactLogic:false,noMotionSeconds:180,dimValue:null,timeEnabled:false,timeFrom:'18:00',timeTo:'23:59',onlyIfLightsOff:false,onlyIfDark:false,luxDeviceIds:[],luxBelow:30});
   render();
 }
 function addTempRule(){
-  config.temperatureRules.push({id:'temp-'+Date.now(),name:'Nieuwe temperatuurregel',enabled:true,modeId:config.currentMode||(config.modes?.[0]?.id)||'home',zoneId:(environment?.zones?.[0]?.id)||'',includeSubzones:false,thermostatDeviceIds:[],temperature:20,windowMode:'ignore',windowTemperature:15,contactDeviceIds:[],smartWeatherEnabled:false,weatherDeviceId:'',weatherColdBelow:5,weatherColdBoost:1,weatherWarmAbove:16,weatherWarmReduce:1,weatherMinTarget:5,weatherMaxTarget:25});
+  config.temperatureRules.push({id:'temp-'+Date.now(),name:tt('Nieuwe temperatuurregel'),enabled:true,modeIds:[config.currentMode||(config.modes?.[0]?.id)||'home'],zoneId:(environment?.zones?.[0]?.id)||'',includeSubzones:false,thermostatDeviceIds:[],temperature:20,windowMode:'ignore',windowTemperature:15,contactDeviceIds:[],smartWeatherEnabled:false,weatherDeviceId:'',weatherColdBelow:5,weatherColdBoost:1,weatherWarmAbove:16,weatherWarmReduce:1,weatherMinTarget:5,weatherMaxTarget:25});
   render();
 }
 function addApplianceRule(){
-  config.applianceRules.push({id:'appliance-'+Date.now(),name:'Wasmachine',enabled:true,type:'washing_machine',deviceId:(environment?.powerDevices?.[0]?.id)||'',startAboveWatt:10,readyBelowWatt:5,minRunSeconds:120,readyDelaySeconds:180,resetMode:'manual',resetAfterReadySeconds:0,resetMotionDeviceIds:[],resetContactDeviceIds:[],repeatReadyNotification:false,readyReminderSeconds:1800,notifyOnStart:false,notifyOnReady:true,useTimelineNotification:false});
+  config.applianceRules.push({id:'appliance-'+Date.now(),name:tt('Wasmachine'),enabled:true,type:'washing_machine',deviceId:(environment?.powerDevices?.[0]?.id)||'',startAboveWatt:10,readyBelowWatt:5,minRunSeconds:120,readyDelaySeconds:180,resetMode:'manual',resetAfterReadySeconds:0,resetMotionDeviceIds:[],resetContactDeviceIds:[],repeatReadyNotification:false,readyReminderSeconds:1800,notifyOnStart:false,notifyOnReady:true,useTimelineNotification:false});
   render();
 }
 function addScheduleRule(){
-  config.scheduleRules.push({id:'schedule-'+Date.now(),name:'Nieuwe planning',enabled:true,modeIds:(config.modes||[]).map(m=>m.id),deviceIds:[],action:'on',timeMode:'fixed',fixedTime:'19:00',randomFrom:'18:30',randomTo:'23:00',sunOffsetMinutes:0,autoOffEnabled:false,autoOffMode:'hours',autoOffAfterHours:1,autoOffTime:'23:00',autoOffRandomFromHours:0.5,autoOffRandomToHours:2,autoOffRandomFromTime:'22:00',autoOffRandomToTime:'23:30',autoOnEnabled:false,autoOnMode:'hours',autoOnAfterHours:1,autoOnTime:'07:00',autoOnRandomFromHours:0.5,autoOnRandomToHours:2,autoOnRandomFromTime:'06:30',autoOnRandomToTime:'08:00',zoneId:(environment?.zones?.[0]?.id)||'',includeSubzones:true,luxCondition:false,luxDeviceIds:[],luxOperator:'below',luxThreshold:30,days:[0,1,2,3,4,5,6]});
+  config.scheduleRules.push({id:'schedule-'+Date.now(),name:tt('Nieuwe planning'),enabled:true,modeIds:(config.modes||[]).map(m=>m.id),deviceIds:[],action:'on',timeMode:'fixed',fixedTime:'19:00',randomFrom:'18:30',randomTo:'23:00',sunOffsetMinutes:0,autoOffEnabled:false,autoOffMode:'hours',autoOffAfterHours:1,autoOffTime:'23:00',autoOffRandomFromHours:0.5,autoOffRandomToHours:2,autoOffRandomFromTime:'22:00',autoOffRandomToTime:'23:30',autoOnEnabled:false,autoOnMode:'hours',autoOnAfterHours:1,autoOnTime:'07:00',autoOnRandomFromHours:0.5,autoOnRandomToHours:2,autoOnRandomFromTime:'06:30',autoOnRandomToTime:'08:00',zoneId:(environment?.zones?.[0]?.id)||'',includeSubzones:true,luxCondition:false,luxDeviceIds:[],luxOperator:'below',luxThreshold:30,days:[0,1,2,3,4,5,6]});
   render();
 }
 async function loadData(){

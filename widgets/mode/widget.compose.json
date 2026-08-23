@@ -11,21 +11,203 @@
   "id": "mode",
   "settings": [
     {
+      "id": "modeSource",
+      "type": "autocomplete",
+      "title": {
+        "en": "Mode source",
+        "nl": "Modusbron",
+        "de": "Modusquelle",
+        "fr": "Source du mode",
+        "es": "Fuente del modo"
+      },
+      "hint": {
+        "en": "Choose the Mode Controller or a Mode & Switch device.",
+        "nl": "Kies de Modus controller of een Mode & Switch-device.",
+        "de": "Wähle den Modus-Controller oder ein Mode-&-Switch-Gerät.",
+        "fr": "Choisis le contrôleur de mode ou un appareil Mode & Switch.",
+        "es": "Elige el controlador de modo o un dispositivo Mode & Switch."
+      }
+    },
+    {
+      "id": "modeList",
+      "type": "autocomplete",
+      "title": {
+        "en": "Mode list",
+        "nl": "Moduslijst",
+        "de": "Modusliste",
+        "fr": "Liste des modes",
+        "es": "Lista de modos"
+      },
+      "hint": {
+        "en": "Choose which list the widget should show.",
+        "nl": "Kies welke lijst de widget moet tonen.",
+        "de": "Wähle aus, welche Liste das Widget anzeigen soll.",
+        "fr": "Choisis la liste que le widget doit afficher.",
+        "es": "Elige qué lista debe mostrar el widget."
+      }
+    },
+    {
+      "id": "showSubModes",
+      "type": "checkbox",
+      "title": {
+        "en": "Show sub modes",
+        "nl": "Submodussen tonen",
+        "de": "Untermodi anzeigen",
+        "fr": "Afficher les sous-modes",
+        "es": "Mostrar submodos"
+      },
+      "hint": {
+        "en": "Show the sub modes belonging to the selected main mode.",
+        "nl": "Toon de submodussen die bij de gekozen hoofdmodus horen.",
+        "de": "Zeigt die Untermodi an, die zum ausgewählten Hauptmodus gehören.",
+        "fr": "Affiche les sous-modes appartenant au mode principal sélectionné.",
+        "es": "Muestra los submodos pertenecientes al modo principal seleccionado."
+      },
+      "value": true
+    },
+    {
+      "id": "showSwitches",
+      "type": "checkbox",
+      "title": {
+        "en": "Show on/off buttons",
+        "nl": "Aan/uit-knoppen tonen",
+        "de": "Ein/Aus-Schaltflächen anzeigen",
+        "fr": "Afficher les boutons marche/arrêt",
+        "es": "Mostrar botones de encendido/apagado"
+      },
+      "hint": {
+        "en": "Show the selected on/off buttons below the modes.",
+        "nl": "Toon de gekozen aan/uit-knoppen onder de modussen.",
+        "de": "Zeigt die ausgewählten Ein/Aus-Schaltflächen unter den Modi an.",
+        "fr": "Affiche les boutons marche/arrêt sélectionnés sous les modes.",
+        "es": "Muestra los botones de encendido/apagado seleccionados debajo de los modos."
+      },
+      "value": true
+    },
+    {
+      "id": "switchButton1",
+      "type": "autocomplete",
+      "title": {
+        "en": "On/off button 1",
+        "nl": "Aan/uit-knop 1",
+        "de": "Ein/Aus-Schaltfläche 1",
+        "fr": "Bouton marche/arrêt 1",
+        "es": "Botón de encendido/apagado 1"
+      },
+      "hint": {
+        "en": "Optional. Choose a button from the selected Mode & Switch device.",
+        "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+        "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+        "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+        "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+      }
+    },
+    {
+      "id": "switchButton2",
+      "type": "autocomplete",
+      "title": {
+        "en": "On/off button 2",
+        "nl": "Aan/uit-knop 2",
+        "de": "Ein/Aus-Schaltfläche 2",
+        "fr": "Bouton marche/arrêt 2",
+        "es": "Botón de encendido/apagado 2"
+      },
+      "hint": {
+        "en": "Optional. Choose a button from the selected Mode & Switch device.",
+        "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+        "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+        "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+        "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+      }
+    },
+    {
+      "id": "switchButton3",
+      "type": "autocomplete",
+      "title": {
+        "en": "On/off button 3",
+        "nl": "Aan/uit-knop 3",
+        "de": "Ein/Aus-Schaltfläche 3",
+        "fr": "Bouton marche/arrêt 3",
+        "es": "Botón de encendido/apagado 3"
+      },
+      "hint": {
+        "en": "Optional. Choose a button from the selected Mode & Switch device.",
+        "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+        "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+        "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+        "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+      }
+    },
+    {
+      "id": "switchButton4",
+      "type": "autocomplete",
+      "title": {
+        "en": "On/off button 4",
+        "nl": "Aan/uit-knop 4",
+        "de": "Ein/Aus-Schaltfläche 4",
+        "fr": "Bouton marche/arrêt 4",
+        "es": "Botón de encendido/apagado 4"
+      },
+      "hint": {
+        "en": "Optional. Choose a button from the selected Mode & Switch device.",
+        "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+        "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+        "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+        "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+      }
+    },
+    {
+      "id": "switchButton5",
+      "type": "autocomplete",
+      "title": {
+        "en": "On/off button 5",
+        "nl": "Aan/uit-knop 5",
+        "de": "Ein/Aus-Schaltfläche 5",
+        "fr": "Bouton marche/arrêt 5",
+        "es": "Botón de encendido/apagado 5"
+      },
+      "hint": {
+        "en": "Optional. Choose a button from the selected Mode & Switch device.",
+        "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+        "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+        "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+        "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+      }
+    },
+    {
+      "id": "switchButton6",
+      "type": "autocomplete",
+      "title": {
+        "en": "On/off button 6",
+        "nl": "Aan/uit-knop 6",
+        "de": "Ein/Aus-Schaltfläche 6",
+        "fr": "Bouton marche/arrêt 6",
+        "es": "Botón de encendido/apagado 6"
+      },
+      "hint": {
+        "en": "Optional. Choose a button from the selected Mode & Switch device.",
+        "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+        "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+        "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+        "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+      }
+    },
+    {
       "id": "widgetHeight",
       "type": "number",
       "title": {
         "en": "Widget height",
-        "nl": "Widget hoogte",
+        "nl": "Widgethoogte",
         "de": "Widget-Höhe",
         "fr": "Hauteur du widget",
         "es": "Altura del widget"
       },
       "hint": {
-        "en": "Height in pixels (220-900).",
-        "nl": "Hoogte in pixels (220-900).",
-        "de": "Höhe in Pixeln (220-900).",
-        "fr": "Hauteur en pixels (220-900).",
-        "es": "Altura en píxeles (220-900)."
+        "en": "Height in pixels, between 220 and 900.",
+        "nl": "Hoogte in pixels, tussen 220 en 900.",
+        "de": "Höhe in Pixeln, zwischen 220 und 900.",
+        "fr": "Hauteur en pixels, comprise entre 220 et 900.",
+        "es": "Altura en píxeles, entre 220 y 900."
       },
       "value": 260,
       "min": 220,
@@ -44,9 +226,9 @@
       "hint": {
         "en": "Show the selected temperature sensor in the top-right corner.",
         "nl": "Toon de gekozen temperatuursensor rechtsboven in de widget.",
-        "de": "Show the selected temperature sensor in the top-right corner.",
-        "fr": "Show the selected temperature sensor in the top-right corner.",
-        "es": "Show the selected temperature sensor in the top-right corner."
+        "de": "Zeigt den ausgewählten Temperatursensor oben rechts im Widget an.",
+        "fr": "Affiche le capteur de température sélectionné en haut à droite du widget.",
+        "es": "Muestra el sensor de temperatura seleccionado en la esquina superior derecha del widget."
       },
       "value": true
     },
@@ -61,11 +243,11 @@
         "es": "Fondo meteorológico en vivo"
       },
       "hint": {
-        "en": "Use Homey's location/weather data as the widget background.",
-        "nl": "Gebruik de Homey-locatie/weerdata als achtergrond van de widget.",
-        "de": "Use Homey's location/weather data as the widget background.",
-        "fr": "Use Homey's location/weather data as the widget background.",
-        "es": "Use Homey's location/weather data as the widget background."
+        "en": "Use Homey's location and weather data as the widget background.",
+        "nl": "Gebruik de locatie- en weergegevens van Homey als achtergrond van de widget.",
+        "de": "Verwendet die Standort- und Wetterdaten von Homey als Widget-Hintergrund.",
+        "fr": "Utilise les données de localisation et météo de Homey comme arrière-plan du widget.",
+        "es": "Utiliza los datos de ubicación y meteorología de Homey como fondo del widget."
       },
       "value": true
     },
@@ -80,11 +262,11 @@
         "es": "Intensidad del fondo meteorológico"
       },
       "hint": {
-        "en": "0 = subtle, 100 = strong.",
-        "nl": "0 = subtiel, 100 = sterk.",
-        "de": "0 = subtle, 100 = strong.",
-        "fr": "0 = subtle, 100 = strong.",
-        "es": "0 = subtle, 100 = strong."
+        "en": "0 is subtle and 100 is strong.",
+        "nl": "0 is subtiel en 100 is sterk.",
+        "de": "0 ist dezent und 100 ist stark.",
+        "fr": "0 correspond à un effet discret et 100 à un effet puissant.",
+        "es": "0 es sutil y 100 es intenso."
       },
       "value": 80,
       "min": 0,
@@ -92,10 +274,31 @@
     }
   ],
   "devices": {
+    "title": {
+      "en": "Temperature sensor",
+      "nl": "Temperatuursensor",
+      "de": "Temperatursensor",
+      "fr": "Capteur de température",
+      "es": "Sensor de temperatura"
+    },
     "type": "global",
     "singular": true,
     "filter": {
       "capabilities": "measure_temperature"
+    }
+  },
+  "api": {
+    "getStatus": {
+      "method": "GET",
+      "path": "/"
+    },
+    "setMode": {
+      "method": "POST",
+      "path": "/mode"
+    },
+    "setSwitch": {
+      "method": "POST",
+      "path": "/switch"
     }
   }
 }

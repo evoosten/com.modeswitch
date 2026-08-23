@@ -23,9 +23,9 @@
       "hint": {
         "en": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height.",
         "nl": "Hoogte in pixels (220-900). Voeg de widget opnieuw toe of bewerk hem als Homey een oude hoogte vasthoudt.",
-        "de": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height.",
-        "fr": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height.",
-        "es": "Height in pixels (220-900). Re-add or edit the widget if Homey keeps an old cached height."
+        "de": "Höhe in Pixeln (220-900). Füge das Widget erneut hinzu oder bearbeite es, wenn Homey eine alte zwischengespeicherte Höhe beibehält.",
+        "fr": "Hauteur en pixels (220-900). Ajoute à nouveau le widget ou modifie-le si Homey conserve une ancienne hauteur en cache.",
+        "es": "Altura en píxeles (220-900). Vuelve a añadir o edita el widget si Homey conserva una altura antigua en caché."
       },
       "value": 360,
       "min": 220,

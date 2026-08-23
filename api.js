@@ -17,9 +17,14 @@ function _availableModes(homey) {
 }
 
 module.exports = {
+  async get_dashboard_status({ homey }) {
+    return homey.app.getDashboardStatus();
+  },
+
   async get_config({ homey }) {
     return {
       modes: _availableModes(homey).map(mode => ({ id: mode, label: homey.app.getModeLabel(mode), parentMode: (homey.app.getSubModes().find(s => s.id === mode) || {}).parentMode || null })),
+      mainModeLabels: homey.app.getMainModeLabels(),
       subModes: homey.app.getSubModes(),
       currentMode: homey.app.getCurrentMode(),
       rules: homey.app.getModeRules(),
@@ -33,6 +38,9 @@ module.exports = {
       scheduleRules: homey.app.getScheduleRules(),
       autoMode: homey.app.getAutoModeSettings(),
       displaySettings: homey.app.getDisplaySettings(),
+      modeSwitchDevices: homey.app.getModeSwitchDevicesForSettings ? homey.app.getModeSwitchDevicesForSettings() : [],
+      modeSwitchDeviceRules: homey.app.getModeSwitchDeviceRules ? homey.app.getModeSwitchDeviceRules() : {},
+      keypadMappings: homey.app.getKeypadMappings ? homey.app.getKeypadMappings() : [],
     };
   },
 
@@ -44,6 +52,16 @@ module.exports = {
     // Settings UI should always load Homey users so the Auto Mode tab can show/select them.
     // Runtime/background code still decides whether to use them based on autoMode settings.
     return homey.app.getEnvironment({ includeHomeyUsers: true, force: true });
+  },
+
+
+  async put_main_mode_labels({ homey, body }) {
+    const mainModeLabels = await homey.app.saveMainModeLabels(body?.mainModeLabels || {});
+    return {
+      ok: true,
+      mainModeLabels,
+      modes: _availableModes(homey).map(mode => ({ id: mode, label: homey.app.getModeLabel(mode), parentMode: (homey.app.getSubModes().find(s => s.id === mode) || {}).parentMode || null })),
+    };
   },
 
   async put_sub_modes({ homey, body }) {
@@ -117,6 +135,31 @@ module.exports = {
     return { ok: true, displaySettings };
   },
 
+  async put_keypad_mappings({ homey, body }) {
+    const keypadMappings = await homey.app.saveKeypadMappings(body?.keypadMappings || []);
+    return { ok: true, keypadMappings };
+  },
+
+  async put_mode_switch_device_rules({ homey, body }) {
+    const modeSwitchDeviceRules = await homey.app.saveModeSwitchDeviceRules(body?.modeSwitchDeviceRules || {});
+    return { ok: true, modeSwitchDeviceRules };
+  },
+
+  async post_mode_switch_device_rules({ homey, body }) {
+    const modeSwitchDeviceRules = await homey.app.saveModeSwitchDeviceRules(body?.modeSwitchDeviceRules || {});
+    return { ok: true, modeSwitchDeviceRules };
+  },
+
+  async put_mode_switch_devices_rules({ homey, body }) {
+    const modeSwitchDeviceRules = await homey.app.saveModeSwitchDeviceRules(body?.modeSwitchDeviceRules || {});
+    return { ok: true, modeSwitchDeviceRules };
+  },
+
+  async post_mode_switch_devices_rules({ homey, body }) {
+    const modeSwitchDeviceRules = await homey.app.saveModeSwitchDeviceRules(body?.modeSwitchDeviceRules || {});
+    return { ok: true, modeSwitchDeviceRules };
+  },
+
   async post_mode({ homey, body }) {
     if (!body || typeof body.mode !== 'string') throw new Error('Missing mode');
     return homey.app.applyMode(body.mode, { source: 'settings' });
@@ -149,7 +192,7 @@ module.exports = {
     if (!body || !body.sections || typeof body.sections !== 'object') {
       throw new Error('Missing import sections');
     }
-    const allowed = ['subModes', 'rules', 'zoneRules', 'temperatureRules', 'applianceRules', 'activityRules', 'scheduleRules', 'autoMode', 'displaySettings'];
+    const allowed = ['subModes', 'rules', 'zoneRules', 'temperatureRules', 'applianceRules', 'activityRules', 'scheduleRules', 'autoMode', 'displaySettings', 'modeSwitchDeviceRules', 'keypadMappings'];
     const ids = Array.isArray(body.ids)
       ? body.ids.filter(id => allowed.includes(id) && Object.prototype.hasOwnProperty.call(body.sections, id))
       : [];
@@ -194,6 +237,14 @@ module.exports = {
       result.displaySettings = await homey.app.saveDisplaySettings(sections.displaySettings && typeof sections.displaySettings === 'object' ? sections.displaySettings : {});
       result.imported.push('displaySettings');
     }
+    if (ids.includes('keypadMappings')) {
+      result.keypadMappings = await homey.app.saveKeypadMappings(Array.isArray(sections.keypadMappings) ? sections.keypadMappings : []);
+      result.imported.push('keypadMappings');
+    }
+    if (ids.includes('modeSwitchDeviceRules')) {
+      result.modeSwitchDeviceRules = await homey.app.saveModeSwitchDeviceRules(sections.modeSwitchDeviceRules && typeof sections.modeSwitchDeviceRules === 'object' ? sections.modeSwitchDeviceRules : {});
+      result.imported.push('modeSwitchDeviceRules');
+    }
 
     return result;
   },
@@ -215,7 +266,7 @@ module.exports = {
       .split(',')
       .map(s => s.trim())
       .filter(Boolean);
-    const allowed = ['subModes', 'rules', 'zoneRules', 'temperatureRules', 'applianceRules', 'activityRules', 'scheduleRules', 'autoMode', 'displaySettings'];
+    const allowed = ['subModes', 'rules', 'zoneRules', 'temperatureRules', 'applianceRules', 'activityRules', 'scheduleRules', 'autoMode', 'displaySettings', 'modeSwitchDeviceRules', 'keypadMappings'];
     const sectionsToExport = requested.length ? requested.filter(id => allowed.includes(id)) : allowed;
     const sections = {};
     if (sectionsToExport.includes('subModes')) sections.subModes = homey.app.getSubModes();
@@ -227,6 +278,7 @@ module.exports = {
     if (sectionsToExport.includes('scheduleRules')) sections.scheduleRules = homey.app.getScheduleRules();
     if (sectionsToExport.includes('autoMode')) sections.autoMode = homey.app.getAutoModeSettings();
     if (sectionsToExport.includes('displaySettings')) sections.displaySettings = homey.app.getDisplaySettings();
+    if (sectionsToExport.includes('modeSwitchDeviceRules')) sections.modeSwitchDeviceRules = homey.app.getModeSwitchDeviceRules ? homey.app.getModeSwitchDeviceRules() : {}; 
     const payload = {
       meta: { app: 'com.eevoosten.modeswitch', name: 'Mode Switch', version: '2.6.30', exportedAt: new Date().toISOString() },
       sections,
@@ -244,3 +296,17 @@ module.exports = {
   },
 
 };
+
+// Dashboard Service API (v1). These read-only endpoints are intended for
+// Home Overview and other trusted Homey apps.
+module.exports.get_dashboard = async ({ homey }) => homey.app.dashboardService.getDashboard();
+module.exports.get_dashboard_modes = async ({ homey }) => homey.app.dashboardService.getModes();
+module.exports.get_dashboard_monitoring = async ({ homey }) => homey.app.dashboardService.getMonitoring();
+module.exports.get_dashboard_activities = async ({ homey }) => homey.app.dashboardService.getActivities();
+module.exports.get_dashboard_schedules = async ({ homey }) => homey.app.dashboardService.getSchedules();
+module.exports.get_dashboard_presence = async ({ homey }) => homey.app.dashboardService.getPresence();
+module.exports.get_dashboard_attention = async ({ homey }) => {
+  const dashboard = homey.app.dashboardService.getDashboard();
+  return dashboard.attention;
+};
+module.exports.get_dashboard_history = async ({ homey }) => homey.app.dashboardService.getHistory();

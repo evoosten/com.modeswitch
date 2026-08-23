@@ -72,6 +72,7 @@ async function buildStatus(homey) {
   }
 
   const applianceState = callSafe(app && typeof app.getApplianceState === 'function' ? app.getApplianceState.bind(app) : null, {}) || {};
+  const applianceHistory = callSafe(app && typeof app.getApplianceHistory === 'function' ? app.getApplianceHistory.bind(app) : null, {}) || {};
   const rulesRaw = callSafe(app && typeof app.getApplianceRules === 'function' ? app.getApplianceRules.bind(app) : null, []);
   const activityState = callSafe(app && typeof app.getActivityState === 'function' ? app.getActivityState.bind(app) : null, {}) || {};
   const activityHistory = callSafe(app && typeof app.getActivityHistory === 'function' ? app.getActivityHistory.bind(app) : null, {}) || {};
@@ -97,6 +98,8 @@ async function buildStatus(homey) {
       updatedAt: state.updatedAt || null,
       readyAt: state.readyAt || null,
       startedAt: state.startedAt || null,
+      history: rule.id && applianceHistory ? toArray(applianceHistory[rule.id]).slice(0, Math.max(1, Math.min(50, Number(rule.historyLimit || 20)))) : [],
+      lastSession: rule.id && applianceHistory && toArray(applianceHistory[rule.id]).length ? toArray(applianceHistory[rule.id])[0] : null,
     });
   }
 

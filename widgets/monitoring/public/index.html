@@ -185,13 +185,34 @@ button.mode-btn.active{
   white-space:nowrap!important;
 }
 
-</style></head><body><div class="widget"><div class="header"><div class="title">Monitoring</div><span style="font-size:10px;opacity:.35">2.6.30</span><button class="sync" id="refresh" title="Vernieuwen">↻</button></div><div class="current"><div class="label">Huidige modus</div><div class="mode" id="currentMode">...</div></div><div class="mode-buttons" id="modeButtons"></div><div class="submode-wrap" id="subModeWrap" style="display:none"><div class="submode-buttons" id="subModeButtons"></div></div><div class="section-line"><div class="section-title">Apparaten</div><div class="count" id="deviceCount"></div></div><div class="devices" id="devices"></div></div>
+
+.device{cursor:pointer!important;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.device:hover{background:rgba(255,255,255,.075)!important;border-color:rgba(255,255,255,.11)!important}
+.device:active{transform:scale(.99)}
+.device-left{min-width:0;flex:1 1 auto}
+.device-right{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.device-arrow{font-size:14px;line-height:1;color:rgba(226,232,240,.48)}
+.history-overlay{position:fixed;inset:0;z-index:1000;display:none;align-items:flex-end;justify-content:center;padding:8px;background:rgba(2,6,23,.62);backdrop-filter:blur(5px)}
+.history-overlay.open{display:flex}
+.history-panel{width:100%;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(160deg,#1e293b,#0f172a);border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.history-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.08)}
+.history-title{min-width:0;font-size:16px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-close{width:32px;height:32px;flex:0 0 32px;border:0;border-radius:11px;background:rgba(255,255,255,.09);color:#fff;font-size:18px;cursor:pointer}
+.history-list{overflow:auto;padding:10px;display:flex;flex-direction:column;gap:7px}
+.history-entry{padding:10px;border-radius:14px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.06)}
+.history-entry-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.history-date{font-size:11px;font-weight:800;color:#e2e8f0}
+.history-time{font-size:10px;color:#94a3b8;text-align:right;white-space:nowrap}
+.history-stats{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.history-stat{font-size:10px;font-weight:750;padding:4px 7px;border-radius:999px;background:rgba(96,165,250,.13);color:#bfdbfe}
+.history-empty{padding:18px 12px;text-align:center;color:#94a3b8;font-size:12px}
+</style></head><body><div class="widget"><div class="header"><div class="title">Monitoring</div><span style="font-size:10px;opacity:.35">2.6.30</span><button class="sync" id="refresh" title="Vernieuwen">↻</button></div><div class="current"><div class="label">Huidige modus</div><div class="mode" id="currentMode">...</div></div><div class="mode-buttons" id="modeButtons"></div><div class="submode-wrap" id="subModeWrap" style="display:none"><div class="submode-buttons" id="subModeButtons"></div></div><div class="section-line"><div class="section-title">Apparaten</div><div class="count" id="deviceCount"></div></div><div class="devices" id="devices"></div></div><div class="history-overlay" id="historyOverlay" role="dialog" aria-modal="true" aria-hidden="true"><div class="history-panel"><div class="history-head"><div class="history-title" id="historyTitle"></div><button class="history-close" id="historyClose" type="button" aria-label="Sluiten">×</button></div><div class="history-list" id="historyList"></div></div></div>
 <script>var api=null,currentMode=null,busy=false,statusTimer=null,configuredHeight=360,SHOW_MODES=true,SHOW_APPLIANCES=true;var WIDGET_LANG='nl';
 function detectWidgetLang(Homey){
   var candidates=[];
   try{ if(Homey){ candidates.push(Homey.language, Homey.lang, Homey.locale); } }catch(e){}
-  try{ candidates.push(document.documentElement.lang); }catch(e){}
   try{ candidates.push(navigator.language, (navigator.languages&&navigator.languages[0])); }catch(e){}
+  try{ candidates.push(document.documentElement.lang); }catch(e){}
   for(var i=0;i<candidates.length;i++){
     var v=String(candidates[i]||'').toLowerCase();
     if(v.indexOf('de')===0)return 'de';
@@ -255,21 +276,21 @@ function applyWidgetTranslations(){
   var refresh=document.getElementById('refresh');
   if(refresh)refresh.setAttribute('title',tr('Vernieuwen','Refresh','Aktualisieren','Actualiser','Actualizar'));
 }
-function clampNumber(v,min,max,f){var n=Number(v);if(!Number.isFinite(n))return f;return Math.max(min,Math.min(max,Math.round(n)))}function readConfiguredHeight(Homey){var s={};try{s=Homey&&typeof Homey.getSettings==='function'?(Homey.getSettings()||{}):{}}catch(e){s={}}return clampNumber(s.widgetHeight,220,900,360)}function applyConfiguredHeight(Homey){configuredHeight=readConfiguredHeight(Homey);document.documentElement.style.setProperty('--widget-height',configuredHeight+'px');if(Homey&&typeof Homey.setHeight==='function')Homey.setHeight(configuredHeight)}function formatEnergyKwh(v){var n=Number(v);if(!Number.isFinite(n)||n<=0)return '';return n.toLocaleString(WIDGET_LANG==='nl'?'nl-NL':(WIDGET_LANG==='de'?'de-DE':(WIDGET_LANG==='fr'?'fr-FR':(WIDGET_LANG==='es'?'es-ES':'en-US'))),{minimumFractionDigits:2,maximumFractionDigits:3})+' kWh'}function statusLabel(s){if(s==='running')return tr('Bezig','Running','Läuft','En cours','En marcha');if(s==='ready')return tr('Klaar','Ready','Fertig','Terminé','Listo');return tr('Stand-by','Standby','Bereitschaft','Veille','En espera')}
+function clampNumber(v,min,max,f){var n=Number(v);if(!Number.isFinite(n))return f;return Math.max(min,Math.min(max,Math.round(n)))}function readConfiguredHeight(Homey){var s={};try{s=Homey&&typeof Homey.getSettings==='function'?(Homey.getSettings()||{}):{}}catch(e){s={}}return clampNumber(s.widgetHeight,220,900,360)}function applyConfiguredHeight(Homey){configuredHeight=readConfiguredHeight(Homey);document.documentElement.style.setProperty('--widget-height',configuredHeight+'px');if(Homey&&typeof Homey.setHeight==='function')Homey.setHeight(configuredHeight)}function formatEnergyKwh(v){var n=Number(v);if(!Number.isFinite(n)||n<=0)return '';return n.toLocaleString(WIDGET_LANG==='nl'?'nl-NL':(WIDGET_LANG==='de'?'de-DE':(WIDGET_LANG==='fr'?'fr-FR':(WIDGET_LANG==='es'?'es-ES':'en-US'))),{minimumFractionDigits:2,maximumFractionDigits:3})+' kWh'}function statusLabel(s){if(s==='running')return tr('Bezig','Running','Läuft','En cours','En funcionamiento');if(s==='ready')return tr('Klaar','Ready','Bereit','Prêt','Listo');return tr('Stand-by','Standby','Standby','En veille','En espera')}
+function localeName(){return WIDGET_LANG==='nl'?'nl-NL':WIDGET_LANG==='de'?'de-DE':WIDGET_LANG==='fr'?'fr-FR':WIDGET_LANG==='es'?'es-ES':'en-US'}
+function formatHistoryDuration(ms){var total=Math.max(0,Math.round(Number(ms||0)/1000));var h=Math.floor(total/3600),m=Math.floor((total%3600)/60),sec=total%60;if(h>0)return h+'u '+String(m).padStart(2,'0')+'m';if(m>0)return m+'m '+String(sec).padStart(2,'0')+'s';return sec+'s'}
+function historyDateParts(value){var d=new Date(value);if(Number.isNaN(d.getTime()))return {date:'',time:''};return {date:d.toLocaleDateString(localeName(),{weekday:'short',day:'2-digit',month:'short'}),time:d.toLocaleTimeString(localeName(),{hour:'2-digit',minute:'2-digit'})}}
+function closeHistory(){var o=document.getElementById('historyOverlay');if(!o)return;o.classList.remove('open');o.setAttribute('aria-hidden','true')}
+function openHistory(device){var o=document.getElementById('historyOverlay'),title=document.getElementById('historyTitle'),list=document.getElementById('historyList');if(!o||!title||!list)return;title.textContent=(device.name||tr('Apparaat','Appliance','Gerät','Appareil','Dispositivo'))+' · '+tr('Geschiedenis','History','Verlauf','Historique','Historial');list.innerHTML='';var history=Array.isArray(device.history)?device.history:[];if(!history.length){list.innerHTML='<div class="history-empty">'+tr('Nog geen afgeronde cycli opgeslagen.','No completed cycles have been saved yet.','Noch keine abgeschlossenen Zyklen gespeichert.','Aucun cycle terminé n’a encore été enregistré.','Todavía no se han guardado ciclos completados.')+'</div>'}else{history.forEach(function(entry){var start=historyDateParts(entry.startTime||entry.startedAt);var end=historyDateParts(entry.endTime||entry.readyAt);var card=document.createElement('div');card.className='history-entry';var top=document.createElement('div');top.className='history-entry-top';var date=document.createElement('div');date.className='history-date';date.textContent=start.date||end.date||tr('Onbekende datum','Unknown date','Unbekanntes Datum','Date inconnue','Fecha desconocida');var time=document.createElement('div');time.className='history-time';time.textContent=(start.time||'—')+' – '+(end.time||'—');top.appendChild(date);top.appendChild(time);card.appendChild(top);var stats=document.createElement('div');stats.className='history-stats';var values=[];if(Number(entry.durationMs)>0)values.push(tr('Duur','Duration','Dauer','Durée','Duración')+': '+formatHistoryDuration(entry.durationMs));if(Number(entry.energyKwh)>0)values.push(formatEnergyKwh(entry.energyKwh));if(Number(entry.averagePower)>0)values.push(tr('Gemiddeld','Average','Durchschnitt','Moyenne','Promedio')+': '+Math.round(Number(entry.averagePower))+' W');values.forEach(function(value){var chip=document.createElement('span');chip.className='history-stat';chip.textContent=value;stats.appendChild(chip)});if(values.length)card.appendChild(stats);list.appendChild(card)})}o.classList.add('open');o.setAttribute('aria-hidden','false');if(window.Homey&&typeof window.Homey.hapticFeedback==='function')window.Homey.hapticFeedback()}
 function runningDurationText(device){if(!device)return '';var ms=(device.status==='ready'&&typeof device.finalDurationMs==='number')?device.finalDurationMs:device.durationMs;if((!Number.isFinite(Number(ms))||Number(ms)<=0)&&typeof device.durationSeconds==='number')ms=device.durationSeconds*1000;if((!Number.isFinite(Number(ms))||Number(ms)<=0)&&device.status==='running'){var raw=device.runningSince||device.startedAt||device.startTime||device.since||device.activeSince;if(raw){var t=Date.parse(raw);if(!Number.isNaN(t))ms=Math.max(0,Date.now()-t);}}var n=Number(ms);if(!Number.isFinite(n)||n<=0)return '';var total=Math.max(0,Math.round(n/1000));var h=Math.floor(total/3600);var m=Math.floor((total%3600)/60);var sec=total%60;var text=h>0?(h+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')):(m+':'+String(sec).padStart(2,'0'));return tr('Duur','Duration','Dauer','Durée','Duración')+': '+text;}function modeText(m){if(m==='home')return tr('Thuis','Home','Zuhause','Maison','Casa');if(m==='sleep')return tr('Slapen','Sleep','Schlafen','Sommeil','Dormir');if(m==='away')return tr('Afwezig','Away','Abwesend','Absent','Fuera');if(m==='vacation')return tr('Vakantie','Vacation','Urlaub','Vacances','Vacaciones');return m}
 function translatedModeLabel(item){
   var id=String((item&&item.id)||'').toLowerCase();
-  var raw=String((item&&(item.label||item.title||item.name))||'');
-  var key=raw.toLowerCase().trim();
-  if(id==='home'||key==='home'||key==='thuis')return tr('Thuis','Home','Zuhause','Maison','Casa');
-  if(id==='away'||key==='away'||key==='afwezig')return tr('Afwezig','Away','Abwesend','Absent','Fuera');
-  if(id==='sleep'||key==='sleep'||key==='slapen')return tr('Slapen','Sleep','Schlafen','Sommeil','Dormir');
-  if(id==='vacation'||key==='vacation'||key==='vakantie')return tr('Vakantie','Vacation','Urlaub','Vacances','Vacaciones');
+  var raw=String((item&&(item.label||item.title||item.name))||'').trim();
+  var key=raw.toLowerCase();
+  // Preserve the user-configured display name for main modes. The stable ID
+  // remains home/sleep/away/vacation and is still used for all actions.
+  if(id==='home'||id==='away'||id==='sleep'||id==='vacation')return raw||modeText(id);
   if(id==='none'||key==='none'||key==='geen submodus'||key==='no sub mode')return tr('Geen submodus','No sub mode','Kein Untermodus','Aucun sous-mode','Sin submodo');
-  if(id.indexOf('home_tv')===0||key==='watch tv'||key==='tv kijken')return tr('TV kijken','Watch TV','Fernsehen','Regarder la TV','Ver TV');
-  if(id.indexOf('home_movie')===0||key==='watch movie'||key==='film kijken')return tr('Film kijken','Watch movie','Film ansehen','Regarder un film','Ver película');
-  if(id.indexOf('home_game')===0||key==='game'||key==='gamen')return tr('Game','Game','Gaming','Jeu','Juego');
-  if(id.indexOf('home_romantic')===0||key==='romantic'||key==='romantisch')return tr('Romantisch','Romantic','Romantisch','Romantique','Romántico');
   return raw||modeText(id);
 }
 function modeIcon(m){if(m==='home')return '🏠';if(m==='sleep')return '🌙';if(m==='away')return '🚶';if(m==='vacation')return '🏖️';return '•'}function setBusy(b){busy=b;document.querySelectorAll('.mode-btn').forEach(function(btn){btn.disabled=busy})}function showError(m){document.getElementById('devices').innerHTML='<div class="error">'+m+'</div>'}
@@ -371,8 +392,8 @@ devices.sort(function(a,b){
 });
 
 devices.forEach(function(device){
-  var row=document.createElement('div');row.className='device';
-  var left=document.createElement('div');
+  var row=document.createElement('div');row.className='device';row.setAttribute('role','button');row.setAttribute('tabindex','0');row.setAttribute('aria-label',(device.name||tr('Apparaat','Appliance','Gerät','Appareil','Dispositivo'))+' '+tr('geschiedenis','history','Verlauf','historique','historial'));row.addEventListener('click',function(){openHistory(device)});row.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openHistory(device)}});
+  var left=document.createElement('div');left.className='device-left';
   var name=document.createElement('div');name.className='device-name';name.textContent=device.name||tr('Apparaat','Appliance','Gerät','Appareil','Dispositivo');left.appendChild(name);
   var metaParts=[];
   if(typeof device.lastPower==='number')metaParts.push(device.lastPower+' W');var energyText=formatEnergyKwh(device.energyKwh);if(energyText)metaParts.push(energyText);
@@ -380,6 +401,7 @@ devices.forEach(function(device){
   if(runText)metaParts.push(runText);
   if(metaParts.length){var meta=document.createElement('div');meta.className='meta';meta.textContent=metaParts.join(' · ');left.appendChild(meta)}
   var state=document.createElement('div');state.className='state '+(device.status==='running'?'running':device.status==='ready'?'ready':'idle');state.textContent=statusLabel(device.status);
-  row.appendChild(left);row.appendChild(state);c.appendChild(row)
+  var right=document.createElement('div');right.className='device-right';right.appendChild(state);var arrow=document.createElement('span');arrow.className='device-arrow';arrow.textContent='›';right.appendChild(arrow);
+  row.appendChild(left);row.appendChild(right);c.appendChild(row)
 })}
-function loadStatus(){if(!api)return;api('GET','/',{}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan status niet laden.','Could not load status.','Status konnte nicht geladen werden.','Impossible de charger l’état.','No se pudo cargar el estado.'))})}function changeMode(mode){if(!api||mode===currentMode||busy)return;setBusy(true);if(window.Homey&&typeof window.Homey.hapticFeedback==='function')window.Homey.hapticFeedback();api('POST','/mode',{mode:mode}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan modus niet wijzigen.','Could not change mode.','Modus konnte nicht geändert werden.','Impossible de changer le mode.','No se pudo cambiar el modo.'))}).finally(function(){setBusy(false)})}function onHomeyReady(Homey){window.Homey=Homey;WIDGET_LANG=detectWidgetLang(Homey);document.documentElement.lang=WIDGET_LANG;api=Homey.api.bind(Homey);applyWidgetTranslations();applyConfiguredHeight(Homey);document.getElementById('refresh').addEventListener('click',loadStatus);Homey.ready({height:configuredHeight});loadStatus();statusTimer=setInterval(loadStatus,10000)}document.addEventListener('DOMContentLoaded',function(){WIDGET_LANG=detectWidgetLang(window.Homey);document.documentElement.lang=WIDGET_LANG;applyWidgetTranslations();});</script></body></html>
+function loadStatus(){if(!api)return;api('GET','/',{}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan status niet laden.','Could not load status.','Status konnte nicht geladen werden.','Impossible de charger l’état.','No se pudo cargar el estado.'))})}function changeMode(mode){if(!api||mode===currentMode||busy)return;setBusy(true);if(window.Homey&&typeof window.Homey.hapticFeedback==='function')window.Homey.hapticFeedback();api('POST','/mode',{mode:mode}).then(render).catch(function(e){showError(e&&e.message?e.message:tr('Kan modus niet wijzigen.','Could not change mode.','Modus konnte nicht geändert werden.','Impossible de modifier le mode.','No se pudo cambiar el modo.'))}).finally(function(){setBusy(false)})}function onHomeyReady(Homey){window.Homey=Homey;WIDGET_LANG=detectWidgetLang(Homey);document.documentElement.lang=WIDGET_LANG;api=Homey.api.bind(Homey);applyWidgetTranslations();applyConfiguredHeight(Homey);document.getElementById('refresh').addEventListener('click',loadStatus);document.getElementById('historyClose').addEventListener('click',closeHistory);document.getElementById('historyOverlay').addEventListener('click',function(e){if(e.target===this)closeHistory()});document.addEventListener('keydown',function(e){if(e.key==='Escape')closeHistory()});Homey.ready({height:configuredHeight});loadStatus();statusTimer=setInterval(loadStatus,10000)}document.addEventListener('DOMContentLoaded',function(){WIDGET_LANG=detectWidgetLang(window.Homey);document.documentElement.lang=WIDGET_LANG;applyWidgetTranslations();});</script></body></html>

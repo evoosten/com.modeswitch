@@ -1,6 +1,6 @@
 {
   "id": "com.modeswitch",
-  "version": "2.9.0",
+  "version": "3.1.18",
   "compatibility": ">=12.3.0",
   "sdk": 3,
   "platforms": [
@@ -45,6 +45,10 @@
     }
   },
   "api": {
+    "get_dashboard_status": {
+      "method": "GET",
+      "path": "/dashboard_status"
+    },
     "get_config": {
       "method": "GET",
       "path": "/config"
@@ -110,6 +114,10 @@
       "method": "GET",
       "path": "/time"
     },
+    "put_main_mode_labels": {
+      "method": "PUT",
+      "path": "/main_mode_labels"
+    },
     "put_sub_modes": {
       "method": "PUT",
       "path": "/sub_modes"
@@ -137,6 +145,58 @@
     "post_clear_crash_log": {
       "method": "POST",
       "path": "/crash_log/clear"
+    },
+    "put_mode_switch_device_rules": {
+      "method": "PUT",
+      "path": "/mode_switch_device_rules"
+    },
+    "post_mode_switch_device_rules": {
+      "method": "POST",
+      "path": "/mode_switch_device_rules"
+    },
+    "put_mode_switch_devices_rules": {
+      "method": "PUT",
+      "path": "/mode_switch_devices_rules"
+    },
+    "post_mode_switch_devices_rules": {
+      "method": "POST",
+      "path": "/mode_switch_devices_rules"
+    },
+    "get_dashboard": {
+      "method": "GET",
+      "path": "/dashboard"
+    },
+    "get_dashboard_modes": {
+      "method": "GET",
+      "path": "/dashboard/modes"
+    },
+    "get_dashboard_monitoring": {
+      "method": "GET",
+      "path": "/dashboard/monitoring"
+    },
+    "get_dashboard_activities": {
+      "method": "GET",
+      "path": "/dashboard/activities"
+    },
+    "get_dashboard_schedules": {
+      "method": "GET",
+      "path": "/dashboard/schedules"
+    },
+    "get_dashboard_presence": {
+      "method": "GET",
+      "path": "/dashboard/presence"
+    },
+    "get_dashboard_attention": {
+      "method": "GET",
+      "path": "/dashboard/attention"
+    },
+    "get_dashboard_history": {
+      "method": "GET",
+      "path": "/dashboard/history"
+    },
+    "put_keypad_mappings": {
+      "method": "PUT",
+      "path": "/keypad_mappings"
     }
   },
   "flow": {
@@ -191,7 +251,21 @@
           "de": "Modus geändert",
           "fr": "Mode modifié",
           "es": "Modo cambiado"
-        }
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_controller",
+            "title": {
+              "en": "Mode Controller",
+              "nl": "Moduscontroller",
+              "de": "Modus-Controller",
+              "fr": "Contrôleur de mode",
+              "es": "Controlador de modo"
+            }
+          }
+        ]
       },
       {
         "title": {
@@ -210,7 +284,7 @@
               "nl": "Zone",
               "de": "Zone",
               "fr": "Zone",
-              "es": "Zone"
+              "es": "Zona"
             }
           },
           {
@@ -262,7 +336,7 @@
               "nl": "Zone",
               "de": "Zone",
               "fr": "Zone",
-              "es": "Zone"
+              "es": "Zona"
             }
           },
           {
@@ -342,9 +416,9 @@
             "title": {
               "en": "Type",
               "nl": "Type",
-              "de": "Type",
+              "de": "Typ",
               "fr": "Type",
-              "es": "Type"
+              "es": "Tipo"
             }
           },
           {
@@ -438,9 +512,9 @@
             "title": {
               "en": "Type",
               "nl": "Type",
-              "de": "Type",
+              "de": "Typ",
               "fr": "Type",
-              "es": "Type"
+              "es": "Tipo"
             }
           },
           {
@@ -504,17 +578,17 @@
         "id": "appliance_ready_reminder",
         "title": {
           "en": "Appliance ready reminder",
-          "nl": "Herinnering apparaat klaar",
-          "de": "Erinnerung: Gerät fertig",
-          "fr": "Rappel appareil prêt",
-          "es": "Recordatorio dispositivo listo"
+          "nl": "Herinnering: apparaat klaar",
+          "de": "Erinnerung: Gerät ist bereit",
+          "fr": "Rappel : appareil prêt",
+          "es": "Recordatorio: dispositivo listo"
         },
         "titleFormatted": {
           "en": "Appliance ready reminder",
-          "nl": "Herinnering apparaat klaar",
-          "de": "Erinnerung: Gerät fertig",
-          "fr": "Rappel appareil prêt",
-          "es": "Recordatorio dispositivo listo"
+          "nl": "Herinnering: apparaat klaar",
+          "de": "Erinnerung: Gerät ist bereit",
+          "fr": "Rappel : appareil prêt",
+          "es": "Recordatorio: dispositivo listo"
         },
         "tokens": [
           {
@@ -534,9 +608,9 @@
             "title": {
               "en": "Type",
               "nl": "Type",
-              "de": "Type",
+              "de": "Typ",
               "fr": "Type",
-              "es": "Type"
+              "es": "Tipo"
             }
           },
           {
@@ -862,18 +936,146 @@
             "type": "string"
           }
         ]
+      },
+      {
+        "id": "list_mode_changed",
+        "title": {
+          "en": "List/mode changed",
+          "nl": "Knop/modus gewijzigd",
+          "de": "Liste/Modus geändert",
+          "fr": "Liste/mode modifié",
+          "es": "Lista/modo cambiado"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_switch"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "list_id",
+            "type": "string",
+            "title": {
+              "en": "List ID",
+              "nl": "Lijst ID",
+              "de": "Listen-ID",
+              "fr": "ID de la liste",
+              "es": "ID de la lista"
+            }
+          },
+          {
+            "name": "list_name",
+            "type": "string",
+            "title": {
+              "en": "List",
+              "nl": "Lijst",
+              "de": "Liste",
+              "fr": "Liste",
+              "es": "Lista"
+            }
+          },
+          {
+            "name": "mode_id",
+            "type": "string",
+            "title": {
+              "en": "Mode ID",
+              "nl": "Modus ID",
+              "de": "Modus-ID",
+              "fr": "ID du mode",
+              "es": "ID del modo"
+            }
+          },
+          {
+            "name": "mode_name",
+            "type": "string",
+            "title": {
+              "en": "Mode",
+              "nl": "Modus",
+              "de": "Modus",
+              "fr": "Mode",
+              "es": "Modo"
+            }
+          }
+        ]
+      },
+      {
+        "id": "switch_changed",
+        "title": {
+          "en": "On/off button changed",
+          "nl": "Aan/uit-knop gewijzigd",
+          "de": "Ein-/Aus-Schalter geändert",
+          "fr": "Bouton marche/arrêt modifié",
+          "es": "Botón de encendido/apagado cambiado"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_switch"
+          }
+        ],
+        "tokens": [
+          {
+            "name": "button_id",
+            "type": "string",
+            "title": {
+              "en": "Button ID",
+              "nl": "Knop ID",
+              "de": "Schalter-ID",
+              "fr": "ID du bouton",
+              "es": "ID del botón"
+            }
+          },
+          {
+            "name": "button_name",
+            "type": "string",
+            "title": {
+              "en": "Button",
+              "nl": "Knop",
+              "de": "Schalter",
+              "fr": "Bouton",
+              "es": "Botón"
+            }
+          },
+          {
+            "name": "is_on",
+            "type": "boolean",
+            "title": {
+              "en": "Is on",
+              "nl": "Is aan",
+              "de": "Ist an",
+              "fr": "Est activé",
+              "es": "Está encendido"
+            }
+          }
+        ]
       }
     ],
     "conditions": [
       {
+        "id": "is_mode",
         "title": {
-          "en": "Current mode is !{{ |not }} [[mode]]",
-          "nl": "Huidige modus is !{{ |niet }} [[mode]]",
-          "de": "Aktueller Modus ist !{{ |nicht }} [[mode]]",
-          "fr": "Le mode actuel est !{{ |non }} [[mode]]",
-          "es": "El modo actual es !{{ |no }} [[mode]]"
+          "en": "Current mode !{{is|is not}} [[mode]]",
+          "nl": "Huidige modus !{{is|is niet}} [[mode]]",
+          "de": "Aktueller Modus !{{ist|ist nicht}} [[mode]]",
+          "fr": "Le mode actuel !{{est|n’est pas}} [[mode]]",
+          "es": "El modo actual !{{es|no es}} [[mode]]"
         },
         "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_controller",
+            "title": {
+              "en": "Mode Controller",
+              "nl": "Moduscontroller",
+              "de": "Modus-Controller",
+              "fr": "Contrôleur de mode",
+              "es": "Controlador de modo"
+            }
+          },
           {
             "type": "autocomplete",
             "name": "mode",
@@ -886,22 +1088,22 @@
             }
           }
         ],
-        "id": "is_mode",
         "titleFormatted": {
-          "en": "Current mode is !{{ |not }} [[mode]]",
-          "nl": "Huidige modus is !{{ |niet }} [[mode]]",
-          "de": "Aktueller Modus ist !{{ |nicht }} [[mode]]",
-          "fr": "Le mode actuel est !{{ |non }} [[mode]]",
-          "es": "El modo actual es !{{ |no }} [[mode]]"
+          "en": "Current mode !{{is|is not}} [[mode]]",
+          "nl": "Huidige modus !{{is|is niet}} [[mode]]",
+          "de": "Aktueller Modus !{{ist|ist nicht}} [[mode]]",
+          "fr": "Le mode actuel !{{est|n’est pas}} [[mode]]",
+          "es": "El modo actual !{{es|no es}} [[mode]]"
         }
       },
       {
+        "id": "zone_has_motion",
         "title": {
-          "en": "Zone [[zone]] has !{{ |no }} motion",
-          "nl": "Zone [[zone]] heeft !{{ |geen }} beweging",
-          "de": "Zone [[zone]] hat !{{ |keine }} Bewegung",
-          "fr": "La zone [[zone]] a !{{ |pas de }} mouvement",
-          "es": "La zona [[zone]] tiene !{{ |ningún }} movimiento"
+          "en": "Zone [[zone]] !{{has motion|has no motion}}",
+          "nl": "Zone [[zone]] !{{heeft beweging|heeft geen beweging}}",
+          "de": "Zone [[zone]] !{{hat Bewegung|hat keine Bewegung}}",
+          "fr": "La zone [[zone]] !{{détecte un mouvement|ne détecte aucun mouvement}}",
+          "es": "La zona [[zone]] !{{detecta movimiento|no detecta movimiento}}"
         },
         "args": [
           {
@@ -912,34 +1114,33 @@
               "nl": "Zone",
               "de": "Zone",
               "fr": "Zone",
-              "es": "Zone"
+              "es": "Zona"
             }
           }
         ],
-        "id": "zone_has_motion",
         "titleFormatted": {
-          "en": "Zone [[zone]] has !{{ |no }} motion",
-          "nl": "Zone [[zone]] heeft !{{ |geen }} beweging",
-          "de": "Zone [[zone]] hat !{{ |keine }} Bewegung",
-          "fr": "La zone [[zone]] a !{{ |pas de }} mouvement",
-          "es": "La zona [[zone]] tiene !{{ |ningún }} movimiento"
+          "en": "Zone [[zone]] !{{has motion|has no motion}}",
+          "nl": "Zone [[zone]] !{{heeft beweging|heeft geen beweging}}",
+          "de": "Zone [[zone]] !{{hat Bewegung|hat keine Bewegung}}",
+          "fr": "La zone [[zone]] !{{détecte un mouvement|ne détecte aucun mouvement}}",
+          "es": "La zona [[zone]] !{{detecta movimiento|no detecta movimiento}}"
         }
       },
       {
         "id": "appliance_is_running",
         "title": {
-          "en": "Appliance [[appliance]] is !{{ |not }} running",
-          "nl": "Apparaat [[appliance]] is !{{ |niet }} actief",
-          "de": "Gerät [[appliance]] ist !{{ |nicht }} aktiv",
-          "fr": "L’appareil [[appliance]] n’est !{{ |pas }} en fonctionnement",
-          "es": "El dispositivo [[appliance]] no está !{{ |no }} en funcionamiento"
+          "en": "Appliance [[appliance]] !{{is running|is not running}}",
+          "nl": "Apparaat [[appliance]] !{{is actief|is niet actief}}",
+          "de": "Gerät [[appliance]] !{{ist aktiv|ist nicht aktiv}}",
+          "fr": "L’appareil [[appliance]] !{{est en fonctionnement|n’est pas en fonctionnement}}",
+          "es": "El dispositivo [[appliance]] !{{está en funcionamiento|no está en funcionamiento}}"
         },
         "titleFormatted": {
-          "en": "Appliance [[appliance]] is !{{ |not }} running",
-          "nl": "Apparaat [[appliance]] is !{{ |niet }} actief",
-          "de": "Gerät [[appliance]] ist !{{ |nicht }} aktiv",
-          "fr": "L’appareil [[appliance]] n’est !{{ |pas }} en fonctionnement",
-          "es": "El dispositivo [[appliance]] no está !{{ |no }} en funcionamiento"
+          "en": "Appliance [[appliance]] !{{is running|is not running}}",
+          "nl": "Apparaat [[appliance]] !{{is actief|is niet actief}}",
+          "de": "Gerät [[appliance]] !{{ist aktiv|ist nicht aktiv}}",
+          "fr": "L’appareil [[appliance]] !{{est en fonctionnement|n’est pas en funcionamiento}}",
+          "es": "El dispositivo [[appliance]] !{{está en funcionamiento|no está en funcionamiento}}"
         },
         "args": [
           {
@@ -958,18 +1159,18 @@
       {
         "id": "appliance_is_ready",
         "title": {
-          "en": "Appliance [[appliance]] is !{{ |not }} ready",
-          "nl": "Apparaat [[appliance]] is !{{ |niet }} klaar",
-          "de": "Gerät [[appliance]] ist !{{ |nicht }} bereit",
-          "fr": "L’appareil [[appliance]] n’est !{{ |pas }} prêt",
-          "es": "El dispositivo [[appliance]] no está !{{ |no }} listo"
+          "en": "Appliance [[appliance]] !{{is ready|is not ready}}",
+          "nl": "Apparaat [[appliance]] !{{is klaar|is niet klaar}}",
+          "de": "Gerät [[appliance]] !{{ist bereit|ist nicht bereit}}",
+          "fr": "L’appareil [[appliance]] !{{est prêt|n’est pas prêt}}",
+          "es": "El dispositivo [[appliance]] !{{está listo|no está listo}}"
         },
         "titleFormatted": {
-          "en": "Appliance [[appliance]] is !{{ |not }} ready",
-          "nl": "Apparaat [[appliance]] is !{{ |niet }} klaar",
-          "de": "Gerät [[appliance]] ist !{{ |nicht }} bereit",
-          "fr": "L’appareil [[appliance]] n’est !{{ |pas }} prêt",
-          "es": "El dispositivo [[appliance]] no está !{{ |no }} listo"
+          "en": "Appliance [[appliance]] !{{is ready|is not ready}}",
+          "nl": "Apparaat [[appliance]] !{{is klaar|is niet klaar}}",
+          "de": "Gerät [[appliance]] !{{ist bereit|ist nicht bereit}}",
+          "fr": "L’appareil [[appliance]] !{{est prêt|n’est pas prêt}}",
+          "es": "El dispositivo [[appliance]] !{{está listo|no está listo}}"
         },
         "args": [
           {
@@ -988,18 +1189,18 @@
       {
         "id": "appliance_waiting_reset",
         "title": {
-          "en": "Appliance [[appliance]] is !{{ |not }} waiting for reset",
-          "nl": "Apparaat [[appliance]] wacht !{{ |niet }} op reset",
-          "de": "Gerät [[appliance]] wartet !{{ |nicht }} auf Zurücksetzung",
-          "fr": "L’appareil [[appliance]] n’attend !{{ |pas }} une réinitialisation",
-          "es": "El dispositivo [[appliance]] no está !{{ |no }} esperando reinicio"
+          "en": "Appliance [[appliance]] !{{is waiting for reset|is not waiting for reset}}",
+          "nl": "Apparaat [[appliance]] !{{wacht op een reset|wacht niet op een reset}}",
+          "de": "Gerät [[appliance]] !{{wartet auf Zurücksetzung|wartet nicht auf Zurücksetzung}}",
+          "fr": "L’appareil [[appliance]] !{{attend une réinitialisation|n’attend pas de réinitialisation}}",
+          "es": "El dispositivo [[appliance]] !{{está esperando un reinicio|no está esperando un reinicio}}"
         },
         "titleFormatted": {
-          "en": "Appliance [[appliance]] is !{{ |not }} waiting for reset",
-          "nl": "Apparaat [[appliance]] wacht !{{ |niet }} op reset",
-          "de": "Gerät [[appliance]] wartet !{{ |nicht }} auf Zurücksetzung",
-          "fr": "L’appareil [[appliance]] n’attend !{{ |pas }} une réinitialisation",
-          "es": "El dispositivo [[appliance]] no está !{{ |no }} esperando reinicio"
+          "en": "Appliance [[appliance]] !{{is waiting for reset|is not waiting for reset}}",
+          "nl": "Apparaat [[appliance]] !{{wacht op een reset|wacht niet op een reset}}",
+          "de": "Gerät [[appliance]] !{{wartet auf Zurücksetzung|wartet nicht auf Zurücksetzung}}",
+          "fr": "L’appareil [[appliance]] !{{attend une réinitialisation|n’attend pas de réinitialisation}}",
+          "es": "El dispositivo [[appliance]] !{{está esperando un reinicio|no está esperando un reinicio}}"
         },
         "args": [
           {
@@ -1018,18 +1219,18 @@
       {
         "id": "activity_is_running",
         "title": {
-          "en": "Activity [[activity]] is !{{ |not }} running",
-          "nl": "Activiteit [[activity]] is !{{ |niet }} actief",
-          "de": "Aktivität [[activity]] ist !{{ |nicht }} aktiv",
-          "fr": "L’activité [[activity]] n’est !{{ |pas }} active",
-          "es": "La actividad [[activity]] no está !{{ |no }} activa"
+          "en": "Activity [[activity]] !{{is running|is not running}}",
+          "nl": "Activiteit [[activity]] !{{is actief|is niet actief}}",
+          "de": "Aktivität [[activity]] !{{ist aktiv|ist nicht aktiv}}",
+          "fr": "L’activité [[activity]] !{{est active|n’est pas active}}",
+          "es": "La actividad [[activity]] !{{está activa|no está activa}}"
         },
         "titleFormatted": {
-          "en": "Activity [[activity]] is !{{ |not }} running",
-          "nl": "Activiteit [[activity]] is !{{ |niet }} actief",
-          "de": "Aktivität [[activity]] ist !{{ |nicht }} aktiv",
-          "fr": "L’activité [[activity]] n’est !{{ |pas }} active",
-          "es": "La actividad [[activity]] no está !{{ |no }} activa"
+          "en": "Activity [[activity]] !{{is running|is not running}}",
+          "nl": "Activiteit [[activity]] !{{is actief|is niet actief}}",
+          "de": "Aktivität [[activity]] !{{ist aktiv|ist nicht aktiv}}",
+          "fr": "L’activité [[activity]] !{{est active|n’est pas active}}",
+          "es": "La actividad [[activity]] !{{está activa|no está activa}}"
         },
         "args": [
           {
@@ -1048,18 +1249,18 @@
       {
         "id": "activity_is_standby",
         "title": {
-          "en": "Activity [[activity]] is !{{ |not }} standby",
-          "nl": "Activiteit [[activity]] is !{{ |niet }} standby",
-          "de": "Aktivität [[activity]] ist !{{ |nicht }} im Standby",
-          "fr": "L’activité [[activity]] n’est !{{ |pas }} en veille",
-          "es": "La actividad [[activity]] no está !{{ |no }} en espera"
+          "en": "Activity [[activity]] !{{is on standby|is not on standby}}",
+          "nl": "Activiteit [[activity]] !{{staat op standby|staat niet op standby}}",
+          "de": "Aktivität [[activity]] !{{ist im Standby|ist nicht im Standby}}",
+          "fr": "L’activité [[activity]] !{{est en veille|n’est pas en veille}}",
+          "es": "La actividad [[activity]] !{{está en espera|no está en espera}}"
         },
         "titleFormatted": {
-          "en": "Activity [[activity]] is !{{ |not }} standby",
-          "nl": "Activiteit [[activity]] is !{{ |niet }} standby",
-          "de": "Aktivität [[activity]] ist !{{ |nicht }} im Standby",
-          "fr": "L’activité [[activity]] n’est !{{ |pas }} en veille",
-          "es": "La actividad [[activity]] no está !{{ |no }} en espera"
+          "en": "Activity [[activity]] !{{is on standby|is not on standby}}",
+          "nl": "Activiteit [[activity]] !{{staat op standby|staat niet op standby}}",
+          "de": "Aktivität [[activity]] !{{ist im Standby|ist nicht im Standby}}",
+          "fr": "L’activité [[activity]] !{{est en veille|n’est pas en veille}}",
+          "es": "La actividad [[activity]] !{{está en espera|no está en espera}}"
         },
         "args": [
           {
@@ -1074,6 +1275,87 @@
             }
           }
         ]
+      },
+      {
+        "id": "list_has_mode",
+        "title": {
+          "en": "List !{{has|does not have}} mode active",
+          "nl": "Lijst !{{heeft|heeft niet}} knop/modus actief",
+          "de": "Liste !{{hat|hat keinen}} Modus aktiv",
+          "fr": "La liste !{{a|n’a pas}} le mode actif",
+          "es": "La lista !{{tiene|no tiene}} el modo activo"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_switch"
+          },
+          {
+            "name": "list",
+            "type": "autocomplete",
+            "title": {
+              "en": "List",
+              "nl": "Lijst",
+              "de": "Liste",
+              "fr": "Liste",
+              "es": "Lista"
+            }
+          },
+          {
+            "name": "mode",
+            "type": "autocomplete",
+            "title": {
+              "en": "Mode",
+              "nl": "Modus",
+              "de": "Modus",
+              "fr": "Mode",
+              "es": "Modo"
+            }
+          }
+        ],
+        "titleFormatted": {
+          "en": "List [[list]] !{{has|does not have}} mode [[mode]] active",
+          "nl": "Lijst [[list]] !{{heeft|heeft niet}} knop/modus [[mode]] actief",
+          "de": "Liste [[list]] !{{hat|hat keinen}} Modus [[mode]] aktiv",
+          "fr": "La liste [[list]] !{{a|n’a pas}} le mode [[mode]] actif",
+          "es": "La lista [[list]] !{{tiene|no tiene}} el modo [[mode]] activo"
+        }
+      },
+      {
+        "id": "switch_is_on",
+        "title": {
+          "en": "On/off button !{{is on|is off}}",
+          "nl": "Aan/uit-knop !{{is aan|is uit}}",
+          "de": "Ein-/Aus-Schalter !{{ist an|ist aus}}",
+          "fr": "Le bouton marche/arrêt !{{est activé|est désactivé}}",
+          "es": "El botón de encendido/apagado !{{está encendido|está apagado}}"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_switch"
+          },
+          {
+            "name": "button",
+            "type": "autocomplete",
+            "title": {
+              "en": "Button",
+              "nl": "Knop",
+              "de": "Schalter",
+              "fr": "Bouton",
+              "es": "Botón"
+            }
+          }
+        ],
+        "titleFormatted": {
+          "en": "On/off button [[button]] !{{is on|is off}}",
+          "nl": "Aan/uit-knop [[button]] !{{is aan|is uit}}",
+          "de": "Ein-/Aus-Schalter [[button]] !{{ist an|ist aus}}",
+          "fr": "Le bouton marche/arrêt [[button]] !{{est activé|est désactivé}}",
+          "es": "El botón de encendido/apagado [[button]] !{{está encendido|está apagado}}"
+        }
       }
     ],
     "actions": [
@@ -1083,7 +1365,7 @@
           "nl": "Voer zoneregels uit voor [[zone]]",
           "de": "Zonenregeln für [[zone]] ausführen",
           "fr": "Exécuter les règles de zone pour [[zone]]",
-          "es": "Ejecutar reglas de zona para [[zone]]"
+          "es": "Ejecutar las reglas de zona para [[zone]]"
         },
         "args": [
           {
@@ -1094,7 +1376,7 @@
               "nl": "Zone",
               "de": "Zone",
               "fr": "Zone",
-              "es": "Zone"
+              "es": "Zona"
             }
           }
         ],
@@ -1104,7 +1386,7 @@
           "nl": "Voer zoneregels uit voor [[zone]]",
           "de": "Zonenregeln für [[zone]] ausführen",
           "fr": "Exécuter les règles de zone pour [[zone]]",
-          "es": "Ejecutar reglas de zona para [[zone]]"
+          "es": "Ejecutar las reglas de zona para [[zone]]"
         }
       },
       {
@@ -1113,9 +1395,21 @@
           "nl": "Zet modus op [[mode]]",
           "de": "Modus auf [[mode]] setzen",
           "fr": "Définir le mode sur [[mode]]",
-          "es": "Establecer modo en [[mode]]"
+          "es": "Establecer el modo en [[mode]]"
         },
         "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_controller",
+            "title": {
+              "en": "Mode Controller",
+              "nl": "Moduscontroller",
+              "de": "Modus-Controller",
+              "fr": "Contrôleur de mode",
+              "es": "Controlador de modo"
+            }
+          },
           {
             "type": "autocomplete",
             "name": "mode",
@@ -1134,7 +1428,7 @@
           "nl": "Zet modus op [[mode]]",
           "de": "Modus auf [[mode]] setzen",
           "fr": "Définir le mode sur [[mode]]",
-          "es": "Establecer modo en [[mode]]"
+          "es": "Establecer el modo en [[mode]]"
         }
       },
       {
@@ -1143,7 +1437,7 @@
           "nl": "Zet lampen uit in zone [[zone]]",
           "de": "Lichter in Zone [[zone]] ausschalten",
           "fr": "Éteindre les lumières dans la zone [[zone]]",
-          "es": "Apagar luces en la zona [[zone]]"
+          "es": "Apagar las luces en la zona [[zone]]"
         },
         "args": [
           {
@@ -1154,7 +1448,7 @@
               "nl": "Zone",
               "de": "Zone",
               "fr": "Zone",
-              "es": "Zone"
+              "es": "Zona"
             }
           }
         ],
@@ -1164,16 +1458,16 @@
           "nl": "Zet lampen uit in zone [[zone]]",
           "de": "Lichter in Zone [[zone]] ausschalten",
           "fr": "Éteindre les lumières dans la zone [[zone]]",
-          "es": "Apagar luces en la zona [[zone]]"
+          "es": "Apagar las luces en la zona [[zone]]"
         }
       },
       {
         "title": {
-          "en": "Turn on lights in zone [[zone]] with dim [[dim]]",
+          "en": "Turn on lights in zone [[zone]] with dim level [[dim]]",
           "nl": "Zet lampen aan in zone [[zone]] met dimniveau [[dim]]",
           "de": "Lichter in Zone [[zone]] mit Dimmwert [[dim]] einschalten",
-          "fr": "Allumer les lumières dans la zone [[zone]] avec variation [[dim]]",
-          "es": "Encender luces en la zona [[zone]] con nivel [[dim]]"
+          "fr": "Allumer les lumières dans la zone [[zone]] avec un niveau de variation de [[dim]]",
+          "es": "Encender las luces en la zona [[zone]] con nivel de atenuación [[dim]]"
         },
         "args": [
           {
@@ -1184,7 +1478,7 @@
               "nl": "Zone",
               "de": "Zone",
               "fr": "Zone",
-              "es": "Zone"
+              "es": "Zona"
             }
           },
           {
@@ -1197,26 +1491,161 @@
               "en": "Optional, 0-1",
               "nl": "Optioneel, 0-1",
               "de": "Optional, 0-1",
-              "fr": "Optional, 0-1",
-              "es": "Optional, 0-1"
+              "fr": "Facultatif, 0-1",
+              "es": "Opcional, 0-1"
             },
             "title": {
               "en": "Dim level",
               "nl": "Dimniveau",
-              "de": "Dim level",
-              "fr": "Dim level",
-              "es": "Dim level"
+              "de": "Dimmstufe",
+              "fr": "Niveau de variation",
+              "es": "Nivel de atenuación"
             }
           }
         ],
         "id": "zone_lights_on",
         "titleFormatted": {
-          "en": "Turn on lights in zone [[zone]] with dim [[dim]]",
+          "en": "Turn on lights in zone [[zone]] with dim level [[dim]]",
           "nl": "Zet lampen aan in zone [[zone]] met dimniveau [[dim]]",
           "de": "Lichter in Zone [[zone]] mit Dimmwert [[dim]] einschalten",
-          "fr": "Allumer les lumières dans la zone [[zone]] avec variation [[dim]]",
-          "es": "Encender luces en la zona [[zone]] con nivel [[dim]]"
+          "fr": "Allumer les lumières dans la zone [[zone]] avec un niveau de variation de [[dim]]",
+          "es": "Encender las luces en la zona [[zone]] con nivel de atenuación [[dim]]"
         }
+      },
+      {
+        "id": "set_list_mode",
+        "title": {
+          "en": "Set mode for list",
+          "nl": "Stel knop/modus in voor lijst",
+          "de": "Modus für Liste einstellen",
+          "fr": "Définir le mode pour la liste",
+          "es": "Establecer el modo para la lista"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_switch"
+          },
+          {
+            "name": "list",
+            "type": "autocomplete",
+            "title": {
+              "en": "List",
+              "nl": "Lijst",
+              "de": "Liste",
+              "fr": "Liste",
+              "es": "Lista"
+            }
+          },
+          {
+            "name": "mode",
+            "type": "autocomplete",
+            "title": {
+              "en": "Mode",
+              "nl": "Modus",
+              "de": "Modus",
+              "fr": "Mode",
+              "es": "Modo"
+            }
+          }
+        ],
+        "titleFormatted": {
+          "en": "Set list [[list]] to [[mode]]",
+          "nl": "Zet lijst [[list]] op [[mode]]",
+          "de": "Liste [[list]] auf [[mode]] setzen",
+          "fr": "Définir la liste [[list]] sur [[mode]]",
+          "es": "Establecer la lista [[list]] en [[mode]]"
+        }
+      },
+      {
+        "id": "set_switch",
+        "title": {
+          "en": "Set on/off button",
+          "nl": "Zet aan/uit-knop aan of uit",
+          "de": "Ein-/Aus-Schalter einstellen",
+          "fr": "Régler le bouton marche/arrêt",
+          "es": "Configurar el botón de encendido/apagado"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_switch"
+          },
+          {
+            "name": "button",
+            "type": "autocomplete",
+            "title": {
+              "en": "Button",
+              "nl": "Knop",
+              "de": "Schalter",
+              "fr": "Bouton",
+              "es": "Botón"
+            }
+          },
+          {
+            "name": "state",
+            "type": "checkbox",
+            "title": {
+              "en": "On",
+              "nl": "Aan",
+              "de": "An",
+              "fr": "Activé",
+              "es": "Encendido"
+            }
+          }
+        ],
+        "titleFormatted": {
+          "en": "Set on/off button [[button]] to [[state]]",
+          "nl": "Zet aan/uit-knop [[button]] op [[state]]",
+          "de": "Ein-/Aus-Schalter [[button]] auf [[state]] setzen",
+          "fr": "Régler le bouton marche/arrêt [[button]] sur [[state]]",
+          "es": "Establecer el botón de encendido/apagado [[button]] en [[state]]"
+        }
+      },
+      {
+        "id": "process_keypad_input",
+        "title": {
+          "en": "Process keypad input",
+          "nl": "Verwerk keypad-invoer",
+          "de": "Keypad-Eingabe verarbeiten",
+          "fr": "Traiter la saisie du clavier",
+          "es": "Procesar entrada del teclado"
+        },
+        "titleFormatted": {
+          "en": "Process keypad [[keypad_id]] PIN [[pin]] action [[action]]",
+          "nl": "Verwerk keypad [[keypad_id]] PIN [[pin]] actie [[action]]",
+          "de": "Keypad [[keypad_id]] PIN [[pin]] Aktion [[action]] verarbeiten",
+          "fr": "Traiter clavier [[keypad_id]] PIN [[pin]] action [[action]]",
+          "es": "Procesar teclado [[keypad_id]] PIN [[pin]] acción [[action]]"
+        },
+        "args": [
+          {
+            "name": "keypad_id",
+            "type": "text",
+            "title": {
+              "en": "Keypad ID",
+              "nl": "Keypad-ID"
+            }
+          },
+          {
+            "name": "pin",
+            "type": "text",
+            "title": {
+              "en": "PIN",
+              "nl": "PIN"
+            }
+          },
+          {
+            "name": "action",
+            "type": "text",
+            "title": {
+              "en": "Action (optional)",
+              "nl": "Actie (optioneel)"
+            }
+          }
+        ]
       }
     ]
   },
@@ -1336,6 +1765,34 @@
           "value": "main_mode_selector"
         }
       ]
+    },
+    {
+      "id": "mode_switch",
+      "name": {
+        "en": "Mode & Switch",
+        "nl": "Mode & Switch",
+        "de": "Modus & Schalter",
+        "fr": "Mode & interrupteur",
+        "es": "Modo e interruptor"
+      },
+      "class": "other",
+      "capabilities": [],
+      "images": {
+        "small": "/drivers/mode_switch/assets/images/small.png",
+        "large": "/drivers/mode_switch/assets/images/large.png"
+      },
+      "icon": "/drivers/mode_switch/assets/icon.svg",
+      "pair": [
+        {
+          "id": "configure"
+        }
+      ],
+      "repair": [
+        {
+          "id": "configure"
+        }
+      ],
+      "settings": []
     }
   ],
   "capabilities": {
@@ -1556,6 +2013,426 @@
           }
         }
       ]
+    },
+    "mode_switch_mode_1": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 1",
+        "nl": "Modus 1"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_mode_2": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 2",
+        "nl": "Modus 2"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_mode_3": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 3",
+        "nl": "Modus 3"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_mode_4": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 4",
+        "nl": "Modus 4"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_mode_5": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 5",
+        "nl": "Modus 5"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_mode_6": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 6",
+        "nl": "Modus 6"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_mode_7": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 7",
+        "nl": "Modus 7"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_mode_8": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 8",
+        "nl": "Modus 8"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_mode_9": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 9",
+        "nl": "Modus 9"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_mode_10": {
+      "type": "enum",
+      "title": {
+        "en": "Mode 10",
+        "nl": "Modus 10"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "picker",
+      "icon": "/assets/list.svg",
+      "values": [
+        {
+          "id": "none",
+          "title": {
+            "en": "Not configured",
+            "nl": "Niet ingesteld"
+          }
+        }
+      ]
+    },
+    "mode_switch_switch_1": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 1",
+        "nl": "Knop 1"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_2": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 2",
+        "nl": "Knop 2"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_3": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 3",
+        "nl": "Knop 3"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_4": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 4",
+        "nl": "Knop 4"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_5": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 5",
+        "nl": "Knop 5"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_6": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 6",
+        "nl": "Knop 6"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_7": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 7",
+        "nl": "Knop 7"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_8": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 8",
+        "nl": "Knop 8"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_9": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 9",
+        "nl": "Knop 9"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_10": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 10",
+        "nl": "Knop 10"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_11": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 11",
+        "nl": "Knop 11"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_12": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 12",
+        "nl": "Knop 12"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_13": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 13",
+        "nl": "Knop 13"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_14": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 14",
+        "nl": "Knop 14"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_15": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 15",
+        "nl": "Knop 15"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_16": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 16",
+        "nl": "Knop 16"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_17": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 17",
+        "nl": "Knop 17"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_18": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 18",
+        "nl": "Knop 18"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_19": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 19",
+        "nl": "Knop 19"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
+    },
+    "mode_switch_switch_20": {
+      "type": "boolean",
+      "title": {
+        "en": "Button 20",
+        "nl": "Knop 20"
+      },
+      "getable": true,
+      "setable": true,
+      "uiComponent": "toggle",
+      "icon": "/assets/power.svg"
     }
   },
   "widgets": {
@@ -1614,34 +2491,206 @@
       },
       "height": 260,
       "transparent": true,
-      "api": {
-        "getStatus": {
-          "method": "GET",
-          "path": "/"
-        },
-        "setMode": {
-          "method": "POST",
-          "path": "/mode"
-        }
-      },
       "id": "mode",
       "settings": [
+        {
+          "id": "modeSource",
+          "type": "autocomplete",
+          "title": {
+            "en": "Mode source",
+            "nl": "Modusbron",
+            "de": "Modusquelle",
+            "fr": "Source du mode",
+            "es": "Fuente del modo"
+          },
+          "hint": {
+            "en": "Choose the Mode Controller or a Mode & Switch device.",
+            "nl": "Kies de Modus controller of een Mode & Switch-device.",
+            "de": "Wähle den Modus-Controller oder ein Mode-&-Switch-Gerät.",
+            "fr": "Choisis le contrôleur de mode ou un appareil Mode & Switch.",
+            "es": "Elige el controlador de modo o un dispositivo Mode & Switch."
+          }
+        },
+        {
+          "id": "modeList",
+          "type": "autocomplete",
+          "title": {
+            "en": "Mode list",
+            "nl": "Moduslijst",
+            "de": "Modusliste",
+            "fr": "Liste des modes",
+            "es": "Lista de modos"
+          },
+          "hint": {
+            "en": "Choose which list the widget should show.",
+            "nl": "Kies welke lijst de widget moet tonen.",
+            "de": "Wähle aus, welche Liste das Widget anzeigen soll.",
+            "fr": "Choisis la liste que le widget doit afficher.",
+            "es": "Elige qué lista debe mostrar el widget."
+          }
+        },
+        {
+          "id": "showSubModes",
+          "type": "checkbox",
+          "title": {
+            "en": "Show sub modes",
+            "nl": "Submodussen tonen",
+            "de": "Untermodi anzeigen",
+            "fr": "Afficher les sous-modes",
+            "es": "Mostrar submodos"
+          },
+          "hint": {
+            "en": "Show the sub modes belonging to the selected main mode.",
+            "nl": "Toon de submodussen die bij de gekozen hoofdmodus horen.",
+            "de": "Zeigt die Untermodi an, die zum ausgewählten Hauptmodus gehören.",
+            "fr": "Affiche les sous-modes appartenant au mode principal sélectionné.",
+            "es": "Muestra los submodos pertenecientes al modo principal seleccionado."
+          },
+          "value": true
+        },
+        {
+          "id": "showSwitches",
+          "type": "checkbox",
+          "title": {
+            "en": "Show on/off buttons",
+            "nl": "Aan/uit-knoppen tonen",
+            "de": "Ein/Aus-Schaltflächen anzeigen",
+            "fr": "Afficher les boutons marche/arrêt",
+            "es": "Mostrar botones de encendido/apagado"
+          },
+          "hint": {
+            "en": "Show the selected on/off buttons below the modes.",
+            "nl": "Toon de gekozen aan/uit-knoppen onder de modussen.",
+            "de": "Zeigt die ausgewählten Ein/Aus-Schaltflächen unter den Modi an.",
+            "fr": "Affiche les boutons marche/arrêt sélectionnés sous les modes.",
+            "es": "Muestra los botones de encendido/apagado seleccionados debajo de los modos."
+          },
+          "value": true
+        },
+        {
+          "id": "switchButton1",
+          "type": "autocomplete",
+          "title": {
+            "en": "On/off button 1",
+            "nl": "Aan/uit-knop 1",
+            "de": "Ein/Aus-Schaltfläche 1",
+            "fr": "Bouton marche/arrêt 1",
+            "es": "Botón de encendido/apagado 1"
+          },
+          "hint": {
+            "en": "Optional. Choose a button from the selected Mode & Switch device.",
+            "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+            "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+            "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+            "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+          }
+        },
+        {
+          "id": "switchButton2",
+          "type": "autocomplete",
+          "title": {
+            "en": "On/off button 2",
+            "nl": "Aan/uit-knop 2",
+            "de": "Ein/Aus-Schaltfläche 2",
+            "fr": "Bouton marche/arrêt 2",
+            "es": "Botón de encendido/apagado 2"
+          },
+          "hint": {
+            "en": "Optional. Choose a button from the selected Mode & Switch device.",
+            "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+            "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+            "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+            "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+          }
+        },
+        {
+          "id": "switchButton3",
+          "type": "autocomplete",
+          "title": {
+            "en": "On/off button 3",
+            "nl": "Aan/uit-knop 3",
+            "de": "Ein/Aus-Schaltfläche 3",
+            "fr": "Bouton marche/arrêt 3",
+            "es": "Botón de encendido/apagado 3"
+          },
+          "hint": {
+            "en": "Optional. Choose a button from the selected Mode & Switch device.",
+            "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+            "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+            "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+            "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+          }
+        },
+        {
+          "id": "switchButton4",
+          "type": "autocomplete",
+          "title": {
+            "en": "On/off button 4",
+            "nl": "Aan/uit-knop 4",
+            "de": "Ein/Aus-Schaltfläche 4",
+            "fr": "Bouton marche/arrêt 4",
+            "es": "Botón de encendido/apagado 4"
+          },
+          "hint": {
+            "en": "Optional. Choose a button from the selected Mode & Switch device.",
+            "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+            "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+            "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+            "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+          }
+        },
+        {
+          "id": "switchButton5",
+          "type": "autocomplete",
+          "title": {
+            "en": "On/off button 5",
+            "nl": "Aan/uit-knop 5",
+            "de": "Ein/Aus-Schaltfläche 5",
+            "fr": "Bouton marche/arrêt 5",
+            "es": "Botón de encendido/apagado 5"
+          },
+          "hint": {
+            "en": "Optional. Choose a button from the selected Mode & Switch device.",
+            "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+            "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+            "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+            "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+          }
+        },
+        {
+          "id": "switchButton6",
+          "type": "autocomplete",
+          "title": {
+            "en": "On/off button 6",
+            "nl": "Aan/uit-knop 6",
+            "de": "Ein/Aus-Schaltfläche 6",
+            "fr": "Bouton marche/arrêt 6",
+            "es": "Botón de encendido/apagado 6"
+          },
+          "hint": {
+            "en": "Optional. Choose a button from the selected Mode & Switch device.",
+            "nl": "Optioneel. Kies een knop van het geselecteerde Mode & Switch-device.",
+            "de": "Optional. Wähle eine Schaltfläche des ausgewählten Mode-&-Switch-Geräts.",
+            "fr": "Facultatif. Choisis un bouton de l’appareil Mode & Switch sélectionné.",
+            "es": "Opcional. Elige un botón del dispositivo Mode & Switch seleccionado."
+          }
+        },
         {
           "id": "widgetHeight",
           "type": "number",
           "title": {
             "en": "Widget height",
-            "nl": "Widget hoogte",
+            "nl": "Widgethoogte",
             "de": "Widget-Höhe",
             "fr": "Hauteur du widget",
             "es": "Altura del widget"
           },
           "hint": {
-            "en": "Height in pixels (220-900).",
-            "nl": "Hoogte in pixels (220-900).",
-            "de": "Höhe in Pixeln (220-900).",
-            "fr": "Hauteur en pixels (220-900).",
-            "es": "Altura en píxeles (220-900)."
+            "en": "Height in pixels, between 220 and 900.",
+            "nl": "Hoogte in pixels, tussen 220 en 900.",
+            "de": "Höhe in Pixeln, zwischen 220 und 900.",
+            "fr": "Hauteur en pixels, comprise entre 220 et 900.",
+            "es": "Altura en píxeles, entre 220 y 900."
           },
           "value": 260,
           "min": 220,
@@ -1660,9 +2709,9 @@
           "hint": {
             "en": "Show the selected temperature sensor in the top-right corner.",
             "nl": "Toon de gekozen temperatuursensor rechtsboven in de widget.",
-            "de": "Zeige den ausgewählten Temperatursensor oben rechts im Widget an.",
-            "fr": "Afficher le capteur de température sélectionné dans le coin supérieur droit du widget.",
-            "es": "Mostrar el sensor de temperatura seleccionado en la esquina superior derecha del widget."
+            "de": "Zeigt den ausgewählten Temperatursensor oben rechts im Widget an.",
+            "fr": "Affiche le capteur de température sélectionné en haut à droite du widget.",
+            "es": "Muestra el sensor de temperatura seleccionado en la esquina superior derecha del widget."
           },
           "value": true
         },
@@ -1677,11 +2726,11 @@
             "es": "Fondo meteorológico en vivo"
           },
           "hint": {
-            "en": "Use Homey's location/weather data as the widget background.",
-            "nl": "Gebruik de Homey-locatie/weerdata als achtergrond van de widget.",
-            "de": "Verwende Homeys Standort- und Wetterdaten als Hintergrund des Widgets.",
-            "fr": "Utiliser les données de localisation et de météo de Homey comme arrière-plan du widget.",
-            "es": "Usar los datos de ubicación y clima de Homey como fondo del widget."
+            "en": "Use Homey's location and weather data as the widget background.",
+            "nl": "Gebruik de locatie- en weergegevens van Homey als achtergrond van de widget.",
+            "de": "Verwendet die Standort- und Wetterdaten von Homey als Widget-Hintergrund.",
+            "fr": "Utilise les données de localisation et météo de Homey comme arrière-plan du widget.",
+            "es": "Utiliza los datos de ubicación y meteorología de Homey como fondo del widget."
           },
           "value": true
         },
@@ -1696,11 +2745,11 @@
             "es": "Intensidad del fondo meteorológico"
           },
           "hint": {
-            "en": "0 = subtle, 100 = strong.",
-            "nl": "0 = subtiel, 100 = sterk.",
-            "de": "0 = dezent, 100 = stark.",
-            "fr": "0 = discret, 100 = intense.",
-            "es": "0 = sutil, 100 = intenso."
+            "en": "0 is subtle and 100 is strong.",
+            "nl": "0 is subtiel en 100 is sterk.",
+            "de": "0 ist dezent und 100 ist stark.",
+            "fr": "0 correspond à un effet discret et 100 à un effet puissant.",
+            "es": "0 es sutil y 100 es intenso."
           },
           "value": 80,
           "min": 0,
@@ -1708,10 +2757,31 @@
         }
       ],
       "devices": {
+        "title": {
+          "en": "Temperature sensor",
+          "nl": "Temperatuursensor",
+          "de": "Temperatursensor",
+          "fr": "Capteur de température",
+          "es": "Sensor de temperatura"
+        },
         "type": "global",
         "singular": true,
         "filter": {
           "capabilities": "measure_temperature"
+        }
+      },
+      "api": {
+        "getStatus": {
+          "method": "GET",
+          "path": "/"
+        },
+        "setMode": {
+          "method": "POST",
+          "path": "/mode"
+        },
+        "setSwitch": {
+          "method": "POST",
+          "path": "/switch"
         }
       }
     },
