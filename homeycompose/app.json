@@ -1,0 +1,217 @@
+{
+  "id": "com.modeswitch",
+  "version": "3.2.1",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Mode Switch",
+    "nl": "Modus Schakelaar",
+    "de": "Modusschalter",
+    "fr": "Commutateur de mode",
+    "es": "Selector de modo",
+    "no": "Modus Switch",
+    "sv": "Lage Switch",
+    "it": "Modalita Switch"
+  },
+  "description": {
+    "en": "Smart home modes for lights, climate and devices — fully automated.",
+    "nl": "Slimme huis modi voor verlichting, klimaat en apparaten — volledig geautomatiseerd.",
+    "de": "Smart-Home-Modi für Licht, Klima und Geräte — vollständig automatisiert.",
+    "fr": "Modes maison intelligente pour l’éclairage, le climat et les appareils — entièrement automatisés.",
+    "es": "Modos de hogar inteligente para luces, clima y dispositivos — totalmente automatizados.",
+    "no": "Smart Hjemme Moduser for Lys, climate and Enheter — fully automated.",
+    "sv": "Smart Hemma Lagen for Lampor, climate and Enheter — fully automated.",
+    "it": "Smart Casa Modalita for Luci, climate and Dispositivi — fully automated."
+  },
+  "source": "https://github.com/evoosten/com.modeswitch",
+  "brandColor": "#0B5FFF",
+  "homeyCommunityTopicId": 154885,
+  "support": "https://community.homey.app/t/app-pro-mode-switch/154885",
+  "category": "tools",
+  "permissions": [
+    "homey:manager:api"
+  ],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Erik van Oosten",
+    "email": "eevoosten@gmail.com"
+  },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "erikvoosten"
+      }
+    }
+  },
+  "api": {
+    "get_dashboard_status": {
+      "method": "GET",
+      "path": "/dashboard_status"
+    },
+    "get_config": {
+      "method": "GET",
+      "path": "/config"
+    },
+    "get_devices": {
+      "method": "GET",
+      "path": "/devices"
+    },
+    "get_environment": {
+      "method": "GET",
+      "path": "/environment"
+    },
+    "put_rules": {
+      "method": "PUT",
+      "path": "/rules"
+    },
+    "put_zone_rules": {
+      "method": "PUT",
+      "path": "/zone_rules"
+    },
+    "post_mode": {
+      "method": "POST",
+      "path": "/mode"
+    },
+    "post_run_zone": {
+      "method": "POST",
+      "path": "/run_zone"
+    },
+    "put_schedule_rules": {
+      "method": "PUT",
+      "path": "/schedule_rules"
+    },
+    "put_auto_mode": {
+      "method": "PUT",
+      "path": "/auto_mode"
+    },
+    "put_display_settings": {
+      "method": "PUT",
+      "path": "/display_settings"
+    },
+    "put_temperature_rules": {
+      "method": "PUT",
+      "path": "/temperature_rules"
+    },
+    "put_appliance_rules": {
+      "method": "PUT",
+      "path": "/appliance_rules"
+    },
+    "web_export": {
+      "method": "GET",
+      "path": "/export",
+      "public": true
+    },
+    "post_prepare_export": {
+      "method": "POST",
+      "path": "/prepare_export"
+    },
+    "post_import": {
+      "method": "POST",
+      "path": "/import"
+    },
+    "get_time": {
+      "method": "GET",
+      "path": "/time"
+    },
+    "put_main_mode_labels": {
+      "method": "PUT",
+      "path": "/main_mode_labels"
+    },
+    "put_sub_modes": {
+      "method": "PUT",
+      "path": "/sub_modes"
+    },
+    "get_activity_rules": {
+      "method": "GET",
+      "path": "/activity_rules"
+    },
+    "put_activity_rules": {
+      "method": "PUT",
+      "path": "/activity_rules"
+    },
+    "get_activity_state": {
+      "method": "GET",
+      "path": "/activity_state"
+    },
+    "get_activity_history": {
+      "method": "GET",
+      "path": "/activity_history"
+    },
+    "get_crash_log": {
+      "method": "GET",
+      "path": "/crash_log"
+    },
+    "post_clear_crash_log": {
+      "method": "POST",
+      "path": "/crash_log/clear"
+    },
+    "put_mode_switch_device_rules": {
+      "method": "PUT",
+      "path": "/mode_switch_device_rules"
+    },
+    "post_mode_switch_device_rules": {
+      "method": "POST",
+      "path": "/mode_switch_device_rules"
+    },
+    "put_mode_switch_devices_rules": {
+      "method": "PUT",
+      "path": "/mode_switch_devices_rules"
+    },
+    "post_mode_switch_devices_rules": {
+      "method": "POST",
+      "path": "/mode_switch_devices_rules"
+    },
+    "get_dashboard": {
+      "method": "GET",
+      "path": "/dashboard"
+    },
+    "get_dashboard_modes": {
+      "method": "GET",
+      "path": "/dashboard/modes"
+    },
+    "get_dashboard_monitoring": {
+      "method": "GET",
+      "path": "/dashboard/monitoring"
+    },
+    "get_dashboard_activities": {
+      "method": "GET",
+      "path": "/dashboard/activities"
+    },
+    "get_dashboard_schedules": {
+      "method": "GET",
+      "path": "/dashboard/schedules"
+    },
+    "get_dashboard_presence": {
+      "method": "GET",
+      "path": "/dashboard/presence"
+    },
+    "get_dashboard_attention": {
+      "method": "GET",
+      "path": "/dashboard/attention"
+    },
+    "get_dashboard_history": {
+      "method": "GET",
+      "path": "/dashboard/history"
+    },
+    "put_keypad_mappings": {
+      "method": "PUT",
+      "path": "/keypad_mappings"
+    },
+    "get_contact_counter_status": {
+      "method": "GET",
+      "path": "/contact_counter_status"
+    },
+    "post_reset_contact_counter": {
+      "method": "POST",
+      "path": "/contact_counter/reset"
+    }
+  },
+  "runtime": "nodejs"
+}
