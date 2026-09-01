@@ -43,7 +43,8 @@
   },
   "images": {
     "small": "/drivers/mode_controller/assets/images/small.png",
-    "large": "/drivers/mode_controller/assets/images/large.png"
+    "large": "/drivers/mode_controller/assets/images/large.png",
+    "xlarge": "/drivers/mode_controller/assets/images/xlarge.png"
   },
   "icon": "/drivers/mode_controller/assets/icon.svg",
   "pair": [

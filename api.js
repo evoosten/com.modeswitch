@@ -74,6 +74,15 @@ module.exports = {
     return { ok: true, rules };
   },
 
+  async get_contact_counter_status({ homey }) {
+    return { ok: true, counters: homey.app.getContactCounterStatus ? homey.app.getContactCounterStatus() : [] };
+  },
+
+  async post_reset_contact_counter({ homey, body }) {
+    const ruleId = String(body?.ruleId || '');
+    return { ok: true, counter: homey.app.resetContactCounter ? homey.app.resetContactCounter(ruleId) : null };
+  },
+
   async put_zone_rules({ homey, body }) {
     const zoneRules = await homey.app.saveZoneRules(body?.zoneRules || []);
     return { ok: true, zoneRules };

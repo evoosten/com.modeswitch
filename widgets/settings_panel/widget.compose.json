@@ -31,5 +31,43 @@
       "min": 520,
       "max": 900
     }
-  ]
+  ],
+  "api": {
+    "getDashboard": {
+      "method": "GET",
+      "path": "/"
+    },
+    "getConfig": {
+      "method": "GET",
+      "path": "/config"
+    },
+    "getEnvironment": {
+      "method": "GET",
+      "path": "/environment"
+    },
+    "saveSubModes": {
+      "method": "PUT",
+      "path": "/sub_modes"
+    },
+    "saveZoneRules": {
+      "method": "PUT",
+      "path": "/zone_rules"
+    },
+    "saveTemperatureRules": {
+      "method": "PUT",
+      "path": "/temperature_rules"
+    },
+    "saveApplianceRules": {
+      "method": "PUT",
+      "path": "/appliance_rules"
+    },
+    "saveScheduleRules": {
+      "method": "PUT",
+      "path": "/schedule_rules"
+    },
+    "saveAutoMode": {
+      "method": "PUT",
+      "path": "/auto_mode"
+    }
+  }
 }

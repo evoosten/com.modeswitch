@@ -9,26 +9,21 @@
   },
   "class": "other",
   "capabilities": [],
-
   "images": {
     "small": "/drivers/mode_switch/assets/images/small.png",
-    "large": "/drivers/mode_switch/assets/images/large.png"
+    "large": "/drivers/mode_switch/assets/images/large.png",
+    "xlarge": "/drivers/mode_switch/assets/images/xlarge.png"
   },
-
   "icon": "/drivers/mode_switch/assets/icon.svg",
-
   "pair": [
     {
       "id": "configure"
     }
   ],
-
   "repair": [
     {
       "id": "configure"
     }
   ],
-
   "settings": []
 }
- 

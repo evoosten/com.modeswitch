@@ -54,7 +54,9 @@ class ModeSwitchApp extends Homey.App {
     this.appStartedAt = Date.now();
     if (this.homey) this.homey.appStartTime = this.appStartedAt;
     this.motionStateByRule = new Map();
+    this.temperatureWindowStateByRule = new Map();
     this.contactRetryTimers = new Map();
+    this.modeDelayTimers = new Set();
     this.pollTimer = null;
     this.schedulerTimer = null;
     this.applianceTimer = null;
@@ -547,7 +549,7 @@ class ModeSwitchApp extends Homey.App {
     });
 
     this.processKeypadInputAction.registerRunListener(async args => {
-      return this.processKeypadInput(args.keypad_id, args.pin, args.action);
+      return this.processKeypadInput(args.keypad_id, args.pin);
     });
 
     this.zoneLightsOnAction.registerRunListener(async args => {
@@ -881,6 +883,103 @@ class ModeSwitchApp extends Homey.App {
     return this.getSubModes().filter(item => item.parentMode === parentMode);
   }
 
+  _normalizeModeLightActions(actions) {
+    if (!Array.isArray(actions)) return [];
+    return actions.map(action => {
+      const deviceId = typeof action?.deviceId === 'string' ? action.deviceId.trim() : '';
+      if (!deviceId) return null;
+      const on = action?.on !== false;
+      const dim = this._numberOrNull(action?.dim);
+      const lightTemperature = this._numberOrNull(action?.lightTemperature);
+      const hue = this._numberOrNull(action?.hue);
+      const saturation = this._numberOrNull(action?.saturation);
+      const delaySeconds = Math.max(0, Math.min(86400, Number(action?.delaySeconds) || 0));
+      const clamp01 = value => value === null ? null : Math.max(0, Math.min(1, value));
+      return { deviceId, on, dim: clamp01(dim), lightTemperature: clamp01(lightTemperature), hue: clamp01(hue), saturation: clamp01(saturation), delaySeconds: Math.round(delaySeconds) };
+    }).filter(Boolean);
+  }
+
+  async _applyLightProfile(deviceId, profile = {}) {
+    const environment = await this.getEnvironment();
+    const device = (environment.lightDevices || []).find(item => item.id === deviceId);
+    if (!device) throw new Error('Light not found: ' + deviceId);
+    const caps = new Set(device.capabilities || []);
+    const on = profile.on !== false;
+    if (caps.has('onoff')) await this._setDeviceCapabilityValue(deviceId, 'onoff', on);
+    if (!on) return;
+    if (profile.dim !== null && profile.dim !== undefined && caps.has('dim')) await this._setDeviceCapabilityValue(deviceId, 'dim', Math.max(0, Math.min(1, Number(profile.dim))));
+    const wantsColor = profile.hue !== null && profile.hue !== undefined;
+    const wantsTemperature = profile.lightTemperature !== null && profile.lightTemperature !== undefined;
+    if (caps.has('light_mode')) {
+      if (wantsColor) await this._setDeviceCapabilityValue(deviceId, 'light_mode', 'color');
+      else if (wantsTemperature) await this._setDeviceCapabilityValue(deviceId, 'light_mode', 'temperature');
+    }
+    if (!wantsColor && wantsTemperature && caps.has('light_temperature')) await this._setDeviceCapabilityValue(deviceId, 'light_temperature', Math.max(0, Math.min(1, Number(profile.lightTemperature))));
+    if (wantsColor && caps.has('light_hue')) await this._setDeviceCapabilityValue(deviceId, 'light_hue', Math.max(0, Math.min(1, Number(profile.hue))));
+    if (profile.saturation !== null && profile.saturation !== undefined && caps.has('light_saturation')) await this._setDeviceCapabilityValue(deviceId, 'light_saturation', Math.max(0, Math.min(1, Number(profile.saturation))));
+  }
+
+  async _scheduleModeLightActions(mode, actions, results) {
+    for (const action of this._normalizeModeLightActions(actions)) {
+      const execute = async () => {
+        if (this.getCurrentMode() !== mode) return;
+        try {
+          await this._applyLightProfile(action.deviceId, action);
+          results.lights.push(action);
+        } catch (error) {
+          this.error(`Failed mode light action for ${action.deviceId}`, error);
+          results.failed.push({ deviceId: action.deviceId, error: error.message });
+        }
+      };
+      if (action.delaySeconds > 0) {
+        const timer = setTimeout(async () => { this.modeDelayTimers.delete(timer); await execute(); }, action.delaySeconds * 1000);
+        if (timer && typeof timer.unref === 'function') timer.unref();
+        this.modeDelayTimers.add(timer);
+      } else {
+        await execute();
+      }
+    }
+  }
+
+  _normalizeModeDelayedActions(actions) {
+    if (!Array.isArray(actions)) return [];
+    return actions.map(action => {
+      const deviceId = typeof action?.deviceId === 'string' ? action.deviceId.trim() : '';
+      const target = action?.target === false || action?.action === 'off' ? false : true;
+      const delaySeconds = Math.max(0, Math.min(86400, Number(action?.delaySeconds) || 0));
+      if (!deviceId || delaySeconds <= 0) return null;
+      return { deviceId, target, delaySeconds: Math.round(delaySeconds) };
+    }).filter(Boolean);
+  }
+
+  _clearModeDelayTimers() {
+    if (!(this.modeDelayTimers instanceof Set)) this.modeDelayTimers = new Set();
+    for (const timer of this.modeDelayTimers) clearTimeout(timer);
+    this.modeDelayTimers.clear();
+  }
+
+  _scheduleModeDelayedActions(mode, actions, results) {
+    this._clearModeDelayTimers();
+    for (const action of this._normalizeModeDelayedActions(actions)) {
+      const timer = setTimeout(async () => {
+        this.modeDelayTimers.delete(timer);
+        if (this.getCurrentMode() !== mode) {
+          this.log(`Skipped delayed mode action for ${action.deviceId}; mode is no longer ${mode}`);
+          return;
+        }
+        try {
+          await this._setSwitchTargetValue(action.deviceId, action.target);
+          this.log(`Delayed mode action executed for ${action.deviceId}: ${action.target ? 'on' : 'off'} after ${action.delaySeconds}s`);
+        } catch (error) {
+          this.error(`Failed delayed mode action for ${action.deviceId}`, error);
+        }
+      }, action.delaySeconds * 1000);
+      if (timer && typeof timer.unref === 'function') timer.unref();
+      this.modeDelayTimers.add(timer);
+      results.delayed.push(action);
+    }
+  }
+
   getModeRules() {
     const rules = this.homey.settings.get(SETTINGS_KEYS.MODE_RULES);
     if (!rules || typeof rules !== 'object') return this._createEmptyModeRules();
@@ -891,6 +990,8 @@ class ModeSwitchApp extends Homey.App {
       normalized[mode] = {
         on: this._sanitizeDeviceIdList(existing.on),
         off: this._sanitizeDeviceIdList(existing.off),
+        delayed: this._normalizeModeDelayedActions(existing.delayed),
+        lights: this._normalizeModeLightActions(existing.lights),
       };
     }
 
@@ -904,10 +1005,39 @@ class ModeSwitchApp extends Homey.App {
       normalized[mode] = {
         on: this._sanitizeDeviceIdList(input.on),
         off: this._sanitizeDeviceIdList(input.off),
+        delayed: this._normalizeModeDelayedActions(input.delayed),
+        lights: this._normalizeModeLightActions(input.lights),
       };
     }
     this.homey.settings.set(SETTINGS_KEYS.MODE_RULES, normalized);
     return normalized;
+  }
+
+  getContactCounterStatus() {
+    const now = Date.now();
+    return this.getZoneRules().filter(rule => rule.contactSequenceEnabled).map(rule => {
+      const state = this.motionStateByRule.get(rule.id) || {};
+      const startedAt = Number(state.contactSequenceStartedAt) || null;
+      const resetSeconds = Number(rule.contactSequenceResetSeconds) || 0;
+      const resetAt = startedAt && resetSeconds > 0 ? startedAt + resetSeconds * 1000 : null;
+      return {
+        ruleId: rule.id,
+        name: rule.name || rule.id,
+        event: rule.contactSequenceEvent === 'closed' ? 'closed' : 'open',
+        count: Number(state.contactSequenceCount) || 0,
+        target: Number(rule.contactSequenceCount) || 2,
+        startedAt,
+        resetAt,
+        remainingSeconds: resetAt ? Math.max(0, Math.ceil((resetAt - now) / 1000)) : null,
+        lastContactOpen: typeof state.wasContactOpen === 'boolean' ? state.wasContactOpen : null,
+      };
+    });
+  }
+
+  resetContactCounter(ruleId) {
+    const state = this.motionStateByRule.get(ruleId) || {};
+    this.motionStateByRule.set(ruleId, { ...state, contactSequenceCount: 0, contactSequenceStartedAt: null });
+    return this.getContactCounterStatus().find(item => item.ruleId === ruleId) || null;
   }
 
   getZoneRules() {
@@ -935,6 +1065,9 @@ class ModeSwitchApp extends Homey.App {
       ? rules.map(rule => this._normalizeTemperatureRule(rule)).filter(Boolean)
       : [];
     this.homey.settings.set(SETTINGS_KEYS.TEMPERATURE_RULES, normalized);
+    // Rebuild the window/contact baseline after editing rules. The next poll then
+    // evaluates the actual contact state without carrying stale rule state.
+    if (this.temperatureWindowStateByRule) this.temperatureWindowStateByRule.clear();
     return normalized;
   }
 
@@ -1047,8 +1180,9 @@ class ModeSwitchApp extends Homey.App {
     if (!this.getAvailableModes().includes(mode)) throw new Error(`Unsupported mode: ${mode}`);
 
     const previousMode = this.getCurrentMode();
-    const selectedRules = this.getModeRules()[mode] || { on: [], off: [] };
-    const results = { turnedOn: [], turnedOff: [], failed: [] };
+    const selectedRules = this.getModeRules()[mode] || { on: [], off: [], delayed: [], lights: [] };
+    this._clearModeDelayTimers();
+    const results = { turnedOn: [], turnedOff: [], delayed: [], lights: [], failed: [] };
 
     for (const deviceId of selectedRules.on) {
       try {
@@ -1071,6 +1205,8 @@ class ModeSwitchApp extends Homey.App {
     }
 
     this.homey.settings.set(SETTINGS_KEYS.CURRENT_MODE, mode);
+    this._scheduleModeDelayedActions(mode, selectedRules.delayed, results);
+    await this._scheduleModeLightActions(mode, selectedRules.lights, results);
     if (previousMode !== mode) {
       this._createModeChangeTimelineNotification(mode, previousMode, source).catch(error => {
         this.error('Failed to create mode change timeline notification', error);
@@ -1079,6 +1215,13 @@ class ModeSwitchApp extends Homey.App {
     await this.applyTemperatureRulesForCurrentMode({ source: 'mode-change' });
     await this._syncModeDevices(mode);
     await this._triggerModeChangedForControllers({ mode, previous_mode: previousMode, source });
+    if (previousMode !== mode) {
+      const resetIds = new Set(this.getZoneRules().filter(rule => rule.contactSequenceEnabled && rule.contactSequenceResetOnModeChange).map(rule => rule.id));
+      for (const ruleId of resetIds) {
+        const state = this.motionStateByRule.get(ruleId);
+        if (state) this.motionStateByRule.set(ruleId, { ...state, contactSequenceCount: 0, contactSequenceStartedAt: null });
+      }
+    }
     await this.runZoneRulesForCurrentMode({ source: 'mode-change' });
 
     return { mode, previousMode, source, ...results };
@@ -1272,7 +1415,65 @@ const isDay = hour >= 7 && hour < 18;
     return environment.switchTargets || environment.switchableDevices;
   }
 
-  async setZoneLights(zoneId, value, { dim = null, onlyDeviceIds = null, includeSubzones = false } = {}) {
+  _getZoneRuleLightActions(rule) {
+    const normalized = this._normalizeModeLightActions(rule?.lights);
+    if (normalized.length) return normalized;
+    const ids = this._sanitizeDeviceIdList(rule?.lightDeviceIds);
+    return ids.map(deviceId => ({
+      deviceId,
+      on: true,
+      dim: this._numberOrNull(rule?.dimValue),
+      lightTemperature: this._numberOrNull(rule?.lightTemperature),
+      hue: rule?.lightColorEnabled === true ? this._numberInRange(rule?.lightHue, 0, 1, 0) : null,
+      saturation: rule?.lightColorEnabled === true ? this._numberInRange(rule?.lightSaturation, 0, 1, 1) : null,
+      delaySeconds: 0,
+    }));
+  }
+
+  _getZoneRuleLightIds(rule) {
+    const profileIds = this._getZoneRuleLightActions(rule).map(action => action.deviceId);
+    return [...new Set(profileIds.length ? profileIds : this._sanitizeDeviceIdList(rule?.lightDeviceIds))];
+  }
+
+  async _applyZoneRuleLights(rule, activated = true) {
+    const actions = this._getZoneRuleLightActions(rule);
+    if (!activated) {
+      return this.setZoneLights(rule.zoneId, false, { onlyDeviceIds: this._getZoneRuleLightIds(rule), includeSubzones: rule.includeSubzones });
+    }
+    if (actions.length === 0) {
+      return this.setZoneLights(rule.zoneId, true, {
+        dim: rule.dimValue,
+        lightTemperature: rule.lightTemperature,
+        hue: rule.lightColorEnabled ? rule.lightHue : null,
+        saturation: rule.lightColorEnabled ? rule.lightSaturation : null,
+        onlyDeviceIds: rule.lightDeviceIds,
+        includeSubzones: rule.includeSubzones,
+      });
+    }
+    const results = { changed: [], failed: [] };
+    for (const action of actions) {
+      const execute = async () => {
+        const liveRule = this.getZoneRules().find(item => item.id === rule.id);
+        if (!liveRule || !liveRule.enabled || !liveRule.modeIds.includes(this.getCurrentMode())) return;
+        try {
+          await this._applyLightProfile(action.deviceId, action);
+          results.changed.push(action.deviceId);
+        } catch (error) {
+          this.error('Failed zone light action for ' + action.deviceId, error);
+          results.failed.push({ deviceId: action.deviceId, error: error.message });
+        }
+      };
+      if (action.delaySeconds > 0) {
+        const timer = this.homey.setTimeout(execute, action.delaySeconds * 1000);
+        if (timer && typeof timer.unref === 'function') timer.unref();
+      } else {
+        await execute();
+      }
+    }
+    return results;
+  }
+
+  async setZoneLights(zoneId, value, { dim = null, lightTemperature = null, hue = null, saturation = null, onlyDeviceIds = null, includeSubzones = false } = {}) {
     const environment = await this.getEnvironment();
     const allowSet = Array.isArray(onlyDeviceIds) && onlyDeviceIds.length > 0 ? new Set(onlyDeviceIds) : null;
     const zoneIds = this._getZoneAndSubZoneIds(zoneId, environment.zones, includeSubzones);
@@ -1281,27 +1482,21 @@ const isDay = hour >= 7 && hour < 18;
 
     await Promise.all(lights.map(async light => {
       try {
-        if (value === true && dim !== null && light.capabilities.includes('dim')) {
-          await Promise.all([
-            this._setDeviceCapabilityValue(light.id, 'onoff', true),
-            this._setDeviceCapabilityValue(light.id, 'dim', dim),
-          ]);
-        } else {
-          await this._setDeviceCapabilityValue(light.id, 'onoff', value);
-        }
+        const profile = { on: value, dim, lightTemperature, hue, saturation };
+        await this._applyLightProfile(light.id, profile);
         results.changed.push(light.id);
       } catch (error) {
         this.error('Failed to update light ' + light.id, error);
         results.failed.push({ deviceId: light.id, error: error.message });
       }
     }));
-
     return results;
   }
 
 
-  async applyTemperatureRulesForCurrentMode({ source = 'manual' } = {}) {
-    const environment = await this.getEnvironment({ force: true });
+
+  async applyTemperatureRulesForCurrentMode({ source = 'manual', environment = null } = {}) {
+    environment = environment || await this.getEnvironment({ force: true });
     const currentMode = this.getCurrentMode();
     const rules = this.getTemperatureRules().filter(rule => rule.enabled && Array.isArray(rule.modeIds) && rule.modeIds.includes(currentMode));
     const results = { changed: [], skipped: [], failed: [] };
@@ -1396,15 +1591,59 @@ const isDay = hour >= 7 && hour < 18;
     if (this.polling) return;
     this.polling = true;
     try {
-      const environment = await this.getEnvironment();
       const currentMode = this.getCurrentMode();
+      const dynamicTemperatureRules = this.getTemperatureRules().filter(rule =>
+        rule.enabled &&
+        Array.isArray(rule.modeIds) &&
+        rule.modeIds.includes(currentMode) &&
+        rule.liveWindowContact === true &&
+        rule.windowMode &&
+        rule.windowMode !== 'ignore'
+      );
+
+      // Contact-driven temperature rules must see fresh alarm_contact values.
+      // Only force a device refresh when such a rule is active, so normal polling
+      // keeps using the existing environment cache.
+      const environment = await this.getEnvironment({ force: dynamicTemperatureRules.length > 0 });
       const rules = this.getZoneRules().filter(rule => rule.enabled && rule.modeIds.includes(currentMode));
 
       for (const rule of rules) {
         await this._evaluateZoneRule(rule, environment, { source: 'poll' });
       }
+
+      await this._pollTemperatureWindowRules(dynamicTemperatureRules, environment);
     } finally {
       this.polling = false;
+    }
+  }
+
+  async _pollTemperatureWindowRules(rules, environment) {
+    if (!this.temperatureWindowStateByRule) this.temperatureWindowStateByRule = new Map();
+    const activeIds = new Set();
+    let contactChanged = false;
+
+    for (const rule of (rules || [])) {
+      if (!rule || !rule.id) continue;
+      activeIds.add(rule.id);
+      const zoneIds = this._getZoneAndSubZoneIds(rule.zoneId, environment.zones, rule.includeSubzones);
+      const windowOpen = this._isTemperatureRuleWindowOpen(rule, environment, zoneIds);
+      const previous = this.temperatureWindowStateByRule.get(rule.id);
+      this.temperatureWindowStateByRule.set(rule.id, windowOpen);
+
+      // The first observation is also applied. This makes a rule correct directly
+      // after app start or after editing while a window is already open.
+      if (previous === undefined || previous !== windowOpen) {
+        contactChanged = true;
+        this.log('Temperature contact state changed for "' + rule.name + '": ' + (windowOpen ? 'open' : 'closed'));
+      }
+    }
+
+    for (const ruleId of [...this.temperatureWindowStateByRule.keys()]) {
+      if (!activeIds.has(ruleId)) this.temperatureWindowStateByRule.delete(ruleId);
+    }
+
+    if (contactChanged) {
+      await this.applyTemperatureRulesForCurrentMode({ source: 'window-contact-change', environment });
     }
   }
 
@@ -1421,6 +1660,26 @@ const isDay = hour >= 7 && hour < 18;
     const contactTurnOffState = contactInverted ? contactOpen : allContactsClosed;
     const zoneName = environment.zones.find(zone => zone.id === rule.zoneId)?.name || rule.zoneId;
 
+    let sequenceCount = Number(previous.contactSequenceCount) || 0;
+    let sequenceStartedAt = Number(previous.contactSequenceStartedAt) || null;
+    if (sequenceStartedAt && rule.contactSequenceResetSeconds > 0 && now - sequenceStartedAt >= rule.contactSequenceResetSeconds * 1000) {
+      sequenceCount = 0;
+      sequenceStartedAt = null;
+    }
+    const contactOpenedEdge = contactDevices.length > 0 && contactOpen === true && previous.wasContactOpen === false;
+    const contactClosedEdge = contactDevices.length > 0 && contactOpen === false && previous.wasContactOpen === true;
+    const sequenceEdge = rule.contactSequenceEvent === 'closed' ? contactClosedEdge : contactOpenedEdge;
+    let sequenceTriggerOff = false;
+    if (rule.contactSequenceEnabled && sequenceEdge) {
+      if (!sequenceStartedAt) sequenceStartedAt = now;
+      sequenceCount += 1;
+      if (sequenceCount >= rule.contactSequenceCount) {
+        sequenceTriggerOff = true;
+        sequenceCount = 0;
+        sequenceStartedAt = null;
+      }
+    }
+
     const next = {
       wasMotionActive: motionActive,
       wasContactOpen: contactOpen,
@@ -1428,6 +1687,8 @@ const isDay = hour >= 7 && hour < 18;
       lastMotionAt: previous.lastMotionAt || null,
       noMotionSince: previous.noMotionSince || null,
       offTriggeredForNoMotionSince: previous.offTriggeredForNoMotionSince || null,
+      contactSequenceCount: sequenceCount,
+      contactSequenceStartedAt: sequenceStartedAt,
     };
 
     if (motionActive) {
@@ -1436,7 +1697,7 @@ const isDay = hour >= 7 && hour < 18;
       next.offTriggeredForNoMotionSince = null;
 
       if ((force || previous.wasMotionActive !== true) && rule.turnOnOnMotion && this._conditionsPass(rule, environment, now)) {
-        await this.setZoneLights(rule.zoneId, true, { dim: rule.dimValue, onlyDeviceIds: rule.lightDeviceIds, includeSubzones: rule.includeSubzones });
+        await this._applyZoneRuleLights(rule, true);
         await this.zoneMotionStartedTrigger.trigger({ zone: zoneName, mode: this.getCurrentMode(), source });
       }
     } else {
@@ -1448,19 +1709,19 @@ const isDay = hour >= 7 && hour < 18;
         && next.offTriggeredForNoMotionSince !== next.noMotionSince;
 
       if (shouldTurnOff) {
-        await this.setZoneLights(rule.zoneId, false, { onlyDeviceIds: rule.lightDeviceIds, includeSubzones: rule.includeSubzones });
+        await this._applyZoneRuleInactiveLights(rule, 'motion');
         next.offTriggeredForNoMotionSince = next.noMotionSince;
         await this.zoneNoMotionTrigger.trigger({ zone: zoneName, mode: this.getCurrentMode(), minutes: Math.round(rule.noMotionSeconds / 60), source });
       }
     }
 
-    if (contactTurnOnState && rule.turnOnOnContact && this._conditionsPass(rule, environment, now)) {
+    if (!sequenceTriggerOff && contactTurnOnState && rule.turnOnOnContact && this._conditionsPass(rule, environment, now)) {
       const selectedLights = this._getRuleLightDevices(rule, environment);
       const anySelectedLightOff = selectedLights.length === 0 || selectedLights.some(light => light.onoff !== true);
       const shouldTurnOnContact = force || previous.wasContactTurnOnState !== true || anySelectedLightOff;
 
       if (shouldTurnOnContact) {
-        await this.setZoneLights(rule.zoneId, true, { dim: rule.dimValue, onlyDeviceIds: rule.lightDeviceIds, includeSubzones: rule.includeSubzones });
+        await this._applyZoneRuleLights(rule, true);
         this._scheduleContactRetries(rule, true, { source });
       }
     }
@@ -1469,9 +1730,15 @@ const isDay = hour >= 7 && hour < 18;
       const shouldTurnOffContact = force || previous.wasContactTurnOnState === true;
 
       if (shouldTurnOffContact) {
-        await this.setZoneLights(rule.zoneId, false, { onlyDeviceIds: rule.lightDeviceIds, includeSubzones: rule.includeSubzones });
+        await this._applyZoneRuleInactiveLights(rule, 'contact');
         this._scheduleContactRetries(rule, false, { source });
       }
+    }
+
+    if (sequenceTriggerOff) {
+      await this._applyZoneRuleLights(rule, false);
+      this._scheduleContactRetries(rule, false, { source });
+      this.log(`Contact sequence completed for zone rule ${rule.name || rule.id}: lights off`);
     }
 
     this.motionStateByRule.set(rule.id, next);
@@ -1522,19 +1789,19 @@ const isDay = hour >= 7 && hour < 18;
       const anySelectedLightOff = selectedLights.length === 0 || selectedLights.some(light => light.onoff !== true);
       if (!anySelectedLightOff) return;
 
-      await this.setZoneLights(rule.zoneId, true, { dim: rule.dimValue, onlyDeviceIds: rule.lightDeviceIds, includeSubzones: rule.includeSubzones });
+      await this._applyZoneRuleLights(rule, true);
       return;
     }
 
     if (!contactTurnOffState || !rule.turnOffWhenContactClosed) return;
-    await this.setZoneLights(rule.zoneId, false, { onlyDeviceIds: rule.lightDeviceIds, includeSubzones: rule.includeSubzones });
+    await this._applyZoneRuleInactiveLights(rule, 'contact');
   }
 
   _conditionsPass(rule, environment, now) {
     if (rule.timeEnabled && !this._isWithinTimeWindow(rule.timeFrom, rule.timeTo, now)) return false;
 
     if (rule.onlyIfLightsOff) {
-      const selected = new Set(rule.lightDeviceIds || []);
+      const selected = new Set(this._getZoneRuleLightIds(rule));
       const lights = environment.lightDevices.filter(device => selected.has(device.id));
       if (lights.some(light => light.onoff === true)) return false;
     }
@@ -1570,6 +1837,52 @@ const isDay = hour >= 7 && hour < 18;
     return hours * 60 + minutes;
   }
 
+
+  async _applyZoneRuleInactiveLights(rule, reason = 'sensor') {
+    const actions = this._normalizeModeLightActions(rule?.deactivationLights);
+    if (actions.length === 0) {
+      return this._applyZoneRuleLights(rule, false);
+    }
+
+    const results = { changed: [], failed: [] };
+    for (const action of actions) {
+      const execute = async () => {
+        const liveRule = this.getZoneRules().find(item => item.id === rule.id);
+        if (!liveRule || !liveRule.enabled || !liveRule.modeIds.includes(this.getCurrentMode())) return;
+
+        // Do not execute a delayed inactive profile when the sensor has become active again.
+        const environment = await this.getEnvironment();
+        if (reason === 'motion') {
+          const motionDevices = this._getRuleMotionDevices(liveRule, environment);
+          if (motionDevices.some(device => device.motion === true)) return;
+        } else if (reason === 'contact') {
+          const contactDevices = this._getRuleContactDevices(liveRule, environment);
+          if (contactDevices.length === 0) return;
+          const contactOpen = contactDevices.some(device => device.contact === true);
+          const allContactsClosed = contactDevices.every(device => device.contact === false);
+          const inactive = liveRule.invertContactLogic === true ? contactOpen : allContactsClosed;
+          if (!inactive) return;
+        }
+
+        try {
+          await this._applyLightProfile(action.deviceId, action);
+          results.changed.push(action.deviceId);
+        } catch (error) {
+          this.error('Failed zone inactive light action for ' + action.deviceId, error);
+          results.failed.push({ deviceId: action.deviceId, error: error.message });
+        }
+      };
+
+      if (action.delaySeconds > 0) {
+        const timer = this.homey.setTimeout(execute, action.delaySeconds * 1000);
+        if (timer && typeof timer.unref === 'function') timer.unref();
+      } else {
+        await execute();
+      }
+    }
+    return results;
+  }
+
   _getRuleMotionDevices(rule, environment) {
     const selected = new Set(rule.motionDeviceIds || []);
     const zoneIds = this._getZoneAndSubZoneIds(rule.zoneId, environment.zones, rule.includeSubzones);
@@ -1583,7 +1896,7 @@ const isDay = hour >= 7 && hour < 18;
   }
 
   _getRuleLightDevices(rule, environment) {
-    const selected = new Set(rule.lightDeviceIds || []);
+    const selected = new Set(this._getZoneRuleLightIds(rule));
     const zoneIds = this._getZoneAndSubZoneIds(rule.zoneId, environment.zones, rule.includeSubzones);
     return environment.lightDevices.filter(device => zoneIds.has(device.zone) && (selected.size === 0 || selected.has(device.id)));
   }
@@ -1650,7 +1963,21 @@ const isDay = hour >= 7 && hour < 18;
     const dateKey = localNow.dateKey;
     const currentMinutes = localNow.minutes;
     for (const rule of rules) {
-      const pendingEntry = state[rule.id] || {};
+      let pendingEntry = state[rule.id] || {};
+      if (Array.isArray(pendingEntry.pendingLightActions) && pendingEntry.pendingLightActions.length) {
+        const remainingLightActions = [];
+        for (const pendingLight of pendingEntry.pendingLightActions) {
+          if (Number(pendingLight?.dueAt) <= now.getTime()) {
+            try { await this._applyLightProfile(pendingLight.deviceId, pendingLight); }
+            catch (error) { this.error(`Failed scheduled light action for ${pendingLight?.deviceId || 'unknown'}`, error); }
+          } else remainingLightActions.push(pendingLight);
+        }
+        if (remainingLightActions.length !== pendingEntry.pendingLightActions.length) {
+          pendingEntry = { ...pendingEntry, pendingLightActions: remainingLightActions };
+          state[rule.id] = pendingEntry;
+          changedState = true;
+        }
+      }
       if (pendingEntry.autoOffAt && now.getTime() >= pendingEntry.autoOffAt) {
         await this._applyDeviceAction(rule.deviceIds, false);
         state[rule.id] = { ...pendingEntry, autoOffAt: null, autoOffRunAt: now.getTime() };
@@ -1682,9 +2009,15 @@ const isDay = hour >= 7 && hour < 18;
       const turnOn = rule.action === 'on';
       this.log(`Schedule '${rule.name}' runs at local ${dateKey} ${String(Math.floor(currentMinutes / 60)).padStart(2, '0')}:${String(currentMinutes % 60).padStart(2, '0')} (${timezone})`);
       await this._applyDeviceAction(rule.deviceIds, turnOn);
+      const normalizedScheduleLights = this._normalizeModeLightActions(rule.lights);
+      const pendingLightActions = Array.isArray(currentEntry.pendingLightActions) ? [...currentEntry.pendingLightActions] : [];
+      for (const lightProfile of normalizedScheduleLights) {
+        if (lightProfile.delaySeconds > 0) pendingLightActions.push({ ...lightProfile, dueAt: now.getTime() + (lightProfile.delaySeconds * 1000) });
+        else { try { await this._applyLightProfile(lightProfile.deviceId, lightProfile); } catch (error) { this.error(`Failed scheduled light action for ${lightProfile.deviceId}`, error); } }
+      }
       const autoOffAt = turnOn && rule.autoOffEnabled ? this._resolveFollowUpTimestamp(now, rule.autoOffMode, rule.autoOffAfterHours, rule.autoOffTime, rule.autoOffRandomFromHours, rule.autoOffRandomToHours, rule.autoOffRandomFromTime, rule.autoOffRandomToTime, timezone) : (currentEntry.autoOffAt || null);
       const autoOnAt = !turnOn && rule.autoOnEnabled ? this._resolveFollowUpTimestamp(now, rule.autoOnMode, rule.autoOnAfterHours, rule.autoOnTime, rule.autoOnRandomFromHours, rule.autoOnRandomToHours, rule.autoOnRandomFromTime, rule.autoOnRandomToTime, timezone) : (currentEntry.autoOnAt || null);
-      state[rule.id] = { ...currentEntry, dateKey, targetMinutes, lastRunKey: runKey, autoOffAt, autoOnAt };
+      state[rule.id] = { ...currentEntry, dateKey, targetMinutes, lastRunKey: runKey, autoOffAt, autoOnAt, pendingLightActions };
       changedState = true;
     }
     if (changedState) this.homey.settings.set(SETTINGS_KEYS.SCHEDULE_STATE, state);
@@ -3516,6 +3849,7 @@ const isDay = hour >= 7 && hour < 18;
       luxDeviceIds: this._sanitizeDeviceIdList(rule.luxDeviceIds),
       luxOperator: rule.luxOperator === 'above' ? 'above' : 'below',
       luxThreshold: this._numberInRange(rule.luxThreshold, 0, 100000, 30),
+      lights: this._normalizeModeLightActions(rule.lights),
     };
   }  _normalizeSwitchRule(rule) {
     if (!rule || typeof rule !== 'object') return null;
@@ -3612,14 +3946,25 @@ const isDay = hour >= 7 && hour < 18;
       includeSubzones: rule.includeSubzones === true,
       motionDeviceIds: this._sanitizeDeviceIdList(rule.motionDeviceIds),
       contactDeviceIds: this._sanitizeDeviceIdList(rule.contactDeviceIds),
-      lightDeviceIds: this._sanitizeDeviceIdList(rule.lightDeviceIds),
+      lightDeviceIds: this._sanitizeDeviceIdList(Array.isArray(rule.lights) && rule.lights.length ? rule.lights.map(item => item && item.deviceId) : rule.lightDeviceIds),
+      lights: this._normalizeModeLightActions(Array.isArray(rule.lights) && rule.lights.length ? rule.lights : this._sanitizeDeviceIdList(rule.lightDeviceIds).map(deviceId => ({ deviceId, on: true, dim: this._numberOrNull(rule.dimValue), lightTemperature: this._numberOrNull(rule.lightTemperature), hue: rule.lightColorEnabled === true ? this._numberInRange(rule.lightHue, 0, 1, 0) : null, saturation: rule.lightColorEnabled === true ? this._numberInRange(rule.lightSaturation, 0, 1, 1) : null, delaySeconds: 0 }))),
+      deactivationLights: this._normalizeModeLightActions(Array.isArray(rule.deactivationLights) ? rule.deactivationLights : []),
       turnOnOnMotion: rule.turnOnOnMotion !== false,
       turnOnOnContact: rule.turnOnOnContact === true,
       turnOffWhenContactClosed: rule.turnOffWhenContactClosed === true,
       invertContactLogic: rule.invertContactLogic === true,
+      contactSequenceEnabled: rule.contactSequenceEnabled === true,
+      contactSequenceEvent: rule.contactSequenceEvent === 'closed' ? 'closed' : 'open',
+      contactSequenceCount: Math.max(2, Math.min(10, Math.round(Number(rule.contactSequenceCount) || 2))),
+      contactSequenceResetSeconds: this._numberInRange(rule.contactSequenceResetSeconds, 30, 86400, 1800),
+      contactSequenceResetOnModeChange: rule.contactSequenceResetOnModeChange !== false,
       turnOffAfterNoMotion: rule.turnOffAfterNoMotion !== false,
       noMotionSeconds: this._numberInRange(rule.noMotionSeconds, 10, 86400, 180),
       dimValue: this._numberOrNull(rule.dimValue),
+      lightTemperature: this._numberOrNull(rule.lightTemperature),
+      lightColorEnabled: rule.lightColorEnabled === true,
+      lightHue: this._numberInRange(rule.lightHue, 0, 1, 0),
+      lightSaturation: this._numberInRange(rule.lightSaturation, 0, 1, 1),
       timeEnabled: rule.timeEnabled === true,
       timeFrom: typeof rule.timeFrom === 'string' ? rule.timeFrom : '18:00',
       timeTo: typeof rule.timeTo === 'string' ? rule.timeTo : '23:59',
@@ -3657,6 +4002,7 @@ const isDay = hour >= 7 && hour < 18;
       temperature: Math.round(temperature * 2) / 2,
       windowMode,
       windowTemperature: Math.round(windowTemperature * 2) / 2,
+      liveWindowContact: rule.liveWindowContact === true,
       contactDeviceIds: this._sanitizeDeviceIdList(rule.contactDeviceIds),
       smartWeatherEnabled: rule.smartWeatherEnabled === true,
       weatherDeviceId: typeof rule.weatherDeviceId === 'string' ? rule.weatherDeviceId : '',
@@ -3736,7 +4082,7 @@ const isDay = hour >= 7 && hour < 18;
   }
 
   _createEmptyModeRules() {
-    return Object.fromEntries(this.getAvailableModes().map(mode => [mode, { on: [], off: [] }]));
+    return Object.fromEntries(this.getAvailableModes().map(mode => [mode, { on: [], off: [], delayed: [], lights: [] }]));
   }
 
   _registerModeAndSwitchFlowCards() {
@@ -3839,7 +4185,6 @@ const isDay = hour >= 7 && hour < 18;
     return mappings.map((m, i) => ({
       id: String(m?.id || `keypad_${i}`),
       keypadId: String(m?.keypadId || '').trim(),
-      action: String(m?.action || '').trim().toLowerCase(),
       modeId: String(m?.modeId || '').trim(),
       salt: String(m?.salt || ''),
       pinHash: String(m?.pinHash || ''),
@@ -3862,21 +4207,19 @@ const isDay = hour >= 7 && hour < 18;
         salt = crypto.randomBytes(16).toString('hex');
         pinHash = crypto.createHash('sha256').update(`${salt}:${pin}`).digest('hex');
       }
-      return { id, keypadId: String(m?.keypadId || '').trim(), action: String(m?.action || '').trim().toLowerCase(), modeId: String(m?.modeId || '').trim(), salt, pinHash };
+      return { id, keypadId: String(m?.keypadId || '').trim(), modeId: String(m?.modeId || '').trim(), salt, pinHash };
     });
     const clean = this._normalizeKeypadMappings(normalized);
     this.homey.settings.set(SETTINGS_KEYS.KEYPAD_MAPPINGS, clean);
     return clean;
   }
 
-  async processKeypadInput(keypadId, pin, action = '') {
+  async processKeypadInput(keypadId, pin) {
     const kid = String(keypadId || '').trim();
     const enteredPin = String(pin || '').trim();
-    const act = String(action || '').trim().toLowerCase();
     if (!kid || !enteredPin) return false;
     for (const mapping of this.getKeypadMappings()) {
       if (mapping.keypadId !== kid) continue;
-      if (mapping.action && mapping.action !== act) continue;
       const hash = crypto.createHash('sha256').update(`${mapping.salt}:${enteredPin}`).digest('hex');
       if (hash.length === mapping.pinHash.length && crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(mapping.pinHash))) {
         await this.applyMode(mapping.modeId, { source: `keypad:${kid}` });

@@ -30,11 +30,47 @@
     "zones": {
       "title": "Zonenregeln",
       "description": "Bewegung, Tür-/Fensterkontakte, Unterzonen, Lichter, Dimmen und Bedingungen.",
-      "add": "Neue Zonenregel"
+      "add": "Neue Zonenregel",
+      "light_settings": {
+        "title": "Lichteinstellungen",
+        "description": "Lege pro Lampe fest, was passiert, wenn Bewegung oder ein Kontakt aktiv wird.",
+        "add": "Lichteinstellung hinzufügen",
+        "light": "Lampe",
+        "state_active": "Status bei Aktivierung",
+        "state_inactive": "Status bei inaktivem Sensor",
+        "on": "Ein",
+        "off": "Aus",
+        "dim": "Dimmwert %",
+        "temperature": "Farbtemperatur %",
+        "temperature_hint": "0 = warm, 100 = kühl",
+        "color": "Farbe",
+        "set_color": "Farbe einstellen",
+        "delay": "Verzögerung",
+        "seconds": "Sekunden",
+        "minutes": "Minuten",
+        "hours": "Stunden",
+        "supports_prefix": "Unterstützt: ",
+        "supports_dim": "Dimmen",
+        "supports_temperature": "Farbtemperatur",
+        "supports_color": "Farbe",
+        "onoff_only": "Nur Ein/Aus ist verfügbar.",
+        "remove": "Löschen"
+      },
+      "sensor_inactive": {
+        "title": "Wenn der Sensor inaktiv ist",
+        "description": "Diese Lichteinstellungen werden angewendet, wenn nach der eingestellten Zeit keine Bewegung mehr erkannt wird oder ein ausgewählter Tür-/Fensterkontakt wieder inaktiv wird. Lasse die Liste leer, um die ausgewählten Lampen wie bisher auszuschalten."
+      },
+      "behavior": {
+        "motion_active": "Lichteinstellungen bei Bewegung anwenden",
+        "motion_inactive": "Inaktive Lichteinstellungen nach keiner Bewegung anwenden",
+        "contact_active": "Lichteinstellungen bei aktivem Kontakt anwenden",
+        "contact_inactive": "Inaktive Lichteinstellungen bei inaktivem Kontakt anwenden",
+        "only_if_lights_off": "Nur ausführen, wenn die ausgewählten Lampen aus sind"
+      }
     },
     "temperature": {
       "title": "Temperatur pro Modus und Zone",
-      "description": "Lege die gewünschte Temperatur pro Modus und Zone fest. Geräte mit target_temperature werden bei einem Moduswechsel automatisch angepasst.",
+      "description": "Lege die gewünschte Temperatur pro Modus und Zone fest. Geräte mit target_temperature werden bei einem Moduswechsel und sofort beim Öffnen oder Schließen eines ausgewählten Fenster-/Türkontakts angepasst.",
       "add": "Neue Temperaturregel"
     },
     "appliances": {

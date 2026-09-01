@@ -31,5 +31,11 @@
       "min": 220,
       "max": 900
     }
-  ]
+  ],
+  "api": {
+    "getStatus": {
+      "method": "GET",
+      "path": "/"
+    }
+  }
 }

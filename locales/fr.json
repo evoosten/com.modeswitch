@@ -30,11 +30,47 @@
     "zones": {
       "title": "Règles de zone",
       "description": "Mouvement, contacts porte/fenêtre, sous-zones, éclairage, variation et conditions.",
-      "add": "Nouvelle règle de zone"
+      "add": "Nouvelle règle de zone",
+      "light_settings": {
+        "title": "Réglages d’éclairage",
+        "description": "Définis ce qui doit se passer pour chaque lampe lorsqu’un mouvement ou un contact devient actif.",
+        "add": "Ajouter un réglage d’éclairage",
+        "light": "Lampe",
+        "state_active": "État à l’activation",
+        "state_inactive": "État lorsque le capteur est inactif",
+        "on": "Allumé",
+        "off": "Éteint",
+        "dim": "Niveau de variation %",
+        "temperature": "Température de couleur %",
+        "temperature_hint": "0 = chaud, 100 = froid",
+        "color": "Couleur",
+        "set_color": "Définir la couleur",
+        "delay": "Délai",
+        "seconds": "Secondes",
+        "minutes": "Minutes",
+        "hours": "Heures",
+        "supports_prefix": "Prend en charge : ",
+        "supports_dim": "variation",
+        "supports_temperature": "température de couleur",
+        "supports_color": "couleur",
+        "onoff_only": "Seul marche/arrêt est disponible.",
+        "remove": "Supprimer"
+      },
+      "sensor_inactive": {
+        "title": "Lorsque le capteur est inactif",
+        "description": "Ces réglages d’éclairage sont appliqués lorsqu’aucun mouvement n’est détecté après le délai défini ou lorsqu’un contact de porte/fenêtre sélectionné redevient inactif. Laisse la liste vide pour éteindre les lampes sélectionnées comme auparavant."
+      },
+      "behavior": {
+        "motion_active": "Appliquer les réglages d’éclairage lors d’un mouvement",
+        "motion_inactive": "Appliquer les réglages inactifs après absence de mouvement",
+        "contact_active": "Appliquer les réglages d’éclairage lorsque le contact est actif",
+        "contact_inactive": "Appliquer les réglages inactifs lorsque le contact est inactif",
+        "only_if_lights_off": "Exécuter uniquement si les lampes sélectionnées sont éteintes"
+      }
     },
     "temperature": {
       "title": "Température par mode et par zone",
-      "description": "Définis la température souhaitée par mode et par zone. Les appareils avec target_temperature sont mis à jour automatiquement lors d’un changement de mode.",
+      "description": "Définis la température souhaitée par mode et par zone. Les appareils avec target_temperature sont ajustés automatiquement lors d’un changement de mode et immédiatement lorsqu’un contact porte/fenêtre sélectionné s’ouvre ou se ferme.",
       "add": "Nouvelle règle de température"
     },
     "appliances": {

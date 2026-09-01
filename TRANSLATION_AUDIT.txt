@@ -1,0 +1,6 @@
+Mode Switch 3.1.49 translation cleanup
+- Disabled legacy EXTRA_PUBLISH_I18N application that introduced mixed-language generated phrases.
+- Preserved existing curated PHRASE_I18N translations.
+- Added curated core settings terminology for Swedish, Italian and Norwegian.
+- Custom user-defined mode names remain untouched.
+- Locale key completeness should still be verified by Homey publish validation externally.

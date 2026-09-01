@@ -1,0 +1,343 @@
+{
+  "2.6.6": {
+    "en": "Updated widgets and cleanup and optimizations",
+    "nl": "Widgets aangepast en wat opgeschoond en geoptimaliseerd",
+    "de": "Widgets aktualisiert sowie Bereinigungen und Optimierungen durchgeführt",
+    "fr": "Widgets mis à jour, avec nettoyage et optimisations",
+    "es": "Widgets actualizados, junto con limpieza y optimizaciones"
+  },
+  "2.6.7": {
+    "en": "Readme update",
+    "nl": "Readme aangepast",
+    "de": "README aktualisiert",
+    "fr": "Mise à jour du README",
+    "es": "Actualización del README"
+  },
+  "2.6.8": {
+    "en": "New pictures",
+    "nl": "Nieuwe afbeeldingen voor de appstore",
+    "de": "Neue Bilder für den App Store",
+    "fr": "Nouvelles images pour l’App Store",
+    "es": "Nuevas imágenes para la App Store"
+  },
+  "2.6.9": {
+    "en": "Updated App Store readme, driver image and widget previews for certification.",
+    "nl": "App Store-readme, driverafbeelding en widget previews aangepast voor certificering.",
+    "de": "App-Store-README, Treiberbild und Widget-Vorschauen für die Zertifizierung aktualisiert.",
+    "fr": "README de l’App Store, image du pilote et aperçus des widgets mis à jour pour la certification.",
+    "es": "README de la App Store, imagen del controlador y vistas previas de widgets actualizadas para la certificación."
+  },
+  "2.7.0": {
+    "en": "Some adjustments for the Homey App Store, and added duration monitoring and kWh count",
+    "nl": "Enkele aanpassingen voor de Homey App Store en monitoring van duur en kWh-telling toegevoegd",
+    "de": "Einige Anpassungen für den Homey App Store sowie Dauerüberwachung und kWh-Zähler hinzugefügt",
+    "fr": "Quelques ajustements pour le Homey App Store et ajout du suivi de durée et du compteur kWh",
+    "es": "Algunos ajustes para la Homey App Store y añadido monitoreo de duración y contador de kWh"
+  },
+  "2.7.1": {
+    "en": "Fixed a settings page error where 'lang' was not defined",
+    "nl": "Een fout op de instellingenpagina opgelost waarbij 'lang' niet was gedefinieerd",
+    "de": "Fehler auf der Einstellungsseite behoben, bei dem 'lang' nicht definiert war",
+    "fr": "Correction d’une erreur sur la page des paramètres où 'lang' n’était pas défini",
+    "es": "Corregido un error en la página de configuración donde 'lang' no estaba definido"
+  },
+  "2.7.2": {
+    "en": "Now you can choose which list is shown as default. Restart the app to apply the changes.",
+    "nl": "Je kunt nu kiezen welke lijst standaard wordt getoond. Herstart de app om de wijzigingen toe te passen.",
+    "de": "Jetzt kannst du auswählen, welche Liste standardmäßig angezeigt wird. Starte die App neu, um die Änderungen anzuwenden.",
+    "fr": "Vous pouvez désormais choisir quelle liste est affichée par défaut. Redémarrez l’application pour appliquer les modifications.",
+    "es": "Ahora puedes elegir qué lista se muestra por defecto. Reinicia la aplicación para aplicar los cambios."
+  },
+  "2.8.0": {
+    "en": "Added German, French and Spanish translations for app metadata, device settings and widgets.",
+    "nl": "Duitse, Franse en Spaanse vertalingen toegevoegd voor appmetadata, apparaatinstellingen en widgets.",
+    "de": "Deutsche, französische und spanische Übersetzungen für App-Metadaten, Geräteeinstellungen und Widgets hinzugefügt.",
+    "fr": "Ajout des traductions allemandes, françaises et espagnoles pour les métadonnées de l’application, les paramètres des appareils et les widgets.",
+    "es": "Se añadieron traducciones al alemán, francés y español para los metadatos de la aplicación, la configuración de dispositivos y los widgets."
+  },
+  "2.8.1": {
+    "en": "Added more translations and README updates for German, French and Spanish.",
+    "nl": "Nog wat vertalingen en README-updates toegevoegd voor Duits, Frans en Spaans.",
+    "de": "Weitere Übersetzungen und README-Aktualisierungen für Deutsch, Französisch und Spanisch hinzugefügt.",
+    "fr": "Ajout de traductions supplémentaires et de mises à jour du README pour l’allemand, le français et l’espagnol.",
+    "es": "Se añadieron más traducciones y actualizaciones del README para alemán, francés y español."
+  },
+  "2.9.0": {
+    "en": "Added Activity Monitoring with multi-condition rules, per-condition active duration, custom capability and time conditions, minimum session duration for history, separate usage sources for water/kWh/gas, translated flows and widgets, improved diagnostics with readable uptime, stability improvements, and a history-only activity widget popup.",
+    "nl": "Activity Monitoring toegevoegd met regels op meerdere voorwaarden, instelbare actieve duur per voorwaarde, aangepaste capability- en tijdvoorwaarden, minimale sessieduur voor historie, losse meetbronnen voor water/kWh/gas, vertaalde flows en widgets, verbeterde diagnose met leesbare uptime, stabiliteitsverbeteringen en een activiteit-widgetpopup met alleen geschiedenis.",
+    "de": "Activity Monitoring mit Regeln aus mehreren Bedingungen, einstellbarer Aktivdauer pro Bedingung, benutzerdefinierten Capability- und Zeitbedingungen, Mindest-Sitzungsdauer für den Verlauf, separaten Verbrauchsquellen für Wasser/kWh/Gas, übersetzten Flows und Widgets, verbesserter Diagnose mit lesbarer Laufzeit, Stabilitätsverbesserungen und einem Aktivitäts-Widget-Popup nur mit Verlauf hinzugefügt.",
+    "fr": "Ajout d’Activity Monitoring avec des règles à plusieurs conditions, une durée active configurable par condition, des conditions de capability personnalisée et d’heure, une durée minimale de session pour l’historique, des sources de consommation séparées pour eau/kWh/gaz, des flows et widgets traduits, des diagnostics améliorés avec uptime lisible, des améliorations de stabilité et une popup du widget d’activité affichant uniquement l’historique.",
+    "es": "Se añadió Activity Monitoring con reglas de múltiples condiciones, duración activa configurable por condición, condiciones de capability personalizada y horario, duración mínima de sesión para el historial, fuentes de consumo separadas para agua/kWh/gas, flows y widgets traducidos, diagnóstico mejorado con tiempo de actividad legible, mejoras de estabilidad y una ventana emergente del widget de actividad solo con historial."
+  },
+  "3.0.0": {
+    "en": "Added the new Mode & Switch device type with custom settings, improved the app settings page layout, and enabled renaming of main modes.",
+    "nl": "De nieuwe Mode & Switch-apparaatsoort toegevoegd met eigen instelmogelijkheden, de instellingenpagina verbeterd en de hoofdmodussen naar wens hernoembaar gemaakt.",
+    "de": "Die neue Device-Art Mode & Switch hinzugefügt mit eigenen Einstellungsmöglichkeiten, die Einstellungsseite verbessert und die Hauptmodi umbenennbar gemacht.",
+    "fr": "Ajout du nouveau type d’appareil Mode & Switch avec des paramètres personnalisés, amélioration de la page de paramètres de l’application et possibilité de renommer les modes principaux.",
+    "es": "Añadido el nuevo tipo de dispositivo Mode & Switch con ajustes personalizados, mejorada la página de configuración de la app y habilitado el cambio de nombre de los modos principales."
+  },
+  "3.1.1": {
+    "en": "Added button and mode IDs to the maintenance page of Mode & Switch devices, and added history for Monitoring, similar to Activities.",
+    "nl": "ID's van knoppen en modussen toegevoegd aan het onderhoudsscherm van Mode & Switch-apparaten en geschiedenis toegevoegd voor Monitoring, vergelijkbaar met Activiteiten.",
+    "de": "Schaltflächen- und Modus-IDs zur Wartungsseite von Mode & Switch-Geräten hinzugefügt sowie eine Verlaufsfunktion für Monitoring, ähnlich wie bei Aktivitäten.",
+    "fr": "Ajout des identifiants des boutons et des modes dans la page de maintenance des appareils Mode & Switch, ainsi qu’un historique pour la surveillance, similaire aux Activités.",
+    "es": "Añadidos los ID de los botones y modos en la página de mantenimiento de los dispositivos Mode & Switch, y añadido un historial para Monitorización, similar al de Actividades."
+  },
+  "3.1.2": {
+    "en": "Updated translations on the Settings page and improved history in widgets by adding the end time.",
+    "nl": "Vertalingen op de instellingenpagina aangepast en de geschiedenis in widgets verbeterd door de eindtijd toe te voegen.",
+    "de": "Übersetzungen auf der Einstellungsseite angepasst und den Verlauf in Widgets durch Hinzufügen der Endzeit verbessert.",
+    "fr": "Mise à jour des traductions sur la page des paramètres et amélioration de l’historique dans les widgets avec l’ajout de l’heure de fin.",
+    "es": "Actualizadas las traducciones en la página de configuración y mejorado el historial de los widgets añadiendo la hora de finalización."
+  },
+  "3.1.3": {
+    "en": "Improved translations in the widgets and fixed inverted Flow conditions for the Mode & Switch device.",
+    "nl": "Vertalingen in de widgets verbeterd en het omkeren van Flow-voorwaarden voor het Mode & Switch-apparaat opgelost.",
+    "de": "Übersetzungen in den Widgets verbessert und invertierte Flow-Bedingungen für das Mode & Switch-Gerät korrigiert.",
+    "fr": "Amélioration des traductions dans les widgets et correction de l’inversion des conditions Flow pour l’appareil Mode & Switch.",
+    "es": "Mejoradas las traducciones en los widgets y corregida la inversión de las condiciones de Flow para el dispositivo Mode & Switch."
+  },
+  "3.1.4": {
+    "en": "Dashboard planning now respects the currently active Mode Switch mode. Mode-specific schedules are only exposed when their configured mode is active.",
+    "nl": "Dashboardplanning houdt nu rekening met de actieve Mode Switch-modus. Modusgebonden planningen worden alleen doorgegeven wanneer de ingestelde modus actief is.",
+    "de": "Die Dashboard-Planung berücksichtigt jetzt den aktuell aktiven Mode-Switch-Modus. Modusgebundene Zeitpläne werden nur ausgegeben, wenn der konfigurierte Modus aktiv ist.",
+    "fr": "La planification du tableau de bord respecte désormais le mode Mode Switch actif. Les plannings liés à un mode ne sont transmis que lorsque ce mode est actif.",
+    "es": "La planificación del panel ahora respeta el modo activo de Mode Switch. Las programaciones vinculadas a un modo solo se muestran cuando ese modo está activo."
+  },
+  "3.1.9": {
+    "en": "Expanded multi-channel device support across switching, schedules, modes and power/energy monitoring per endpoint.",
+    "nl": "Ondersteuning voor apparaten met meerdere kanalen uitgebreid naar schakelen, planning, modussen en vermogen/energie-monitoring per uitgang.",
+    "de": "Unterstützung für Mehrkanalgeräte auf Schalten, Zeitpläne, Modi sowie Leistungs-/Energiemonitoring pro Ausgang erweitert.",
+    "fr": "Prise en charge des appareils multicanaux étendue à la commutation, aux plannings, aux modes et au suivi puissance/énergie par sortie.",
+    "es": "Compatibilidad con dispositivos multicanal ampliada a conmutación, programación, modos y monitorización de potencia/energía por salida."
+  },
+  "3.1.19": {
+    "en": "Added delayed on/off actions to modes, with per-device or per-plug delay in seconds, minutes or hours.",
+    "nl": "Vertraagde aan/uit-acties toegevoegd aan modussen, met per apparaat of plug een vertraging in seconden, minuten of uren.",
+    "de": "Verzögerte Ein-/Aus-Aktionen für Modi hinzugefügt, mit einer Verzögerung pro Gerät oder Steckdose in Sekunden, Minuten oder Stunden.",
+    "fr": "Ajout d’actions marche/arrêt différées aux modes, avec un délai par appareil ou prise en secondes, minutes ou heures.",
+    "es": "Añadidas acciones de encendido/apagado retrasadas a los modos, con un retraso por dispositivo o enchufe en segundos, minutos u horas."
+  },
+  "3.1.20": {
+    "en": "Fixed delayed mode actions not being saved. Delayed actions now persist correctly after saving, reloading and export/import.",
+    "nl": "Opgelost dat vertraagde modusacties niet werden opgeslagen. Vertraagde acties blijven nu correct behouden na opslaan, opnieuw laden en export/import.",
+    "de": "Behoben, dass verzögerte Modusaktionen nicht gespeichert wurden. Verzögerte Aktionen bleiben nun nach dem Speichern, Neuladen sowie Export/Import korrekt erhalten.",
+    "fr": "Correction d’un problème empêchant l’enregistrement des actions de mode différées. Elles sont désormais conservées après l’enregistrement, le rechargement et l’export/import.",
+    "es": "Corregido un problema por el que no se guardaban las acciones de modo retrasadas. Ahora se conservan correctamente tras guardar, recargar y exportar/importar."
+  },
+  "3.1.21": {
+    "en": "Added advanced light settings for modes and zone/sensor rules, including dimming, color temperature, color and optional delay. Simplified keypad mappings to PIN directly to mode.",
+    "nl": "Uitgebreide lichtinstellingen toegevoegd voor modussen en zone-/sensorregels, inclusief dimmen, kleurtemperatuur, kleur en optionele vertraging. Keypad-koppelingen vereenvoudigd naar PIN direct naar modus.",
+    "de": "Erweiterte Lichteinstellungen für Modi sowie Zonen-/Sensorregeln hinzugefügt, einschließlich Dimmen, Farbtemperatur, Farbe und optionaler Verzögerung. Keypad-Zuordnungen auf PIN direkt zu Modus vereinfacht.",
+    "fr": "Ajout de réglages d’éclairage avancés pour les modes et les règles de zone/capteur, avec variation, température de couleur, couleur et délai facultatif. Associations de clavier simplifiées : PIN directement vers le mode.",
+    "es": "Añadidos ajustes avanzados de iluminación para modos y reglas de zona/sensor, con atenuación, temperatura de color, color y retraso opcional. Asignaciones de teclado simplificadas: PIN directamente al modo."
+  },
+  "3.1.22": {
+    "en": "Added advanced light settings to Planning, including on/off, dimming, color temperature, color and optional delayed light actions.",
+    "nl": "Uitgebreide lichtinstellingen toegevoegd aan Planning, inclusief aan/uit, dimmen, kleurtemperatuur, kleur en optionele vertraagde lichtacties.",
+    "de": "Erweiterte Lichteinstellungen zur Planung hinzugefügt, einschließlich Ein/Aus, Dimmen, Farbtemperatur, Farbe und optional verzögerten Lichtaktionen.",
+    "fr": "Ajout de réglages d’éclairage avancés à la planification, avec marche/arrêt, variation, température de couleur, couleur et actions d’éclairage différées facultatives.",
+    "es": "Añadidos ajustes avanzados de iluminación a la programación, incluidos encendido/apagado, atenuación, temperatura de color, color y acciones de iluminación retrasadas opcionales."
+  },
+  "3.1.23": {
+    "en": "Reduced duplicate light selections: advanced lights now appear under Light settings, while simple on/off lights remain in regular device lists. Existing selections are preserved.",
+    "nl": "Dubbele lampselecties verminderd: uitgebreide lampen staan nu onder Lichtinstellingen, terwijl eenvoudige aan/uit-lampen in de gewone apparatenlijsten blijven. Bestaande selecties blijven behouden.",
+    "de": "Doppelte Lampenauswahl reduziert: Erweiterte Lampen erscheinen jetzt unter Lichteinstellungen, während einfache Ein/Aus-Lampen in den normalen Gerätelisten bleiben. Bestehende Auswahlen bleiben erhalten.",
+    "fr": "Réduction des sélections de lampes en double : les lampes avancées apparaissent désormais dans Paramètres d’éclairage, tandis que les lampes marche/arrêt simples restent dans les listes d’appareils. Les sélections existantes sont conservées.",
+    "es": "Se redujeron las selecciones de luces duplicadas: las luces avanzadas aparecen ahora en Ajustes de iluminación, mientras que las luces simples de encendido/apagado permanecen en las listas normales de dispositivos. Se conservan las selecciones existentes."
+  },
+  "3.1.25": {
+    "en": "Added contact sensor counters/sequences for zone rules, allowing lights to switch off on a configurable second or later open/close event with automatic reset.",
+    "nl": "Contactsensor-tellers/volgordes toegevoegd aan zoneregels, zodat lampen bij een instelbare tweede of latere open-/dichtgebeurtenis uit kunnen gaan met automatische reset.",
+    "de": "Kontaktzähler/-sequenzen für Zonenregeln hinzugefügt, damit Lichter bei einem konfigurierbaren zweiten oder späteren Öffnen/Schließen ausgeschaltet und der Zähler automatisch zurückgesetzt werden kann.",
+    "fr": "Ajout de compteurs/séquences de contacts aux règles de zone afin d’éteindre les lumières lors d’une deuxième ouverture/fermeture ou ultérieure configurable, avec réinitialisation automatique.",
+    "es": "Añadidos contadores/secuencias de contacto a las reglas de zona para apagar las luces en una segunda apertura/cierre o posterior configurable, con reinicio automático."
+  },
+  "3.1.27": {
+    "en": "Contact counter settings are now collapsed and only shown when the contact counter option is enabled.",
+    "nl": "Instellingen voor de contact-teller zijn nu ingeklapt en worden alleen getoond wanneer de contact-teller is ingeschakeld.",
+    "de": "Die Einstellungen des Kontaktzählers sind jetzt eingeklappt und werden nur angezeigt, wenn der Kontaktzähler aktiviert ist.",
+    "fr": "Les paramètres du compteur de contact sont désormais repliés et ne s’affichent que lorsque le compteur est activé.",
+    "es": "Los ajustes del contador de contacto ahora están contraídos y solo se muestran cuando el contador está activado."
+  },
+  "3.1.31": {
+    "en": "Added Norwegian (Bokmal), Swedish and Italian translations throughout the app.",
+    "nl": "Noorse (Bokmal), Zweedse en Italiaanse vertalingen toegevoegd in de hele app.",
+    "de": "Norwegische (Bokmal), schwedische und italienische Ubersetzungen in der gesamten App hinzugefugt.",
+    "fr": "Ajout des traductions norvegiennes (Bokmal), suedoises et italiennes dans toute l’application.",
+    "es": "Se han anadido traducciones al noruego (Bokmal), sueco e italiano en toda la aplicacion.",
+    "no": "Lagt til norsk (Bokmal), svensk og italiensk oversettelse i hele appen.",
+    "sv": "Lagt till norska (Bokmal), svenska och italienska oversattningar i hela appen.",
+    "it": "Aggiunte le traduzioni in norvegese (Bokmal), svedese e italiano in tutta l’app."
+  },
+  "3.1.32": {
+    "en": "Temperature rules now react immediately when a selected door or window contact opens or closes, so window setback temperatures are applied without requiring a mode change.",
+    "nl": "Temperatuurregels reageren nu direct wanneer een gekozen deur- of raamcontact opent of sluit, zodat de raamtemperatuur wordt toegepast zonder dat eerst de modus hoeft te wijzigen.",
+    "de": "Temperaturregeln reagieren jetzt sofort, wenn sich ein ausgewählter Tür- oder Fensterkontakt öffnet oder schließt. Die Fenster-Absenktemperatur wird dadurch ohne Moduswechsel angewendet.",
+    "fr": "Les règles de température réagissent désormais immédiatement à l’ouverture ou la fermeture d’un contact porte/fenêtre sélectionné, sans nécessiter de changement de mode.",
+    "es": "Las reglas de temperatura reaccionan ahora inmediatamente cuando se abre o cierra un contacto de puerta/ventana seleccionado, sin necesidad de cambiar de modo.",
+    "no": "Temperaturregler reagerer nå umiddelbart når en valgt dør- eller vinduskontakt åpnes eller lukkes, uten at modusen må endres.",
+    "sv": "Temperaturregler reagerar nu direkt när en vald dörr- eller fönsterkontakt öppnas eller stängs, utan att läget behöver ändras.",
+    "it": "Le regole di temperatura reagiscono ora immediatamente quando un contatto porta/finestra selezionato si apre o si chiude, senza richiedere un cambio di modalità."
+  },
+  "3.1.33": {
+    "en": "Live reaction to window/door changes in temperature rules is now optional and disabled by default.",
+    "nl": "Direct reageren op raam/deurwijzigingen bij temperatuurregels is nu optioneel en staat standaard uit.",
+    "de": "Die direkte Reaktion auf Fenster-/Türänderungen in Temperaturregeln ist jetzt optional und standardmäßig deaktiviert.",
+    "fr": "La réaction immédiate aux changements de fenêtre/porte dans les règles de température est désormais optionnelle et désactivée par défaut.",
+    "es": "La reacción inmediata a cambios de ventana/puerta en las reglas de temperatura ahora es opcional y está desactivada por defecto.",
+    "no": "Direkte reaksjon på endringer i vindu/dør i temperaturregler er nå valgfritt og deaktivert som standard.",
+    "sv": "Direkt reaktion på ändringar av fönster/dörr i temperaturregler är nu valfri och avstängd som standard.",
+    "it": "La reazione immediata ai cambiamenti di finestra/porta nelle regole di temperatura è ora opzionale e disattivata per impostazione predefinita."
+  },
+  "3.1.34": {
+    "en": "Fixed Flow card placeholders in the new Norwegian, Swedish and Italian translations so Homey validation succeeds.",
+    "nl": "Flow-kaart placeholders in de nieuwe Noorse, Zweedse en Italiaanse vertalingen hersteld zodat Homey-validatie slaagt.",
+    "de": "Flow-Karten-Platzhalter in den neuen norwegischen, schwedischen und italienischen Übersetzungen korrigiert, damit die Homey-Validierung erfolgreich ist.",
+    "fr": "Correction des paramètres réservés des cartes Flow dans les nouvelles traductions norvégienne, suédoise et italienne afin que la validation Homey réussisse.",
+    "es": "Corregidos los marcadores de las tarjetas Flow en las nuevas traducciones noruega, sueca e italiana para que la validación de Homey sea correcta.",
+    "no": "Rettet plassholdere i Flow-kort i de nye norske, svenske og italienske oversettelsene slik at Homey-valideringen lykkes.",
+    "sv": "Korrigerade platshållare i Flow-kort i de nya norska, svenska och italienska översättningarna så att Homey-valideringen lyckas.",
+    "it": "Corretti i segnaposto delle schede Flow nelle nuove traduzioni norvegesi, svedesi e italiane affinché la convalida Homey riesca."
+  },
+  "3.1.35": {
+    "en": "Fixed the compact Settings menu so menu items remain clickable and touch interaction is not blocked by the overlay.",
+    "nl": "Het compacte instellingenmenu hersteld zodat menu-items weer aanklikbaar zijn en touchbediening niet door de overlay wordt geblokkeerd.",
+    "de": "Das kompakte Einstellungsmenü wurde korrigiert, sodass Menüeinträge wieder anklickbar sind und die Touch-Bedienung nicht von der Überlagerung blockiert wird.",
+    "fr": "Correction du menu compact des paramètres afin que les éléments restent cliquables et que l’interaction tactile ne soit plus bloquée par la superposition.",
+    "es": "Corregido el menú compacto de configuración para que los elementos vuelvan a ser pulsables y la superposición no bloquee la interacción táctil.",
+    "no": "Det kompakte innstillingsmenyen er rettet slik at menyelementer igjen kan trykkes på og berøring ikke blokkeres av overlegget.",
+    "sv": "Den kompakta inställningsmenyn har rättats så att menyalternativen går att trycka på igen och pekinteraktion inte blockeras av överlägget.",
+    "it": "Corretto il menu compatto delle impostazioni in modo che le voci siano nuovamente selezionabili e l’overlay non blocchi l’interazione touch."
+  },
+  "3.1.36": {
+    "en": "Fixed Norwegian language support by using Homey’s official no locale, added Norwegian/Swedish/Italian widget language detection, and fixed the settings menu in my.homey.com.",
+    "nl": "Noorse taalondersteuning hersteld door Homey’s officiële no-locale te gebruiken, Noorse/Zweedse/Italiaanse widget-taaldetectie toegevoegd en het instellingenmenu in my.homey.com hersteld.",
+    "de": "Norwegische Sprachunterstützung mit Homeys offizieller no-Locale korrigiert, norwegische/schwedische/italienische Widget-Spracherkennung ergänzt und das Einstellungsmenü in my.homey.com behoben.",
+    "fr": "Correction du norvégien avec la locale officielle no de Homey, ajout de la détection norvégienne/suédoise/italienne dans les widgets et correction du menu des paramètres dans my.homey.com.",
+    "es": "Corregido el noruego usando la configuración regional oficial no de Homey, añadida detección de noruego/sueco/italiano en widgets y corregido el menú de ajustes en my.homey.com.",
+    "no": "Rettet norsk språkstøtte med Homeys offisielle no-locale, la til norsk/svensk/italiensk språkdeteksjon i widgeter og rettet innstillingsmenyen i my.homey.com.",
+    "sv": "Korrigerade norskt språkstöd med Homeys officiella no-locale, lade till norsk/svensk/italiensk språkdetektering i widgetar och rättade inställningsmenyn i my.homey.com.",
+    "it": "Corretto il supporto norvegese usando la locale ufficiale no di Homey, aggiunto il rilevamento norvegese/svedese/italiano nei widget e corretto il menu impostazioni in my.homey.com."
+  },
+  "3.1.38": {
+    "en": "Completed Norwegian settings translations, including contact counters, activities and a localized file picker.",
+    "nl": "Noorse vertalingen op de instellingenpagina verder compleet gemaakt, inclusief contacttellers, activiteiten en een vertaalde bestandskiezer.",
+    "no": "Fullførte norske oversettelser på innstillingssiden, inkludert kontakttellere, aktiviteter og en lokalisert filvelger.",
+    "sv": "Kompletterade norska översättningar på inställningssidan, inklusive kontakträknare, aktiviteter och lokaliserad filväljare.",
+    "it": "Completate le traduzioni norvegesi nella pagina impostazioni, inclusi contatori contatto, attività e selettore file localizzato."
+  },
+  "3.1.39": {
+    "en": "Fixed a Settings page loading issue caused by an invalid Norwegian translation string.",
+    "nl": "Probleem opgelost waarbij de instellingenpagina bleef laden door een ongeldige Noorse vertaaltekst.",
+    "de": "Ein Ladeproblem der Einstellungsseite durch einen ungültigen norwegischen Übersetzungstext wurde behoben.",
+    "fr": "Correction d’un problème de chargement de la page des paramètres causé par un texte de traduction norvégien invalide.",
+    "es": "Corregido un problema de carga de la página de configuración causado por un texto de traducción noruego no válido.",
+    "no": "Rettet et problem der innstillingssiden fortsatte å laste på grunn av en ugyldig norsk oversettelsestekst.",
+    "sv": "Åtgärdade ett problem där inställningssidan fortsatte att ladda på grund av en ogiltig norsk översättningstext.",
+    "it": "Risolto un problema di caricamento della pagina delle impostazioni causato da un testo di traduzione norvegese non valido."
+  },
+  "3.1.40": {
+    "en": "Fixed a runtime error that could leave the Settings page stuck on loading before Homey initialization completed.",
+    "nl": "Runtimefout opgelost waardoor de instellingenpagina kon blijven hangen op laden voordat Homey volledig was geïnitialiseerd.",
+    "de": "Ein Laufzeitfehler wurde behoben, durch den die Einstellungsseite vor Abschluss der Homey-Initialisierung beim Laden hängen bleiben konnte.",
+    "fr": "Correction d’une erreur d’exécution pouvant laisser la page des paramètres bloquée sur le chargement avant la fin de l’initialisation de Homey.",
+    "es": "Corregido un error de ejecución que podía dejar la página de configuración bloqueada cargando antes de completar la inicialización de Homey.",
+    "no": "Rettet en kjoretidsfeil som kunne gjore at innstillingssiden ble hengende pa lasting for Homey-initialiseringen var ferdig.",
+    "sv": "Atgardade ett korfel som kunde gora att installningssidan fastnade pa laddning innan Homey-initieringen var klar.",
+    "it": "Corretto un errore di runtime che poteva lasciare la pagina delle impostazioni bloccata sul caricamento prima del completamento dell’inizializzazione di Homey."
+  },
+  "3.1.41": {
+    "en": "Expanded the settings translation audit across all supported languages and fixed remaining static labels and explanations.",
+    "nl": "De vertaalcontrole van de instellingen is uitgebreid naar alle ondersteunde talen en resterende statische labels en uitleg zijn vertaald.",
+    "de": "Die Übersetzungsprüfung der Einstellungen wurde auf alle unterstützten Sprachen erweitert und verbleibende statische Beschriftungen und Erklärungen wurden übersetzt.",
+    "fr": "L’audit des traductions des réglages a été étendu à toutes les langues prises en charge et les derniers libellés et textes explicatifs statiques ont été traduits.",
+    "es": "La revisión de traducciones de los ajustes se amplió a todos los idiomas compatibles y se tradujeron las etiquetas y explicaciones estáticas restantes.",
+    "no": "Oversettelseskontrollen for innstillingene er utvidet til alle støttede språk, og gjenværende statiske etiketter og forklaringer er oversatt.",
+    "sv": "Översättningsgranskningen av inställningarna har utökats till alla språk som stöds och återstående statiska etiketter och förklaringar har översatts.",
+    "it": "La revisione delle traduzioni delle impostazioni è stata estesa a tutte le lingue supportate e sono state tradotte le etichette e le spiegazioni statiche rimanenti."
+  },
+  "3.1.42": {
+    "en": "Fixed a settings startup error caused by the full static language audit function not being defined, while keeping the expanded translations.",
+    "nl": "Een opstartfout op de instellingenpagina opgelost doordat de volledige statische vertaalaudit niet was gedefinieerd, met behoud van de uitgebreide vertalingen.",
+    "de": "Ein Startfehler der Einstellungsseite wurde behoben, weil die vollständige statische Übersetzungsprüfung nicht definiert war; die erweiterten Übersetzungen bleiben erhalten.",
+    "fr": "Correction d’une erreur au démarrage de la page des paramètres due à l’absence de la fonction d’audit des traductions statiques, tout en conservant les traductions étendues.",
+    "es": "Corregido un error al iniciar la página de ajustes porque no estaba definida la función de revisión completa de traducciones estáticas, manteniendo las traducciones ampliadas.",
+    "no": "Rettet en oppstartsfeil på innstillingssiden fordi funksjonen for full statisk oversettelseskontroll ikke var definert, samtidig som de utvidede oversettelsene beholdes.",
+    "sv": "Åtgärdade ett startfel på inställningssidan eftersom funktionen för full statisk översättningsgranskning inte var definierad, samtidigt som de utökade översättningarna behålls.",
+    "it": "Corretto un errore di avvio della pagina delle impostazioni causato dalla funzione di controllo completo delle traduzioni statiche non definita, mantenendo le traduzioni estese."
+  },
+  "3.1.43": {
+    "en": "Completed Italian and Swedish settings/widget translations and prevented English fallback for dynamically generated labels.",
+    "nl": "Italiaanse en Zweedse vertalingen voor instellingen/widgets aangevuld en Engelse fallback bij dynamische labels voorkomen.",
+    "de": "Italienische und schwedische Übersetzungen für Einstellungen/Widgets vervollständigt und englische Fallbacks bei dynamischen Beschriftungen verhindert.",
+    "fr": "Traductions italiennes et suédoises des réglages/widgets complétées et suppression des retours en anglais pour les libellés dynamiques.",
+    "es": "Completadas las traducciones italianas y suecas de ajustes/widgets y evitada la vuelta al inglés en etiquetas dinámicas.",
+    "no": "Italienske og svenske oversettelser for innstillinger/widgets er fullført, og engelsk fallback for dynamiske tekster er fjernet.",
+    "sv": "Italienska och svenska översättningar för inställningar/widgets har kompletterats och engelska reservtexter för dynamiska etiketter har tagits bort.",
+    "it": "Completate le traduzioni italiane e svedesi di impostazioni/widget ed eliminati i fallback in inglese per le etichette dinamiche."
+  },
+  "3.1.44": {
+    "en": "Completed translations for all supported languages, including later-added settings, widgets, Flow cards and Mode & Switch capabilities.",
+    "nl": "Vertalingen voor alle ondersteunde talen voltooid, inclusief later toegevoegde instellingen, widgets, Flow-kaarten en Mode & Switch-capabilities.",
+    "de": "Übersetzungen für alle unterstützten Sprachen vervollständigt, einschließlich später hinzugefügter Einstellungen, Widgets, Flow-Karten und Mode-&-Switch-Funktionen.",
+    "fr": "Traductions complétées pour toutes les langues prises en charge, y compris les réglages, widgets, cartes Flow et fonctions Mode & Switch ajoutés ultérieurement.",
+    "es": "Traducciones completadas para todos los idiomas compatibles, incluidos ajustes, widgets, tarjetas Flow y funciones de Mode & Switch añadidos posteriormente.",
+    "no": "Oversettelser fullført for alle støttede språk, inkludert senere tilføyde innstillinger, widgeter, Flow-kort og Mode & Switch-funksjoner.",
+    "sv": "Översättningarna har slutförts för alla språk som stöds, inklusive senare tillagda inställningar, widgetar, Flow-kort och Mode & Switch-funktioner.",
+    "it": "Traduzioni completate per tutte le lingue supportate, incluse impostazioni, widget, schede Flow e funzioni Mode & Switch aggiunte successivamente."
+  },
+  "3.1.45": {
+    "en": "Fixed missing settings translation keys for all supported languages and made local settings translations take precedence over missing Homey keys.",
+    "nl": "Ontbrekende vertaalkeys in de instellingen zijn voor alle ondersteunde talen toegevoegd. Lokale instellingenvertalingen krijgen nu voorrang op ontbrekende Homey-keys.",
+    "de": "Fehlende Übersetzungsschlüssel in den Einstellungen wurden für alle unterstützten Sprachen ergänzt.",
+    "fr": "Les clés de traduction manquantes dans les réglages ont été ajoutées pour toutes les langues prises en charge.",
+    "es": "Se añadieron las claves de traducción que faltaban en los ajustes para todos los idiomas compatibles.",
+    "no": "Manglende oversettelsesnøkler i innstillingene er lagt til for alle støttede språk.",
+    "sv": "Saknade översättningsnycklar i inställningarna har lagts till för alla språk som stöds.",
+    "it": "Sono state aggiunte le chiavi di traduzione mancanti nelle impostazioni per tutte le lingue supportate."
+  },
+  "3.1.46": {
+    "en": "Fixed a settings crash when environment power-target data is temporarily unavailable and completed main-mode labels for the new languages.",
+    "nl": "Een crash op de instellingenpagina opgelost wanneer power-targetgegevens tijdelijk ontbreken en hoofdmodusteksten voor de nieuwe talen aangevuld.",
+    "de": "Ein Absturz der Einstellungsseite bei vorübergehend fehlenden Power-Target-Daten wurde behoben und Hauptmodus-Texte für die neuen Sprachen ergänzt.",
+    "fr": "Correction d’un plantage des paramètres lorsque les données power-target sont temporairement indisponibles et ajout des textes de modes principaux pour les nouvelles langues.",
+    "es": "Corregido un fallo de la página de ajustes cuando los datos power-target no están disponibles temporalmente y completados los textos de modos principales para los nuevos idiomas.",
+    "no": "Rettet en feil på innstillingssiden når power-target-data midlertidig mangler, og fullførte tekster for hovedmoduser i de nye språkene.",
+    "sv": "Åtgärdade en krasch på inställningssidan när power-target-data tillfälligt saknas och kompletterade texter för huvudlägen i de nya språken.",
+    "it": "Corretto un crash della pagina impostazioni quando i dati power-target non sono temporaneamente disponibili e completati i testi delle modalità principali nelle nuove lingue."
+  },
+  "3.1.51": {
+    "en": "Added per-light settings to Zones & Sensors with individual state, dim level, color temperature, color and optional delay.",
+    "nl": "Lichtinstellingen per lamp toegevoegd aan Zones & sensoren, met eigen status, dimniveau, kleurtemperatuur, kleur en optionele vertraging.",
+    "de": "Lichteinstellungen pro Lampe für Zonen & Sensoren hinzugefügt, mit eigenem Status, Dimmwert, Farbtemperatur, Farbe und optionaler Verzögerung.",
+    "fr": "Ajout de réglages par lampe pour Zones & capteurs, avec état, variation, température de couleur, couleur et délai optionnel.",
+    "es": "Añadidos ajustes por luz para Zonas y sensores, con estado, nivel de atenuación, temperatura de color, color y retraso opcional.",
+    "it": "Aggiunte impostazioni per singola luce in Zone e sensori, con stato, dimmer, temperatura colore, colore e ritardo opzionale.",
+    "sv": "Ljusinställningar per lampa har lagts till i Zoner och sensorer, med status, dimnivå, färgtemperatur, färg och valfri fördröjning.",
+    "no": "Lysinnstillinger per lampe er lagt til i Soner og sensorer, med status, dimmenivå, fargetemperatur, farge og valgfri forsinkelse.",
+    "nb": "Lysinnstillinger per lampe er lagt til i Soner og sensorer, med status, dimmenivå, fargetemperatur, farge og valgfri forsinkelse."
+  },
+  "3.1.52": {
+    "en": "Added optional light actions when a Zones & Sensors status is deactivated.",
+    "nl": "Optionele lichtacties toegevoegd wanneer een status bij Zones & sensoren wordt gedeactiveerd.",
+    "de": "Optionale Lichtaktionen hinzugefügt, wenn ein Status bei Zonen & Sensoren deaktiviert wird.",
+    "fr": "Ajout d’actions d’éclairage facultatives lorsqu’un statut Zones & capteurs est désactivé.",
+    "es": "Se añadieron acciones de luz opcionales cuando se desactiva un estado de Zonas y sensores.",
+    "it": "Aggiunte azioni luce opzionali quando viene disattivato uno stato di Zone e sensori.",
+    "sv": "Valfria ljusåtgärder har lagts till när en status för Zoner och sensorer avaktiveras.",
+    "no": "Valgfrie lyshandlinger er lagt til når en status for Soner og sensorer deaktiveres.",
+    "nb": "Valgfrie lyshandlinger er lagt til når en status for Soner og sensorer deaktiveres."
+  },
+  "3.2.1": {
+    "en": "Major update since 3.1.42: improved and completed translations across settings, widgets, Flow cards and Mode & Switch capabilities; migrated the app to the modern Homey Compose structure; restored all widget API routes after the Compose migration; added individual light profiles to Zones & Sensors with on/off, dim level, color temperature, color and optional delay; added a separate light profile for when a sensor becomes inactive (no motion or a door/window contact closes), with delayed actions cancelled if the sensor becomes active again; existing zone light settings are migrated automatically; moved the new settings texts to the central Homey i18n locale files; and fixed several settings startup/runtime issues, including the translation initialization error.",
+    "nl": "Grote update sinds 3.1.42: vertalingen in instellingen, widgets, Flow-kaarten en Mode & Switch-capabilities verder aangevuld en verbeterd; de app omgezet naar de moderne Homey Compose-structuur; alle widget-API-routes hersteld na de Compose-omzetting; individuele lichtprofielen toegevoegd aan Zones & sensoren met aan/uit, dimniveau, kleurtemperatuur, kleur en optionele vertraging; een apart lichtprofiel toegevoegd voor wanneer een sensor inactief wordt (geen beweging of deur-/raamcontact gesloten), waarbij vertraagde acties worden geannuleerd als de sensor opnieuw actief wordt; bestaande zone-lichtinstellingen worden automatisch overgenomen; nieuwe instellingsteksten verplaatst naar de centrale Homey i18n-locales; en meerdere opstart-/runtimeproblemen in de instellingen opgelost, waaronder de fout bij het initialiseren van vertalingen.",
+    "de": "Großes Update seit 3.1.42: Übersetzungen in Einstellungen, Widgets, Flow-Karten und Mode-&-Switch-Funktionen erweitert und verbessert; die App auf die moderne Homey-Compose-Struktur umgestellt; alle Widget-API-Routen nach der Compose-Migration wiederhergestellt; individuelle Lichtprofile für Zonen & Sensoren mit Ein/Aus, Dimmwert, Farbtemperatur, Farbe und optionaler Verzögerung hinzugefügt; ein separates Lichtprofil für inaktive Sensoren (keine Bewegung oder geschlossener Tür-/Fensterkontakt) ergänzt, wobei verzögerte Aktionen abgebrochen werden, wenn der Sensor erneut aktiv wird; bestehende Zonen-Lichteinstellungen werden automatisch übernommen; neue Einstellungstexte in die zentralen Homey-i18n-Locale-Dateien verschoben; und mehrere Start-/Laufzeitfehler in den Einstellungen behoben, einschließlich des Fehlers bei der Übersetzungsinitialisierung.",
+    "fr": "Mise à jour majeure depuis la 3.1.42 : traductions des réglages, widgets, cartes Flow et fonctions Mode & Switch complétées et améliorées ; migration de l’application vers la structure Homey Compose moderne ; restauration de toutes les routes API des widgets après la migration Compose ; ajout de profils d’éclairage individuels dans Zones & capteurs avec marche/arrêt, variation, température de couleur, couleur et délai optionnel ; ajout d’un profil séparé lorsque le capteur devient inactif (absence de mouvement ou fermeture d’un contact porte/fenêtre), avec annulation des actions différées si le capteur redevient actif ; migration automatique des réglages d’éclairage existants ; déplacement des nouveaux textes vers les fichiers de langue i18n Homey centraux ; et correction de plusieurs erreurs de démarrage/exécution des réglages, dont l’erreur d’initialisation des traductions.",
+    "es": "Gran actualización desde la 3.1.42: traducciones de ajustes, widgets, tarjetas Flow y funciones Mode & Switch ampliadas y mejoradas; migración de la app a la estructura moderna Homey Compose; restauración de todas las rutas API de los widgets tras la migración; nuevos perfiles de luz individuales en Zonas y sensores con encendido/apagado, nivel de atenuación, temperatura de color, color y retraso opcional; perfil independiente cuando el sensor queda inactivo (sin movimiento o contacto de puerta/ventana cerrado), cancelando acciones retrasadas si el sensor vuelve a activarse; migración automática de los ajustes de iluminación existentes; nuevos textos trasladados a los archivos i18n centrales de Homey; y corrección de varios errores de inicio/ejecución de los ajustes, incluido el error de inicialización de traducciones.",
+    "it": "Aggiornamento importante dalla 3.1.42: traduzioni di impostazioni, widget, schede Flow e funzioni Mode & Switch ampliate e migliorate; migrazione dell’app alla moderna struttura Homey Compose; ripristino di tutte le route API dei widget dopo la migrazione Compose; aggiunta di profili luce individuali in Zone e sensori con accensione/spegnimento, dimmer, temperatura colore, colore e ritardo opzionale; aggiunto un profilo separato quando il sensore diventa inattivo (nessun movimento o contatto porta/finestra chiuso), annullando le azioni ritardate se il sensore torna attivo; migrazione automatica delle impostazioni luce esistenti; nuovi testi spostati nei file locale i18n centrali di Homey; e correzione di diversi errori di avvio/runtime delle impostazioni, incluso l’errore di inizializzazione delle traduzioni.",
+    "sv": "Stor uppdatering sedan 3.1.42: översättningar i inställningar, widgetar, Flow-kort och Mode & Switch-funktioner har kompletterats och förbättrats; appen har migrerats till den moderna Homey Compose-strukturen; alla widget-API-rutter har återställts efter Compose-migreringen; individuella ljusprofiler har lagts till i Zoner och sensorer med på/av, dimnivå, färgtemperatur, färg och valfri fördröjning; ett separat ljusprofil har lagts till när sensorn blir inaktiv (ingen rörelse eller stängd dörr-/fönsterkontakt), där fördröjda åtgärder avbryts om sensorn blir aktiv igen; befintliga zonljusinställningar migreras automatiskt; nya inställningstexter har flyttats till Homeys centrala i18n-filer; och flera start-/körfel i inställningarna har rättats, inklusive felet vid initiering av översättningar.",
+    "no": "Stor oppdatering siden 3.1.42: oversettelser i innstillinger, widgeter, Flow-kort og Mode & Switch-funksjoner er utvidet og forbedret; appen er migrert til den moderne Homey Compose-strukturen; alle widget-API-ruter er gjenopprettet etter Compose-migreringen; individuelle lysprofiler er lagt til i Soner og sensorer med av/på, dimmenivå, fargetemperatur, farge og valgfri forsinkelse; en egen lysprofil er lagt til når sensoren blir inaktiv (ingen bevegelse eller lukket dør-/vinduskontakt), der forsinkede handlinger avbrytes hvis sensoren blir aktiv igjen; eksisterende sonelysinnstillinger migreres automatisk; nye innstillingstekster er flyttet til Homeys sentrale i18n-filer; og flere oppstarts-/kjøretidsfeil i innstillingene er rettet, inkludert feilen ved initialisering av oversettelser.",
+    "nb": "Stor oppdatering siden 3.1.42: oversettelser i innstillinger, widgeter, Flow-kort og Mode & Switch-funksjoner er utvidet og forbedret; appen er migrert til den moderne Homey Compose-strukturen; alle widget-API-ruter er gjenopprettet etter Compose-migreringen; individuelle lysprofiler er lagt til i Soner og sensorer med av/på, dimmenivå, fargetemperatur, farge og valgfri forsinkelse; en egen lysprofil er lagt til når sensoren blir inaktiv (ingen bevegelse eller lukket dør-/vinduskontakt), der forsinkede handlinger avbrytes hvis sensoren blir aktiv igjen; eksisterende sonelysinnstillinger migreres automatisk; nye innstillingstekster er flyttet til Homeys sentrale i18n-filer; og flere oppstarts-/kjøretidsfeil i innstillingene er rettet, inkludert feilen ved initialisering av oversettelser."
+  }
+}

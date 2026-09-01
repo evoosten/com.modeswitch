@@ -30,11 +30,47 @@
     "zones": {
       "title": "Reglas de zona",
       "description": "Movimiento, contactos de puertas/ventanas, subzonas, luces, atenuación y condiciones.",
-      "add": "Nueva regla de zona"
+      "add": "Nueva regla de zona",
+      "light_settings": {
+        "title": "Ajustes de luz",
+        "description": "Configura qué debe ocurrir con cada luz cuando se detecta movimiento o se activa un contacto.",
+        "add": "Añadir ajuste de luz",
+        "light": "Luz",
+        "state_active": "Estado al activar",
+        "state_inactive": "Estado cuando el sensor está inactivo",
+        "on": "Encendido",
+        "off": "Apagado",
+        "dim": "Nivel de atenuación %",
+        "temperature": "Temperatura de color %",
+        "temperature_hint": "0 = cálido, 100 = frío",
+        "color": "Color",
+        "set_color": "Establecer color",
+        "delay": "Retraso",
+        "seconds": "Segundos",
+        "minutes": "Minutos",
+        "hours": "Horas",
+        "supports_prefix": "Compatible con: ",
+        "supports_dim": "atenuación",
+        "supports_temperature": "temperatura de color",
+        "supports_color": "color",
+        "onoff_only": "Solo está disponible encendido/apagado.",
+        "remove": "Eliminar"
+      },
+      "sensor_inactive": {
+        "title": "Cuando el sensor está inactivo",
+        "description": "Estos ajustes de luz se aplican cuando deja de detectarse movimiento tras el tiempo configurado o cuando un contacto de puerta/ventana seleccionado vuelve a estar inactivo. Deja la lista vacía para apagar las luces seleccionadas como antes."
+      },
+      "behavior": {
+        "motion_active": "Aplicar ajustes de luz al detectar movimiento",
+        "motion_inactive": "Aplicar ajustes de luz inactivos cuando no haya movimiento",
+        "contact_active": "Aplicar ajustes de luz cuando el contacto esté activo",
+        "contact_inactive": "Aplicar ajustes de luz inactivos cuando el contacto esté inactivo",
+        "only_if_lights_off": "Ejecutar solo si las luces seleccionadas están apagadas"
+      }
     },
     "temperature": {
       "title": "Temperatura por modo y zona",
-      "description": "Configura la temperatura deseada por modo y zona. Los dispositivos con target_temperature se actualizan automáticamente cuando cambia el modo.",
+      "description": "Configura la temperatura deseada por modo y zona. Los dispositivos con target_temperature se ajustan automáticamente al cambiar de modo y de inmediato cuando un contacto de puerta/ventana seleccionado se abre o se cierra.",
       "add": "Nueva regla de temperatura"
     },
     "appliances": {

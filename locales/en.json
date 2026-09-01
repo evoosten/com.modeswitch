@@ -30,11 +30,47 @@
     "zones": {
       "title": "Zone rules",
       "description": "Motion, door/window contacts, subzones, lights, dimming and conditions.",
-      "add": "New zone rule"
+      "add": "New zone rule",
+      "light_settings": {
+        "title": "Light settings",
+        "description": "Set what should happen per light when motion or contact becomes active.",
+        "add": "Add light setting",
+        "light": "Light",
+        "state_active": "State when activated",
+        "state_inactive": "State when sensor is inactive",
+        "on": "On",
+        "off": "Off",
+        "dim": "Dim level %",
+        "temperature": "Color temperature %",
+        "temperature_hint": "0 = warm, 100 = cool",
+        "color": "Color",
+        "set_color": "Set color",
+        "delay": "Delay",
+        "seconds": "Seconds",
+        "minutes": "Minutes",
+        "hours": "Hours",
+        "supports_prefix": "Supports: ",
+        "supports_dim": "dimming",
+        "supports_temperature": "color temperature",
+        "supports_color": "color",
+        "onoff_only": "Only on/off is available.",
+        "remove": "Delete"
+      },
+      "sensor_inactive": {
+        "title": "When sensor is inactive",
+        "description": "These light settings are applied when there is no motion after the configured time or when a selected door/window contact becomes inactive again. Leave this list empty to switch the selected lights off as before."
+      },
+      "behavior": {
+        "motion_active": "Apply light settings when motion is detected",
+        "motion_inactive": "Apply inactive light settings after no motion",
+        "contact_active": "Apply light settings when contact is active",
+        "contact_inactive": "Apply inactive light settings when contact is inactive",
+        "only_if_lights_off": "Only run if selected lights are off"
+      }
     },
     "temperature": {
       "title": "Temperature per mode and zone",
-      "description": "Set the desired temperature per mode and zone. Devices with target_temperature are updated automatically when the mode changes.",
+      "description": "Set the desired temperature per mode and zone. Devices with target_temperature are updated automatically when the mode changes and immediately when a selected window/door contact opens or closes.",
       "add": "New temperature rule"
     },
     "appliances": {

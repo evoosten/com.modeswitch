@@ -30,11 +30,47 @@
     "zones": {
       "title": "Zoneregels",
       "description": "Beweging, deur/raamcontacten, subzones, lampen, dimmen en voorwaarden.",
-      "add": "Nieuwe zoneregel"
+      "add": "Nieuwe zoneregel",
+      "light_settings": {
+        "title": "Lichtinstellingen",
+        "description": "Stel hier per lamp in wat er gebeurt wanneer beweging of contact actief wordt.",
+        "add": "Lichtinstelling toevoegen",
+        "light": "Lamp",
+        "state_active": "Status bij activeren",
+        "state_inactive": "Status bij sensor inactief",
+        "on": "Aan",
+        "off": "Uit",
+        "dim": "Dimniveau %",
+        "temperature": "Kleurtemperatuur %",
+        "temperature_hint": "0 = warm, 100 = koel",
+        "color": "Kleur",
+        "set_color": "Kleur instellen",
+        "delay": "Vertraging",
+        "seconds": "Seconden",
+        "minutes": "Minuten",
+        "hours": "Uren",
+        "supports_prefix": "Ondersteunt: ",
+        "supports_dim": "dimmen",
+        "supports_temperature": "kleurtemperatuur",
+        "supports_color": "kleur",
+        "onoff_only": "Alleen aan/uit beschikbaar.",
+        "remove": "Verwijderen"
+      },
+      "sensor_inactive": {
+        "title": "Bij sensor inactief",
+        "description": "Deze lichtinstellingen worden uitgevoerd wanneer er na de ingestelde tijd geen beweging meer is of wanneer een gekozen deur-/raamcontact weer inactief is. Laat deze lijst leeg om de gekozen lampen zoals voorheen gewoon uit te schakelen."
+      },
+      "behavior": {
+        "motion_active": "Lichtinstellingen uitvoeren bij beweging",
+        "motion_inactive": "Lichtinstellingen uitvoeren na geen beweging",
+        "contact_active": "Lichtinstellingen uitvoeren bij contact-actief",
+        "contact_inactive": "Lichtinstellingen uitvoeren bij contact-inactief",
+        "only_if_lights_off": "Alleen uitvoeren als gekozen lampen uit zijn"
+      }
     },
     "temperature": {
       "title": "Temperatuur per modus en zone",
-      "description": "Stel per modus en zone de gewenste temperatuur in. Apparaten met target_temperature worden automatisch aangepast bij een moduswissel.",
+      "description": "Stel per modus en zone de gewenste temperatuur in. Apparaten met target_temperature worden automatisch aangepast bij een moduswissel én direct wanneer een gekozen raam/deurcontact opent of sluit.",
       "add": "Nieuwe temperatuurregel"
     },
     "appliances": {

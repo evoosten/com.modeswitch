@@ -60,36 +60,66 @@ function buildDashboard(homey) {
 }
 
 module.exports = {
-  async getDashboard({ homey }) { return buildDashboard(homey); },
-  async setMode({ homey, body }) {
-    const mode = body && typeof body.mode === 'string' ? body.mode : '';
-    if (!mode) throw new Error('Missing mode');
-    await homey.app.applyMode(mode, { source: 'settings-widget' });
-    return buildDashboard(homey);
+  async getDashboard({ homey }) {
+    const app = homey.app;
+    return {
+      modes: getModes(app),
+      mainModeLabels: safeCall(app.getMainModeLabels && app.getMainModeLabels.bind(app), {}),
+      subModes: safeCall(app.getSubModes && app.getSubModes.bind(app), []),
+      currentMode: safeCall(app.getCurrentMode && app.getCurrentMode.bind(app), 'home') || 'home',
+      rules: safeCall(app.getModeRules && app.getModeRules.bind(app), {}),
+      zoneRules: safeCall(app.getZoneRules && app.getZoneRules.bind(app), []),
+      temperatureRules: safeCall(app.getTemperatureRules && app.getTemperatureRules.bind(app), []),
+      applianceRules: safeCall(app.getApplianceRules && app.getApplianceRules.bind(app), []),
+      applianceState: safeCall(app.getApplianceState && app.getApplianceState.bind(app), {}),
+      activityRules: safeCall(app.getActivityRules && app.getActivityRules.bind(app), []),
+      activityState: safeCall(app.getActivityState && app.getActivityState.bind(app), {}),
+      activityHistory: safeCall(app.getActivityHistory && app.getActivityHistory.bind(app), []),
+      scheduleRules: safeCall(app.getScheduleRules && app.getScheduleRules.bind(app), []),
+      autoMode: safeCall(app.getAutoModeSettings && app.getAutoModeSettings.bind(app), {}),
+      displaySettings: safeCall(app.getDisplaySettings && app.getDisplaySettings.bind(app), {}),
+      modeSwitchDevices: safeCall(app.getModeSwitchDevicesForSettings && app.getModeSwitchDevicesForSettings.bind(app), []),
+      modeSwitchDeviceRules: safeCall(app.getModeSwitchDeviceRules && app.getModeSwitchDeviceRules.bind(app), {}),
+      keypadMappings: safeCall(app.getKeypadMappings && app.getKeypadMappings.bind(app), []),
+    };
   },
+
+  async getConfig({ homey }) {
+    return module.exports.getDashboard({ homey });
+  },
+
+  async getEnvironment({ homey }) {
+    if (!homey.app || typeof homey.app.getEnvironment !== 'function') return {};
+    return homey.app.getEnvironment({ includeHomeyUsers: true, force: true });
+  },
+
   async saveSubModes({ homey, body }) {
     const subModes = await homey.app.saveSubModes(safeArray(body && body.subModes));
-    return { ok: true, subModes, dashboard: buildDashboard(homey) };
+    return { ok: true, subModes, modes: getModes(homey.app) };
   },
-  async saveAppliances({ homey, body }) {
-    const current = safeCall(homey.app.getApplianceRules.bind(homey.app), []);
-    const updates = body && body.enabledById && typeof body.enabledById === 'object' ? body.enabledById : {};
-    const next = safeArray(current).map(rule => Object.prototype.hasOwnProperty.call(updates, rule.id) ? { ...rule, enabled: updates[rule.id] === true } : rule);
-    const applianceRules = await homey.app.saveApplianceRules(next);
-    return { ok: true, applianceRules, dashboard: buildDashboard(homey) };
+
+  async saveZoneRules({ homey, body }) {
+    const zoneRules = await homey.app.saveZoneRules(safeArray(body && body.zoneRules));
+    return { ok: true, zoneRules };
   },
-  async saveAutoMode({ homey, body }) {
-    const current = safeCall(homey.app.getAutoModeSettings.bind(homey.app), {}) || {};
-    const input = body && body.autoMode && typeof body.autoMode === 'object' ? body.autoMode : {};
-    const autoMode = await homey.app.saveAutoModeSettings({ ...current, ...input });
-    return { ok: true, autoMode, dashboard: buildDashboard(homey) };
+
+  async saveTemperatureRules({ homey, body }) {
+    const temperatureRules = await homey.app.saveTemperatureRules(safeArray(body && body.temperatureRules));
+    return { ok: true, temperatureRules };
   },
+
+  async saveApplianceRules({ homey, body }) {
+    const applianceRules = await homey.app.saveApplianceRules(safeArray(body && body.applianceRules));
+    return { ok: true, applianceRules };
+  },
+
   async saveScheduleRules({ homey, body }) {
-    const current = safeCall(homey.app.getScheduleRules.bind(homey.app), []);
-    const input = safeArray(body && body.scheduleRules);
-    const byId = new Map(input.map(rule => [rule && rule.id, rule]).filter(item => item[0]));
-    const next = safeArray(current).map(rule => byId.has(rule.id) ? { ...rule, ...byId.get(rule.id) } : rule);
-    const scheduleRules = await homey.app.saveScheduleRules(next);
-    return { ok: true, scheduleRules, dashboard: buildDashboard(homey) };
+    const scheduleRules = await homey.app.saveScheduleRules(safeArray(body && body.scheduleRules));
+    return { ok: true, scheduleRules };
+  },
+
+  async saveAutoMode({ homey, body }) {
+    const autoMode = await homey.app.saveAutoModeSettings((body && body.autoMode && typeof body.autoMode === 'object') ? body.autoMode : {});
+    return { ok: true, autoMode };
   },
 };
