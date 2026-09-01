@@ -1,0 +1,17 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Button 8",
+    "nl": "Knop 8",
+    "no": "Knapp 8",
+    "sv": "Knapp 8",
+    "it": "Pulsante 8",
+    "de": "Taste 8",
+    "fr": "Bouton 8",
+    "es": "Botón 8"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "toggle",
+  "icon": "/assets/power.svg"
+}

@@ -1,0 +1,17 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Button 13",
+    "nl": "Knop 13",
+    "no": "Knapp 13",
+    "sv": "Knapp 13",
+    "it": "Pulsante 13",
+    "de": "Taste 13",
+    "fr": "Bouton 13",
+    "es": "Botón 13"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "toggle",
+  "icon": "/assets/power.svg"
+}

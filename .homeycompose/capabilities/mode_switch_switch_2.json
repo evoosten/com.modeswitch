@@ -1,0 +1,17 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Button 2",
+    "nl": "Knop 2",
+    "no": "Knapp 2",
+    "sv": "Knapp 2",
+    "it": "Pulsante 2",
+    "de": "Taste 2",
+    "fr": "Bouton 2",
+    "es": "Botón 2"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "toggle",
+  "icon": "/assets/power.svg"
+}

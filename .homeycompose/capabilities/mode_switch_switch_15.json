@@ -1,0 +1,17 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Button 15",
+    "nl": "Knop 15",
+    "no": "Knapp 15",
+    "sv": "Knapp 15",
+    "it": "Pulsante 15",
+    "de": "Taste 15",
+    "fr": "Bouton 15",
+    "es": "Botón 15"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "toggle",
+  "icon": "/assets/power.svg"
+}

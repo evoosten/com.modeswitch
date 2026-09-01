@@ -1,0 +1,32 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Mode 9",
+    "nl": "Modus 9",
+    "no": "Modus 9",
+    "sv": "Läge 9",
+    "it": "Modalità 9",
+    "de": "Modus 9",
+    "fr": "Mode 9",
+    "es": "Modo 9"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/list.svg",
+  "values": [
+    {
+      "id": "none",
+      "title": {
+        "en": "Not configured",
+        "nl": "Niet geconfigureerd",
+        "no": "Ikke konfigurert",
+        "sv": "Inte konfigurerad",
+        "it": "Non configurato",
+        "de": "Nicht konfiguriert",
+        "fr": "Non configuré",
+        "es": "No configurado"
+      }
+    }
+  ]
+}

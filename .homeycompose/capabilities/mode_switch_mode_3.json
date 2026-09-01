@@ -1,0 +1,32 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Mode 3",
+    "nl": "Modus 3",
+    "no": "Modus 3",
+    "sv": "Läge 3",
+    "it": "Modalità 3",
+    "de": "Modus 3",
+    "fr": "Mode 3",
+    "es": "Modo 3"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/list.svg",
+  "values": [
+    {
+      "id": "none",
+      "title": {
+        "en": "Not configured",
+        "nl": "Niet geconfigureerd",
+        "no": "Ikke konfigurert",
+        "sv": "Inte konfigurerad",
+        "it": "Non configurato",
+        "de": "Nicht konfiguriert",
+        "fr": "Non configuré",
+        "es": "No configurado"
+      }
+    }
+  ]
+}

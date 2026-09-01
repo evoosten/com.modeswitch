@@ -1,0 +1,57 @@
+{
+  "title": {
+    "en": "Set on/off button",
+    "nl": "Zet aan/uit-knop aan of uit",
+    "de": "Ein-/Aus-Schalter einstellen",
+    "fr": "Régler le bouton marche/arrêt",
+    "es": "Configurar el botón de encendido/apagado",
+    "no": "Angi av/på-knapp",
+    "sv": "Ställ in på/av-knapp",
+    "it": "Imposta pulsante acceso/spento"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_switch"
+    },
+    {
+      "name": "button",
+      "type": "autocomplete",
+      "title": {
+        "en": "Button",
+        "nl": "Knop",
+        "de": "Schalter",
+        "fr": "Bouton",
+        "es": "Botón",
+        "no": "Knapp",
+        "sv": "Knapp",
+        "it": "Pulsante"
+      }
+    },
+    {
+      "name": "state",
+      "type": "checkbox",
+      "title": {
+        "en": "On",
+        "nl": "Aan",
+        "de": "An",
+        "fr": "Activé",
+        "es": "Encendido",
+        "no": "Pa",
+        "sv": "Pa",
+        "it": "Acceso"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Set on/off button [[button]] to [[state]]",
+    "nl": "Zet aan/uit-knop [[button]] op [[state]]",
+    "de": "Ein-/Aus-Schalter [[button]] auf [[state]] setzen",
+    "fr": "Régler le bouton marche/arrêt [[button]] sur [[state]]",
+    "es": "Establecer el botón de encendido/apagado [[button]] en [[state]]",
+    "no": "Sett av/på-knapp [[button]] til [[state]]",
+    "sv": "Ställ på/av-knapp [[button]] till [[state]]",
+    "it": "Imposta pulsante [[button]] su [[state]]"
+  }
+}

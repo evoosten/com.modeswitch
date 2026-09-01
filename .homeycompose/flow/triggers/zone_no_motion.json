@@ -1,0 +1,80 @@
+{
+  "title": {
+    "en": "No motion in a zone",
+    "nl": "Geen beweging meer in een zone",
+    "de": "Keine Bewegung in einer Zone",
+    "fr": "Aucun mouvement dans une zone",
+    "es": "Sin movimiento en una zona",
+    "no": "Ingen bevegelse i en sone",
+    "sv": "Ingen rörelse i en zon",
+    "it": "Nessun movimento in una zona"
+  },
+  "tokens": [
+    {
+      "name": "zone",
+      "type": "string",
+      "title": {
+        "en": "Zone",
+        "nl": "Zone",
+        "de": "Zone",
+        "fr": "Zone",
+        "es": "Zona",
+        "no": "Sone",
+        "sv": "Zon",
+        "it": "Zona"
+      }
+    },
+    {
+      "name": "mode",
+      "type": "string",
+      "title": {
+        "en": "Mode",
+        "nl": "Modus",
+        "de": "Modus",
+        "fr": "Mode",
+        "es": "Modo",
+        "no": "Modus",
+        "sv": "Läge",
+        "it": "Modalità"
+      }
+    },
+    {
+      "name": "minutes",
+      "type": "number",
+      "title": {
+        "en": "Minutes",
+        "nl": "Minuten",
+        "de": "Minuten",
+        "fr": "Minutes",
+        "es": "Minutos",
+        "no": "Minutter",
+        "sv": "Minuter",
+        "it": "Minuti"
+      }
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "title": {
+        "en": "Source",
+        "nl": "Bron",
+        "de": "Quelle",
+        "fr": "Source",
+        "es": "Origen",
+        "no": "Kilde",
+        "sv": "Källa",
+        "it": "Origine"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "No motion in a zone",
+    "nl": "Geen beweging meer in een zone",
+    "de": "Keine Bewegung in einer Zone",
+    "fr": "Aucun mouvement dans une zone",
+    "es": "Sin movimiento en una zona",
+    "no": "Ingen bevegelse i en sone",
+    "sv": "Ingen rörelse i en zon",
+    "it": "Nessun movimento in una zona"
+  }
+}

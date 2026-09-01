@@ -1,0 +1,32 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Mode 4",
+    "nl": "Modus 4",
+    "no": "Modus 4",
+    "sv": "Läge 4",
+    "it": "Modalità 4",
+    "de": "Modus 4",
+    "fr": "Mode 4",
+    "es": "Modo 4"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/list.svg",
+  "values": [
+    {
+      "id": "none",
+      "title": {
+        "en": "Not configured",
+        "nl": "Niet geconfigureerd",
+        "no": "Ikke konfigurert",
+        "sv": "Inte konfigurerad",
+        "it": "Non configurato",
+        "de": "Nicht konfiguriert",
+        "fr": "Non configuré",
+        "es": "No configurado"
+      }
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "title": {
+    "en": "Appliance started",
+    "nl": "Apparaat gestart",
+    "de": "Gerät gestartet",
+    "fr": "Appareil démarré",
+    "es": "Dispositivo iniciado",
+    "no": "Apparat startet",
+    "sv": "Apparat startade",
+    "it": "Elettrodomestico avviato"
+  },
+  "titleFormatted": {
+    "en": "Appliance started",
+    "nl": "Apparaat gestart",
+    "de": "Gerät gestartet",
+    "fr": "Appareil démarré",
+    "es": "Dispositivo iniciado",
+    "no": "Apparat startet",
+    "sv": "Apparat startade",
+    "it": "Elettrodomestico avviato"
+  },
+  "tokens": [
+    {
+      "name": "name",
+      "type": "string",
+      "title": {
+        "en": "Name",
+        "nl": "Naam",
+        "de": "Name",
+        "fr": "Nom",
+        "es": "Nombre",
+        "no": "Navn",
+        "sv": "Namn",
+        "it": "Nome"
+      }
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "title": {
+        "en": "Type",
+        "nl": "Type",
+        "de": "Typ",
+        "fr": "Type",
+        "es": "Tipo",
+        "no": "Type",
+        "sv": "Typ",
+        "it": "Tipo"
+      }
+    },
+    {
+      "name": "device",
+      "type": "string",
+      "title": {
+        "en": "Device",
+        "nl": "Apparaat",
+        "de": "Gerät",
+        "fr": "Appareil",
+        "es": "Dispositivo",
+        "no": "Enhet",
+        "sv": "Enhet",
+        "it": "Dispositivo"
+      }
+    },
+    {
+      "name": "power",
+      "type": "number",
+      "title": {
+        "en": "Power",
+        "nl": "Vermogen",
+        "de": "Leistung",
+        "fr": "Puissance",
+        "es": "Potencia",
+        "no": "Effekt",
+        "sv": "Effekt",
+        "it": "Potenza"
+      }
+    },
+    {
+      "name": "energy_kwh",
+      "type": "number",
+      "title": {
+        "en": "Energy used (kWh)",
+        "nl": "Verbruikt (kWh)",
+        "de": "Energieverbrauch (kWh)",
+        "fr": "Énergie consommée (kWh)",
+        "es": "Energía consumida (kWh)",
+        "no": "Energi brukt (kWh)",
+        "sv": "Använd energi (kWh)",
+        "it": "Energia utilizzata (kWh)"
+      }
+    },
+    {
+      "name": "duration_seconds",
+      "type": "number",
+      "title": {
+        "en": "Duration (seconds)",
+        "nl": "Duur (seconden)",
+        "de": "Dauer (Sekunden)",
+        "fr": "Durée (secondes)",
+        "es": "Duración (segundos)",
+        "no": "Varighet (seconds)",
+        "sv": "Varaktighet (seconds)",
+        "it": "Durata (seconds)"
+      }
+    },
+    {
+      "name": "duration",
+      "type": "string",
+      "title": {
+        "en": "Duration",
+        "nl": "Duur",
+        "de": "Dauer",
+        "fr": "Durée",
+        "es": "Duración",
+        "no": "Varighet",
+        "sv": "Varaktighet",
+        "it": "Durata"
+      }
+    }
+  ]
+}

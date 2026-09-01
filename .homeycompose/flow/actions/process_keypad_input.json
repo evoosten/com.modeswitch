@@ -1,0 +1,52 @@
+{
+  "title": {
+    "en": "Process keypad input",
+    "nl": "Verwerk keypad-invoer",
+    "de": "Keypad-Eingabe verarbeiten",
+    "fr": "Traiter la saisie du clavier",
+    "es": "Procesar entrada del teclado",
+    "no": "Behandle tastaturinndata",
+    "sv": "Bearbeta knappsatsinmatning",
+    "it": "Elabora input tastierino"
+  },
+  "titleFormatted": {
+    "en": "Process keypad [[keypad_id]] PIN [[pin]]",
+    "nl": "Verwerk keypad [[keypad_id]] PIN [[pin]]",
+    "de": "Keypad [[keypad_id]] PIN [[pin]] verarbeiten",
+    "fr": "Traiter clavier [[keypad_id]] PIN [[pin]]",
+    "es": "Procesar teclado [[keypad_id]] PIN [[pin]]",
+    "no": "Behandle tastatur [[keypad_id]] PIN [[pin]]",
+    "sv": "Bearbeta knappsats [[keypad_id]] PIN [[pin]]",
+    "it": "Elabora tastierino [[keypad_id]] PIN [[pin]]"
+  },
+  "args": [
+    {
+      "name": "keypad_id",
+      "type": "text",
+      "title": {
+        "en": "Keypad ID",
+        "nl": "Keypad-ID",
+        "no": "Tastatur-ID",
+        "sv": "Knappsats-ID",
+        "it": "ID tastierino",
+        "de": "Tastatur-ID",
+        "fr": "ID du clavier",
+        "es": "ID del teclado"
+      }
+    },
+    {
+      "name": "pin",
+      "type": "text",
+      "title": {
+        "en": "PIN",
+        "nl": "PIN",
+        "no": "PIN",
+        "sv": "PIN",
+        "it": "PIN",
+        "de": "PIN",
+        "fr": "PIN",
+        "es": "PIN"
+      }
+    }
+  ]
+}

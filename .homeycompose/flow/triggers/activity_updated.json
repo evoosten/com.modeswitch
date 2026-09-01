@@ -1,0 +1,112 @@
+{
+  "title": {
+    "en": "Activity updated",
+    "nl": "Activiteit bijgewerkt",
+    "de": "Aktivität aktualisiert",
+    "fr": "Activité mise à jour",
+    "es": "Actividad actualizada",
+    "no": "Aktivitet oppdatert",
+    "sv": "Aktivitet uppdaterades",
+    "it": "Attività aggiornata"
+  },
+  "tokens": [
+    {
+      "name": "activity_name",
+      "title": {
+        "en": "Activity",
+        "nl": "Activiteit",
+        "de": "Aktivität",
+        "fr": "Activité",
+        "es": "Actividad",
+        "no": "Aktivitet",
+        "sv": "Aktivitet",
+        "it": "Attività"
+      },
+      "type": "string"
+    },
+    {
+      "name": "duration",
+      "title": {
+        "en": "Duration",
+        "nl": "Duur",
+        "de": "Dauer",
+        "fr": "Durée",
+        "es": "Duración",
+        "no": "Varighet",
+        "sv": "Varaktighet",
+        "it": "Durata"
+      },
+      "type": "string"
+    },
+    {
+      "name": "water_used",
+      "title": {
+        "en": "Water used",
+        "nl": "Water gebruikt",
+        "de": "Wasserverbrauch",
+        "fr": "Eau utilisée",
+        "es": "Agua usada",
+        "no": "Vann brukt",
+        "sv": "Använt vatten",
+        "it": "Acqua utilizzata"
+      },
+      "type": "number"
+    },
+    {
+      "name": "kwh_used",
+      "title": {
+        "en": "kWh used",
+        "nl": "kWh gebruikt",
+        "de": "kWh verbraucht",
+        "fr": "kWh utilisés",
+        "es": "kWh usados",
+        "no": "kWh brukt",
+        "sv": "Använda kWh",
+        "it": "kWh utilizzati"
+      },
+      "type": "number"
+    },
+    {
+      "name": "gas_used",
+      "title": {
+        "en": "Gas used",
+        "nl": "Gas gebruikt",
+        "de": "Gasverbrauch",
+        "fr": "Gaz utilisé",
+        "es": "Gas usado",
+        "no": "Gass brukt",
+        "sv": "Använd gas",
+        "it": "Gas utilizzato"
+      },
+      "type": "number"
+    },
+    {
+      "name": "start_time",
+      "title": {
+        "en": "Start time",
+        "nl": "Starttijd",
+        "de": "Startzeit",
+        "fr": "Heure de début",
+        "es": "Hora de inicio",
+        "no": "Starttid",
+        "sv": "Starttid",
+        "it": "Avvio time"
+      },
+      "type": "string"
+    },
+    {
+      "name": "end_time",
+      "title": {
+        "en": "End time",
+        "nl": "Eindtijd",
+        "de": "Endzeit",
+        "fr": "Heure de fin",
+        "es": "Hora de fin",
+        "no": "Sluttid",
+        "sv": "Sluttid",
+        "it": "Ora di fine"
+      },
+      "type": "string"
+    }
+  ]
+}

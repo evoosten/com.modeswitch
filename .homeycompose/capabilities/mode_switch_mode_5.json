@@ -1,0 +1,32 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Mode 5",
+    "nl": "Modus 5",
+    "no": "Modus 5",
+    "sv": "Läge 5",
+    "it": "Modalità 5",
+    "de": "Modus 5",
+    "fr": "Mode 5",
+    "es": "Modo 5"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/list.svg",
+  "values": [
+    {
+      "id": "none",
+      "title": {
+        "en": "Not configured",
+        "nl": "Niet geconfigureerd",
+        "no": "Ikke konfigurert",
+        "sv": "Inte konfigurerad",
+        "it": "Non configurato",
+        "de": "Nicht konfiguriert",
+        "fr": "Non configuré",
+        "es": "No configurado"
+      }
+    }
+  ]
+}

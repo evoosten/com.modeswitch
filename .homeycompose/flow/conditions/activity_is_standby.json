@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Activity [[activity]] !{{is on standby|is not on standby}}",
+    "nl": "Activiteit [[activity]] !{{staat op standby|staat niet op standby}}",
+    "de": "Aktivität [[activity]] !{{ist im Standby|ist nicht im Standby}}",
+    "fr": "L’activité [[activity]] !{{est en veille|n’est pas en veille}}",
+    "es": "La actividad [[activity]] !{{está en espera|no está en espera}}",
+    "no": "Activity [[activity]] !{{is on Ventemodus|is not on Ventemodus}}",
+    "sv": "Activity [[activity]] !{{is on Vanteläge|is not on Vanteläge}}",
+    "it": "Activity [[activity]] !{{is on Standby|is not on Standby}}"
+  },
+  "titleFormatted": {
+    "en": "Activity [[activity]] !{{is on standby|is not on standby}}",
+    "nl": "Activiteit [[activity]] !{{staat op standby|staat niet op standby}}",
+    "de": "Aktivität [[activity]] !{{ist im Standby|ist nicht im Standby}}",
+    "fr": "L’activité [[activity]] !{{est en veille|n’est pas en veille}}",
+    "es": "La actividad [[activity]] !{{está en espera|no está en espera}}",
+    "no": "Activity [[activity]] !{{is on Ventemodus|is not on Ventemodus}}",
+    "sv": "Activity [[activity]] !{{is on Vanteläge|is not on Vanteläge}}",
+    "it": "Activity [[activity]] !{{is on Standby|is not on Standby}}"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "activity",
+      "title": {
+        "en": "Activity",
+        "nl": "Activiteit",
+        "de": "Aktivität",
+        "fr": "Activité",
+        "es": "Actividad",
+        "no": "Aktivitet",
+        "sv": "Aktivitet",
+        "it": "Attività"
+      }
+    }
+  ]
+}

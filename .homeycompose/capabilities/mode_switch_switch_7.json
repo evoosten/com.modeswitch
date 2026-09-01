@@ -1,0 +1,17 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Button 7",
+    "nl": "Knop 7",
+    "no": "Knapp 7",
+    "sv": "Knapp 7",
+    "it": "Pulsante 7",
+    "de": "Taste 7",
+    "fr": "Bouton 7",
+    "es": "Botón 7"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "toggle",
+  "icon": "/assets/power.svg"
+}

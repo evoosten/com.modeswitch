@@ -1,0 +1,65 @@
+{
+  "title": {
+    "en": "Turn on lights in zone [[zone]] with dim level [[dim]]",
+    "nl": "Zet lampen aan in zone [[zone]] met dimniveau [[dim]]",
+    "de": "Lichter in Zone [[zone]] mit Dimmwert [[dim]] einschalten",
+    "fr": "Allumer les lumières dans la zone [[zone]] avec un niveau de variation de [[dim]]",
+    "es": "Encender las luces en la zona [[zone]] con nivel de atenuación [[dim]]",
+    "no": "Turn on Lys in zone [[zone]] with dim level [[dim]]",
+    "sv": "Turn on Lampor in zone [[zone]] with dim level [[dim]]",
+    "it": "Turn on Luci in zone [[zone]] with dim level [[dim]]"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "zone",
+      "title": {
+        "en": "Zone",
+        "nl": "Zone",
+        "de": "Zone",
+        "fr": "Zone",
+        "es": "Zona",
+        "no": "Sone",
+        "sv": "Zon",
+        "it": "Zona"
+      }
+    },
+    {
+      "type": "number",
+      "name": "dim",
+      "min": 0,
+      "max": 1,
+      "step": 0.05,
+      "placeholder": {
+        "en": "Optional, 0-1",
+        "nl": "Optioneel, 0-1",
+        "de": "Optional, 0–1",
+        "fr": "Optionnel, 0–1",
+        "es": "Opcional, 0–1",
+        "no": "Valgfritt, 0–1",
+        "sv": "Valfritt, 0–1",
+        "it": "Opzionale, 0–1"
+      },
+      "title": {
+        "en": "Dim level",
+        "nl": "Dimniveau",
+        "de": "Dimmstufe",
+        "fr": "Niveau de variation",
+        "es": "Nivel de atenuación",
+        "no": "Dimmenivå",
+        "sv": "Dimnivå",
+        "it": "Livello dimmer"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Turn on lights in zone [[zone]] with dim level [[dim]]",
+    "nl": "Zet lampen aan in zone [[zone]] met dimniveau [[dim]]",
+    "de": "Lichter in Zone [[zone]] mit Dimmwert [[dim]] einschalten",
+    "fr": "Allumer les lumières dans la zone [[zone]] avec un niveau de variation de [[dim]]",
+    "es": "Encender las luces en la zona [[zone]] con nivel de atenuación [[dim]]",
+    "no": "Turn on Lys in zone [[zone]] with dim level [[dim]]",
+    "sv": "Turn on Lampor in zone [[zone]] with dim level [[dim]]",
+    "it": "Turn on Luci in zone [[zone]] with dim level [[dim]]"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Run zone rules for [[zone]]",
+    "nl": "Voer zoneregels uit voor [[zone]]",
+    "de": "Zonenregeln für [[zone]] ausführen",
+    "fr": "Exécuter les règles de zone pour [[zone]]",
+    "es": "Ejecutar las reglas de zona para [[zone]]",
+    "no": "Run Soneregler for [[zone]]",
+    "sv": "Run Zonregler for [[zone]]",
+    "it": "Run Regole di zona for [[zone]]"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "zone",
+      "title": {
+        "en": "Zone",
+        "nl": "Zone",
+        "de": "Zone",
+        "fr": "Zone",
+        "es": "Zona",
+        "no": "Sone",
+        "sv": "Zon",
+        "it": "Zona"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Run zone rules for [[zone]]",
+    "nl": "Voer zoneregels uit voor [[zone]]",
+    "de": "Zonenregeln für [[zone]] ausführen",
+    "fr": "Exécuter les règles de zone pour [[zone]]",
+    "es": "Ejecutar las reglas de zona para [[zone]]",
+    "no": "Run Soneregler for [[zone]]",
+    "sv": "Run Zonregler for [[zone]]",
+    "it": "Run Regole di zona for [[zone]]"
+  }
+}

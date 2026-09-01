@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Activity [[activity]] !{{is running|is not running}}",
+    "nl": "Activiteit [[activity]] !{{is actief|is niet actief}}",
+    "de": "Aktivität [[activity]] !{{ist aktiv|ist nicht aktiv}}",
+    "fr": "L’activité [[activity]] !{{est active|n’est pas active}}",
+    "es": "La actividad [[activity]] !{{está activa|no está activa}}",
+    "no": "Activity [[activity]] !{{is Kjorer|is not Kjorer}}",
+    "sv": "Activity [[activity]] !{{is Kors|is not Kors}}",
+    "it": "Activity [[activity]] !{{is In esecuzione|is not In esecuzione}}"
+  },
+  "titleFormatted": {
+    "en": "Activity [[activity]] !{{is running|is not running}}",
+    "nl": "Activiteit [[activity]] !{{is actief|is niet actief}}",
+    "de": "Aktivität [[activity]] !{{ist aktiv|ist nicht aktiv}}",
+    "fr": "L’activité [[activity]] !{{est active|n’est pas active}}",
+    "es": "La actividad [[activity]] !{{está activa|no está activa}}",
+    "no": "Activity [[activity]] !{{is Kjorer|is not Kjorer}}",
+    "sv": "Activity [[activity]] !{{is Kors|is not Kors}}",
+    "it": "Activity [[activity]] !{{is In esecuzione|is not In esecuzione}}"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "activity",
+      "title": {
+        "en": "Activity",
+        "nl": "Activiteit",
+        "de": "Aktivität",
+        "fr": "Activité",
+        "es": "Actividad",
+        "no": "Aktivitet",
+        "sv": "Aktivitet",
+        "it": "Attività"
+      }
+    }
+  ]
+}

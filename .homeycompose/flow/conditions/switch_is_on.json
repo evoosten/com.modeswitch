@@ -1,0 +1,43 @@
+{
+  "title": {
+    "en": "On/off button !{{is on|is off}}",
+    "nl": "Aan/uit-knop !{{is aan|is uit}}",
+    "de": "Ein-/Aus-Schalter !{{ist an|ist aus}}",
+    "fr": "Le bouton marche/arrêt !{{est activé|est désactivé}}",
+    "es": "El botón de encendido/apagado !{{está encendido|está apagado}}",
+    "no": "Pa/off button !{{is on|is off}}",
+    "sv": "Pa/off button !{{is on|is off}}",
+    "it": "Acceso/off button !{{is on|is off}}"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_switch"
+    },
+    {
+      "name": "button",
+      "type": "autocomplete",
+      "title": {
+        "en": "Button",
+        "nl": "Knop",
+        "de": "Schalter",
+        "fr": "Bouton",
+        "es": "Botón",
+        "no": "Knapp",
+        "sv": "Knapp",
+        "it": "Pulsante"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "On/off button [[button]] !{{is on|is off}}",
+    "nl": "Aan/uit-knop [[button]] !{{is aan|is uit}}",
+    "de": "Ein-/Aus-Schalter [[button]] !{{ist an|ist aus}}",
+    "fr": "Le bouton marche/arrêt [[button]] !{{est activé|est désactivé}}",
+    "es": "El botón de encendido/apagado [[button]] !{{está encendido|está apagado}}",
+    "no": "Pa/off button [[button]] !{{is on|is off}}",
+    "sv": "Pa/off button [[button]] !{{is on|is off}}",
+    "it": "Acceso/off button [[button]] !{{is on|is off}}"
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Active mode",
+    "nl": "Actieve modus",
+    "de": "Aktiver Modus",
+    "fr": "Mode actif",
+    "es": "Modo activo",
+    "no": "Active Modus",
+    "sv": "Active Lage",
+    "it": "Active Modalita"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/icons/mode_selector.svg",
+  "values": [
+    {
+      "id": "home",
+      "title": {
+        "en": "Home",
+        "nl": "Thuis",
+        "de": "Zuhause",
+        "fr": "Maison",
+        "es": "Casa",
+        "no": "Hjemme",
+        "sv": "Hemma",
+        "it": "Casa"
+      }
+    },
+    {
+      "id": "away",
+      "title": {
+        "en": "Away",
+        "nl": "Afwezig",
+        "de": "Abwesend",
+        "fr": "Absent",
+        "es": "Fuera",
+        "no": "Borte",
+        "sv": "Borta",
+        "it": "Fuori casa"
+      }
+    },
+    {
+      "id": "sleep",
+      "title": {
+        "en": "Sleep",
+        "nl": "Slapen",
+        "de": "Schlafen",
+        "fr": "Sommeil",
+        "es": "Dormir",
+        "no": "Sove",
+        "sv": "Sova",
+        "it": "Sonno"
+      }
+    },
+    {
+      "id": "vacation",
+      "title": {
+        "en": "Vacation",
+        "nl": "Vakantie",
+        "de": "Urlaub",
+        "fr": "Vacances",
+        "es": "Vacaciones",
+        "no": "Ferie",
+        "sv": "Semester",
+        "it": "Vacanza"
+      }
+    },
+    {
+      "id": "home_tv",
+      "title": {
+        "en": "Watch TV",
+        "nl": "TV kijken",
+        "de": "Fernsehen",
+        "fr": "Regarder la TV",
+        "es": "Ver TV",
+        "no": "Se pa TV",
+        "sv": "Titta pa TV",
+        "it": "Guarda TV"
+      }
+    },
+    {
+      "id": "home_romantic",
+      "title": {
+        "en": "Romantic",
+        "nl": "Romantisch",
+        "de": "Romantisch",
+        "fr": "Romantique",
+        "es": "Romántico",
+        "no": "Romantisk",
+        "sv": "Romantiskt",
+        "it": "Romantico"
+      }
+    },
+    {
+      "id": "home_game",
+      "title": {
+        "en": "Game",
+        "nl": "Game",
+        "de": "Gaming",
+        "fr": "Jeu",
+        "es": "Juego",
+        "no": "Spill",
+        "sv": "Spel",
+        "it": "Gioco"
+      }
+    },
+    {
+      "id": "home_movie",
+      "title": {
+        "en": "Watch movie",
+        "nl": "Film kijken",
+        "de": "Film ansehen",
+        "fr": "Regarder un film",
+        "es": "Ver película",
+        "no": "Se film",
+        "sv": "Titta pa film",
+        "it": "Guarda film"
+      }
+    }
+  ]
+}

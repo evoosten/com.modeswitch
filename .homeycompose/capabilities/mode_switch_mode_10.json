@@ -1,0 +1,32 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Mode 10",
+    "nl": "Modus 10",
+    "no": "Modus 10",
+    "sv": "Läge 10",
+    "it": "Modalità 10",
+    "de": "Modus 10",
+    "fr": "Mode 10",
+    "es": "Modo 10"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/list.svg",
+  "values": [
+    {
+      "id": "none",
+      "title": {
+        "en": "Not configured",
+        "nl": "Niet geconfigureerd",
+        "no": "Ikke konfigurert",
+        "sv": "Inte konfigurerad",
+        "it": "Non configurato",
+        "de": "Nicht konfiguriert",
+        "fr": "Non configuré",
+        "es": "No configurado"
+      }
+    }
+  ]
+}

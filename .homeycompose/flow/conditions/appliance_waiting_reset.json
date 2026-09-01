@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Appliance [[appliance]] !{{is waiting for reset|is not waiting for reset}}",
+    "nl": "Apparaat [[appliance]] !{{wacht op een reset|wacht niet op een reset}}",
+    "de": "Gerät [[appliance]] !{{wartet auf Zurücksetzung|wartet nicht auf Zurücksetzung}}",
+    "fr": "L’appareil [[appliance]] !{{attend une réinitialisation|n’attend pas de réinitialisation}}",
+    "es": "El dispositivo [[appliance]] !{{está esperando un reinicio|no está esperando un reinicio}}",
+    "no": "Apparat [[appliance]] !{{venter på tilbakestilling|venter ikke på tilbakestilling}}",
+    "sv": "Apparat [[appliance]] !{{väntar på återställning|väntar inte på återställning}}",
+    "it": "Elettrodomestico [[appliance]] !{{in attesa di reimpostazione|non in attesa di reimpostazione}}"
+  },
+  "titleFormatted": {
+    "en": "Appliance [[appliance]] !{{is waiting for reset|is not waiting for reset}}",
+    "nl": "Apparaat [[appliance]] !{{wacht op een reset|wacht niet op een reset}}",
+    "de": "Gerät [[appliance]] !{{wartet auf Zurücksetzung|wartet nicht auf Zurücksetzung}}",
+    "fr": "L’appareil [[appliance]] !{{attend une réinitialisation|n’attend pas de réinitialisation}}",
+    "es": "El dispositivo [[appliance]] !{{está esperando un reinicio|no está esperando un reinicio}}",
+    "no": "Apparat [[appliance]] !{{venter på tilbakestilling|venter ikke på tilbakestilling}}",
+    "sv": "Apparat [[appliance]] !{{väntar på återställning|väntar inte på återställning}}",
+    "it": "Elettrodomestico [[appliance]] !{{in attesa di reimpostazione|non in attesa di reimpostazione}}"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "appliance",
+      "title": {
+        "en": "Appliance",
+        "nl": "Apparaat",
+        "de": "Gerät",
+        "fr": "Appareil",
+        "es": "Dispositivo",
+        "no": "Apparat",
+        "sv": "Apparat",
+        "it": "Elettrodomestico"
+      }
+    }
+  ]
+}

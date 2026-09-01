@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Zone [[zone]] !{{has motion|has no motion}}",
+    "nl": "Zone [[zone]] !{{heeft beweging|heeft geen beweging}}",
+    "de": "Zone [[zone]] !{{hat Bewegung|hat keine Bewegung}}",
+    "fr": "La zone [[zone]] !{{détecte un mouvement|ne détecte aucun mouvement}}",
+    "es": "La zona [[zone]] !{{detecta movimiento|no detecta movimiento}}",
+    "no": "Zone [[zone]] !{{has Bevegelse|has no Bevegelse}}",
+    "sv": "Zone [[zone]] !{{has Rorelse|has no Rorelse}}",
+    "it": "Zone [[zone]] !{{has Movimento|has no Movimento}}"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "zone",
+      "title": {
+        "en": "Zone",
+        "nl": "Zone",
+        "de": "Zone",
+        "fr": "Zone",
+        "es": "Zona",
+        "no": "Sone",
+        "sv": "Zon",
+        "it": "Zona"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Zone [[zone]] !{{has motion|has no motion}}",
+    "nl": "Zone [[zone]] !{{heeft beweging|heeft geen beweging}}",
+    "de": "Zone [[zone]] !{{hat Bewegung|hat keine Bewegung}}",
+    "fr": "La zone [[zone]] !{{détecte un mouvement|ne détecte aucun mouvement}}",
+    "es": "La zona [[zone]] !{{detecta movimiento|no detecta movimiento}}",
+    "no": "Zone [[zone]] !{{has Bevegelse|has no Bevegelse}}",
+    "sv": "Zone [[zone]] !{{has Rorelse|has no Rorelse}}",
+    "it": "Zone [[zone]] !{{has Movimento|has no Movimento}}"
+  }
+}

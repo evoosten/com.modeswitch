@@ -1,0 +1,71 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Main mode",
+    "nl": "Hoofdmodus",
+    "de": "Hauptmodus",
+    "fr": "Mode principal",
+    "es": "Modo principal",
+    "no": "Main Modus",
+    "sv": "Main Lage",
+    "it": "Main Modalita"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/icons/mode_selector.svg",
+  "values": [
+    {
+      "id": "home",
+      "title": {
+        "en": "Home",
+        "nl": "Thuis",
+        "de": "Zuhause",
+        "fr": "Maison",
+        "es": "Casa",
+        "no": "Hjemme",
+        "sv": "Hemma",
+        "it": "Casa"
+      }
+    },
+    {
+      "id": "away",
+      "title": {
+        "en": "Away",
+        "nl": "Afwezig",
+        "de": "Abwesend",
+        "fr": "Absent",
+        "es": "Fuera",
+        "no": "Borte",
+        "sv": "Borta",
+        "it": "Fuori casa"
+      }
+    },
+    {
+      "id": "sleep",
+      "title": {
+        "en": "Sleep",
+        "nl": "Slapen",
+        "de": "Schlafen",
+        "fr": "Sommeil",
+        "es": "Dormir",
+        "no": "Sove",
+        "sv": "Sova",
+        "it": "Sonno"
+      }
+    },
+    {
+      "id": "vacation",
+      "title": {
+        "en": "Vacation",
+        "nl": "Vakantie",
+        "de": "Urlaub",
+        "fr": "Vacances",
+        "es": "Vacaciones",
+        "no": "Ferie",
+        "sv": "Semester",
+        "it": "Vacanza"
+      }
+    }
+  ]
+}

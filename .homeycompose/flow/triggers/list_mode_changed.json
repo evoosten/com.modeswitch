@@ -1,0 +1,77 @@
+{
+  "title": {
+    "en": "List/mode changed",
+    "nl": "Knop/modus gewijzigd",
+    "de": "Liste/Modus geändert",
+    "fr": "Liste/mode modifié",
+    "es": "Lista/modo cambiado",
+    "no": "List/Modus changed",
+    "sv": "List/Lage changed",
+    "it": "List/Modalita changed"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_switch"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "list_id",
+      "type": "string",
+      "title": {
+        "en": "List ID",
+        "nl": "Lijst ID",
+        "de": "Listen-ID",
+        "fr": "ID de la liste",
+        "es": "ID de la lista",
+        "no": "Liste-ID",
+        "sv": "List-ID",
+        "it": "ID elenco"
+      }
+    },
+    {
+      "name": "list_name",
+      "type": "string",
+      "title": {
+        "en": "List",
+        "nl": "Lijst",
+        "de": "Liste",
+        "fr": "Liste",
+        "es": "Lista",
+        "no": "Liste",
+        "sv": "Lista",
+        "it": "Elenco"
+      }
+    },
+    {
+      "name": "mode_id",
+      "type": "string",
+      "title": {
+        "en": "Mode ID",
+        "nl": "Modus ID",
+        "de": "Modus-ID",
+        "fr": "ID du mode",
+        "es": "ID del modo",
+        "no": "Modus ID",
+        "sv": "Lage ID",
+        "it": "Modalita ID"
+      }
+    },
+    {
+      "name": "mode_name",
+      "type": "string",
+      "title": {
+        "en": "Mode",
+        "nl": "Modus",
+        "de": "Modus",
+        "fr": "Mode",
+        "es": "Modo",
+        "no": "Modus",
+        "sv": "Läge",
+        "it": "Modalità"
+      }
+    }
+  ]
+}

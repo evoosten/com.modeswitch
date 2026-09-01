@@ -1,0 +1,83 @@
+{
+  "title": {
+    "en": "Mode changed",
+    "nl": "Modus gewijzigd",
+    "de": "Modus geändert",
+    "fr": "Mode modifié",
+    "es": "Modo cambiado",
+    "no": "Modus changed",
+    "sv": "Lage changed",
+    "it": "Modalita changed"
+  },
+  "tokens": [
+    {
+      "name": "mode",
+      "type": "string",
+      "title": {
+        "en": "Mode",
+        "nl": "Modus",
+        "de": "Modus",
+        "fr": "Mode",
+        "es": "Modo",
+        "no": "Modus",
+        "sv": "Läge",
+        "it": "Modalità"
+      }
+    },
+    {
+      "name": "previous_mode",
+      "type": "string",
+      "title": {
+        "en": "Previous mode",
+        "nl": "Vorige modus",
+        "de": "Vorheriger Modus",
+        "fr": "Mode précédent",
+        "es": "Modo anterior",
+        "no": "Previous Modus",
+        "sv": "Previous Lage",
+        "it": "Previous Modalita"
+      }
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "title": {
+        "en": "Source",
+        "nl": "Bron",
+        "de": "Quelle",
+        "fr": "Source",
+        "es": "Origen",
+        "no": "Kilde",
+        "sv": "Källa",
+        "it": "Origine"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Mode changed",
+    "nl": "Modus gewijzigd",
+    "de": "Modus geändert",
+    "fr": "Mode modifié",
+    "es": "Modo cambiado",
+    "no": "Modus changed",
+    "sv": "Lage changed",
+    "it": "Modalita changed"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_controller",
+      "title": {
+        "en": "Mode Controller",
+        "nl": "Moduscontroller",
+        "de": "Modus-Controller",
+        "fr": "Contrôleur de mode",
+        "es": "Controlador de modo",
+        "no": "Moduskontroller",
+        "sv": "Lägeskontroller",
+        "it": "Controller modalità"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Button 18",
+    "nl": "Knop 18",
+    "no": "Knapp 18",
+    "sv": "Knapp 18",
+    "it": "Pulsante 18",
+    "de": "Taste 18",
+    "fr": "Bouton 18",
+    "es": "Botón 18"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "toggle",
+  "icon": "/assets/power.svg"
+}

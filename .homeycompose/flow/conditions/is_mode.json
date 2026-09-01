@@ -1,0 +1,53 @@
+{
+  "title": {
+    "en": "Current mode !{{is|is not}} [[mode]]",
+    "nl": "Huidige modus !{{is|is niet}} [[mode]]",
+    "de": "Aktueller Modus !{{ist|ist nicht}} [[mode]]",
+    "fr": "Le mode actuel !{{est|n’est pas}} [[mode]]",
+    "es": "El modo actual !{{es|no es}} [[mode]]",
+    "no": "Gjeldende modus !{{is|is not}} [[mode]]",
+    "sv": "Aktuellt lage !{{is|is not}} [[mode]]",
+    "it": "Modalita attuale !{{is|is not}} [[mode]]"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_controller",
+      "title": {
+        "en": "Mode Controller",
+        "nl": "Moduscontroller",
+        "de": "Modus-Controller",
+        "fr": "Contrôleur de mode",
+        "es": "Controlador de modo",
+        "no": "Moduskontroller",
+        "sv": "Lägeskontroller",
+        "it": "Controller modalità"
+      }
+    },
+    {
+      "type": "autocomplete",
+      "name": "mode",
+      "title": {
+        "en": "Mode",
+        "nl": "Modus",
+        "de": "Modus",
+        "fr": "Mode",
+        "es": "Modo",
+        "no": "Modus",
+        "sv": "Läge",
+        "it": "Modalità"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Current mode !{{is|is not}} [[mode]]",
+    "nl": "Huidige modus !{{is|is niet}} [[mode]]",
+    "de": "Aktueller Modus !{{ist|ist nicht}} [[mode]]",
+    "fr": "Le mode actuel !{{est|n’est pas}} [[mode]]",
+    "es": "El modo actual !{{es|no es}} [[mode]]",
+    "no": "Gjeldende modus !{{is|is not}} [[mode]]",
+    "sv": "Aktuellt lage !{{is|is not}} [[mode]]",
+    "it": "Modalita attuale !{{is|is not}} [[mode]]"
+  }
+}

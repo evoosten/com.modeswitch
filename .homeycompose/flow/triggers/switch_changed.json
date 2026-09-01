@@ -1,0 +1,63 @@
+{
+  "title": {
+    "en": "On/off button changed",
+    "nl": "Aan/uit-knop gewijzigd",
+    "de": "Ein-/Aus-Schalter geändert",
+    "fr": "Bouton marche/arrêt modifié",
+    "es": "Botón de encendido/apagado cambiado",
+    "no": "Pa/off button changed",
+    "sv": "Pa/off button changed",
+    "it": "Acceso/off button changed"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_switch"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "button_id",
+      "type": "string",
+      "title": {
+        "en": "Button ID",
+        "nl": "Knop ID",
+        "de": "Schalter-ID",
+        "fr": "ID du bouton",
+        "es": "ID del botón",
+        "no": "Knapp-ID",
+        "sv": "Knapp-ID",
+        "it": "ID pulsante"
+      }
+    },
+    {
+      "name": "button_name",
+      "type": "string",
+      "title": {
+        "en": "Button",
+        "nl": "Knop",
+        "de": "Schalter",
+        "fr": "Bouton",
+        "es": "Botón",
+        "no": "Knapp",
+        "sv": "Knapp",
+        "it": "Pulsante"
+      }
+    },
+    {
+      "name": "is_on",
+      "type": "boolean",
+      "title": {
+        "en": "Is on",
+        "nl": "Is aan",
+        "de": "Ist an",
+        "fr": "Est activé",
+        "es": "Está encendido",
+        "no": "Er på",
+        "sv": "Är på",
+        "it": "È acceso"
+      }
+    }
+  ]
+}

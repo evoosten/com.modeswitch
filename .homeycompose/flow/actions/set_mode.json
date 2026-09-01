@@ -1,0 +1,53 @@
+{
+  "title": {
+    "en": "Set mode to [[mode]]",
+    "nl": "Zet modus op [[mode]]",
+    "de": "Modus auf [[mode]] setzen",
+    "fr": "Définir le mode sur [[mode]]",
+    "es": "Establecer el modo en [[mode]]",
+    "no": "Set Modus to [[mode]]",
+    "sv": "Set Lage to [[mode]]",
+    "it": "Set Modalita to [[mode]]"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_controller",
+      "title": {
+        "en": "Mode Controller",
+        "nl": "Moduscontroller",
+        "de": "Modus-Controller",
+        "fr": "Contrôleur de mode",
+        "es": "Controlador de modo",
+        "no": "Moduskontroller",
+        "sv": "Lägeskontroller",
+        "it": "Controller modalità"
+      }
+    },
+    {
+      "type": "autocomplete",
+      "name": "mode",
+      "title": {
+        "en": "Mode",
+        "nl": "Modus",
+        "de": "Modus",
+        "fr": "Mode",
+        "es": "Modo",
+        "no": "Modus",
+        "sv": "Läge",
+        "it": "Modalità"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Set mode to [[mode]]",
+    "nl": "Zet modus op [[mode]]",
+    "de": "Modus auf [[mode]] setzen",
+    "fr": "Définir le mode sur [[mode]]",
+    "es": "Establecer el modo en [[mode]]",
+    "no": "Set Modus to [[mode]]",
+    "sv": "Set Lage to [[mode]]",
+    "it": "Set Modalita to [[mode]]"
+  }
+}

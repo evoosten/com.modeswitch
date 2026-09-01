@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Turn off lights in zone [[zone]]",
+    "nl": "Zet lampen uit in zone [[zone]]",
+    "de": "Lichter in Zone [[zone]] ausschalten",
+    "fr": "Éteindre les lumières dans la zone [[zone]]",
+    "es": "Apagar las luces en la zona [[zone]]",
+    "no": "Turn off Lys in zone [[zone]]",
+    "sv": "Turn off Lampor in zone [[zone]]",
+    "it": "Turn off Luci in zone [[zone]]"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "zone",
+      "title": {
+        "en": "Zone",
+        "nl": "Zone",
+        "de": "Zone",
+        "fr": "Zone",
+        "es": "Zona",
+        "no": "Sone",
+        "sv": "Zon",
+        "it": "Zona"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Turn off lights in zone [[zone]]",
+    "nl": "Zet lampen uit in zone [[zone]]",
+    "de": "Lichter in Zone [[zone]] ausschalten",
+    "fr": "Éteindre les lumières dans la zone [[zone]]",
+    "es": "Apagar las luces en la zona [[zone]]",
+    "no": "Turn off Lys in zone [[zone]]",
+    "sv": "Turn off Lampor in zone [[zone]]",
+    "it": "Turn off Luci in zone [[zone]]"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Sub mode",
+    "nl": "Submodus",
+    "de": "Untermodus",
+    "fr": "Sous-mode",
+    "es": "Submodo",
+    "no": "Undermodus",
+    "sv": "Underlage",
+    "it": "Sottomodalita"
+  },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/icons/mode_selector.svg",
+  "values": [
+    {
+      "id": "none",
+      "title": {
+        "en": "No sub mode",
+        "nl": "Geen submodus",
+        "de": "Kein Untermodus",
+        "fr": "Aucun sous-mode",
+        "es": "Sin submodo",
+        "no": "No Undermodus",
+        "sv": "No Underlage",
+        "it": "No Sottomodalita"
+      }
+    },
+    {
+      "id": "home_tv",
+      "title": {
+        "en": "Watch TV",
+        "nl": "TV kijken",
+        "de": "Fernsehen",
+        "fr": "Regarder la TV",
+        "es": "Ver TV",
+        "no": "Se pa TV",
+        "sv": "Titta pa TV",
+        "it": "Guarda TV"
+      }
+    },
+    {
+      "id": "home_romantic",
+      "title": {
+        "en": "Romantic",
+        "nl": "Romantisch",
+        "de": "Romantisch",
+        "fr": "Romantique",
+        "es": "Romántico",
+        "no": "Romantisk",
+        "sv": "Romantiskt",
+        "it": "Romantico"
+      }
+    },
+    {
+      "id": "home_game",
+      "title": {
+        "en": "Game",
+        "nl": "Game",
+        "de": "Gaming",
+        "fr": "Jeu",
+        "es": "Juego",
+        "no": "Spill",
+        "sv": "Spel",
+        "it": "Gioco"
+      }
+    },
+    {
+      "id": "home_movie",
+      "title": {
+        "en": "Watch movie",
+        "nl": "Film kijken",
+        "de": "Film ansehen",
+        "fr": "Regarder un film",
+        "es": "Ver película",
+        "no": "Se film",
+        "sv": "Titta pa film",
+        "it": "Guarda film"
+      }
+    }
+  ]
+}

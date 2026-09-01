@@ -1,0 +1,57 @@
+{
+  "title": {
+    "en": "List !{{has|does not have}} mode active",
+    "nl": "Lijst !{{heeft|heeft niet}} knop/modus actief",
+    "de": "Liste !{{hat|hat keinen}} Modus aktiv",
+    "fr": "La liste !{{a|n’a pas}} le mode actif",
+    "es": "La lista !{{tiene|no tiene}} el modo activo",
+    "no": "List !{{has|does not have}} Modus active",
+    "sv": "List !{{has|does not have}} Lage active",
+    "it": "List !{{has|does not have}} Modalita active"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_switch"
+    },
+    {
+      "name": "list",
+      "type": "autocomplete",
+      "title": {
+        "en": "List",
+        "nl": "Lijst",
+        "de": "Liste",
+        "fr": "Liste",
+        "es": "Lista",
+        "no": "Liste",
+        "sv": "Lista",
+        "it": "Elenco"
+      }
+    },
+    {
+      "name": "mode",
+      "type": "autocomplete",
+      "title": {
+        "en": "Mode",
+        "nl": "Modus",
+        "de": "Modus",
+        "fr": "Mode",
+        "es": "Modo",
+        "no": "Modus",
+        "sv": "Läge",
+        "it": "Modalità"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "List [[list]] !{{has|does not have}} mode [[mode]] active",
+    "nl": "Lijst [[list]] !{{heeft|heeft niet}} knop/modus [[mode]] actief",
+    "de": "Liste [[list]] !{{hat|hat keinen}} Modus [[mode]] aktiv",
+    "fr": "La liste [[list]] !{{a|n’a pas}} le mode [[mode]] actif",
+    "es": "La lista [[list]] !{{tiene|no tiene}} el modo [[mode]] activo",
+    "no": "List [[list]] !{{has|does not have}} Modus [[mode]] active",
+    "sv": "List [[list]] !{{has|does not have}} Lage [[mode]] active",
+    "it": "List [[list]] !{{has|does not have}} Modalita [[mode]] active"
+  }
+}

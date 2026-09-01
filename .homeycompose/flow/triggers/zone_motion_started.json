@@ -1,0 +1,66 @@
+{
+  "title": {
+    "en": "Motion started in a zone",
+    "nl": "Beweging gestart in een zone",
+    "de": "Bewegung in einer Zone erkannt",
+    "fr": "Mouvement détecté dans une zone",
+    "es": "Movimiento detectado en una zona",
+    "no": "Bevegelse startet i en sone",
+    "sv": "Rörelse startade i en zon",
+    "it": "Movimento rilevato in una zona"
+  },
+  "tokens": [
+    {
+      "name": "zone",
+      "type": "string",
+      "title": {
+        "en": "Zone",
+        "nl": "Zone",
+        "de": "Zone",
+        "fr": "Zone",
+        "es": "Zona",
+        "no": "Sone",
+        "sv": "Zon",
+        "it": "Zona"
+      }
+    },
+    {
+      "name": "mode",
+      "type": "string",
+      "title": {
+        "en": "Mode",
+        "nl": "Modus",
+        "de": "Modus",
+        "fr": "Mode",
+        "es": "Modo",
+        "no": "Modus",
+        "sv": "Läge",
+        "it": "Modalità"
+      }
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "title": {
+        "en": "Source",
+        "nl": "Bron",
+        "de": "Quelle",
+        "fr": "Source",
+        "es": "Origen",
+        "no": "Kilde",
+        "sv": "Källa",
+        "it": "Origine"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Motion started in a zone",
+    "nl": "Beweging gestart in een zone",
+    "de": "Bewegung in einer Zone erkannt",
+    "fr": "Mouvement détecté dans une zone",
+    "es": "Movimiento detectado en una zona",
+    "no": "Bevegelse startet i en sone",
+    "sv": "Rörelse startade i en zon",
+    "it": "Movimento rilevato in una zona"
+  }
+}
