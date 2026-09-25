@@ -3,6 +3,7 @@
 const Homey = require('homey');
 const { HomeyAPI } = require('homey-api');
 const DashboardService = require('./lib/dashboard-service');
+const LocalConfigServer = require('./lib/local-config-server');
 const crypto = require('crypto');
 
 const SETTINGS_KEYS = {
@@ -24,10 +25,15 @@ const SETTINGS_KEYS = {
   AUTO_STATE: 'auto_state',
   DISPLAY_SETTINGS: 'display_settings',
   MODE_SWITCH_DEVICE_RULES: 'mode_switch_device_rules',
+  AVD_DEVICE_RULES: 'avd_device_rules',
+  SWITCH_RULES: 'switch_rules',
   KEYPAD_MAPPINGS: 'keypad_mappings',
   CRASH_LOG: 'crash_log',
   CRASH_DIAGNOSTICS: 'crash_diagnostics',
   CRASH_BREADCRUMBS: 'crash_breadcrumbs',
+  CONTACT_COUNTER_STATE: 'contact_counter_state',
+  GROUP_WATCH_RULES: 'group_watch_rules',
+  GROUP_WATCH_STATE: 'group_watch_state',
 };
 
 const DEFAULT_MODES = ['home', 'sleep', 'away', 'vacation'];
@@ -40,13 +46,19 @@ const DEFAULT_SUB_MODES = [
 const POLL_INTERVAL_MS = 2000;
 const SCHEDULER_INTERVAL_MS = 60000;
 const APPLIANCE_INTERVAL_MS = 10000;
+const APPLIANCE_IDLE_INTERVAL_MS = 30000;
+const APPLIANCE_RUNNING_INTERVAL_MS = 5000;
+const SWITCH_FALLBACK_INTERVAL_MS = 30000;
+const CONTACT_FALLBACK_REFRESH_MS = 30000;
 const ACTIVITY_HISTORY_LIMIT = 20;
 const APPLIANCE_HISTORY_LIMIT = 20;
 const CONTACT_RETRY_DELAYS_MS = [1000];
 const ENV_CACHE_TTL_MS = 8000;
+const DEFAULT_WEATHER_REFRESH_HOURS = 5;
 const STATIC_CACHE_TTL_MS = 300000;
 const MONITORING_ENV_TIMEOUT_MS = 7000;
 const MONITORING_SLOW_PHASE_MS = 4000;
+const GROUP_WATCH_INTERVAL_MS = 30000;
 
 
 class ModeSwitchApp extends Homey.App {
@@ -56,22 +68,39 @@ class ModeSwitchApp extends Homey.App {
     this.motionStateByRule = new Map();
     this.temperatureWindowStateByRule = new Map();
     this.contactRetryTimers = new Map();
+    this.contactCapabilityListeners = new Map();
+    this.contactEventQueues = new Map();
     this.modeDelayTimers = new Set();
     this.pollTimer = null;
     this.schedulerTimer = null;
     this.applianceTimer = null;
+    this.switchTimer = null;
     this.diagnosticsTimer = null;
+    this.groupWatchTimer = null;
+    this.groupWatchPolling = false;
+    this.groupWatchCapabilityListeners = new Map();
+    this.groupWatchSignalState = new Map();
+    this.groupWatchRuntimeState = null;
+    this.avdCapabilityListeners = new Map();
+    this.avdEventGuard = new Map();
+    this.avdSuppressedCapabilityEvents = new Map();
+    this.avdCapabilityState = new Map();
+    this.avdGroupAllOffState = new Map();
+    this.lastContactFallbackRefreshAt = 0;
     this.polling = false;
     this.appliancePolling = false;
     this.schedulerPolling = false;
     this.environmentCache = null;
     this.environmentCacheTs = 0;
+    this.homeyWeatherCache = null;
+    this.homeyWeatherCacheTs = 0;
     this.staticCache = null;
     this.staticCacheTs = 0;
 
     this._registerProcessErrorGuards();
 
     this.modeChangedTrigger = this.homey.flow.getDeviceTriggerCard('mode_changed');
+    this.mainModeActivatedTrigger = this.homey.flow.getDeviceTriggerCard('main_mode_activated');
     this.zoneMotionStartedTrigger = this.homey.flow.getTriggerCard('zone_motion_started');
     this.zoneNoMotionTrigger = this.homey.flow.getTriggerCard('zone_no_motion');
     this.applianceStartedTrigger = this.homey.flow.getTriggerCard('appliance_started');
@@ -85,30 +114,50 @@ class ModeSwitchApp extends Homey.App {
     this.activityUpdatedTrigger = this.homey.flow.getTriggerCard('activity_updated');
     this.activityRunningCondition = this.homey.flow.getConditionCard('activity_is_running');
     this.activityStandbyCondition = this.homey.flow.getConditionCard('activity_is_standby');
+    this.groupWatchSuspectTrigger = this.homey.flow.getTriggerCard('group_watch_suspect');
+    this.groupWatchOutageTrigger = this.homey.flow.getTriggerCard('group_watch_outage');
+    this.groupWatchRecoveredTrigger = this.homey.flow.getTriggerCard('group_watch_recovered');
+    this.groupWatchProblemCondition = this.homey.flow.getConditionCard('group_watch_has_problem');
+    this.groupWatchOkCondition = this.homey.flow.getConditionCard('group_watch_is_ok');
 
     this.isModeCondition = this.homey.flow.getConditionCard('is_mode');
+    this.isMainModeCondition = this.homey.flow.getConditionCard('is_main_mode');
+    this.isMainSubModeCondition = this.homey.flow.getConditionCard('is_main_sub_mode');
     this.zoneHasMotionCondition = this.homey.flow.getConditionCard('zone_has_motion');
 
     this.setModeAction = this.homey.flow.getActionCard('set_mode');
+    this.setMainModeAction = this.homey.flow.getActionCard('set_main_mode');
     this.processKeypadInputAction = this.homey.flow.getActionCard('process_keypad_input');
     this.zoneLightsOnAction = this.homey.flow.getActionCard('zone_lights_on');
     this.zoneLightsOffAction = this.homey.flow.getActionCard('zone_lights_off');
     this.runZoneRulesAction = this.homey.flow.getActionCard('run_zone_rules');
+    this.startApplianceAction = this.homey.flow.getActionCard('start_appliance');
+    this.stopApplianceAction = this.homey.flow.getActionCard('stop_appliance');
 
     this.homeyApi = await HomeyAPI.createAppAPI({ homey: this.homey });
     this.dashboardService = new DashboardService({ app: this });
+    this.localConfigServer = new LocalConfigServer({ app: this });
 
     this._registerFlowRunListeners();
     this._registerFlowArgumentAutocomplete();
     this._registerModeAndSwitchFlowCards();
     this._registerModeWidgetSettings();
     this._ensureDefaultSettings();
+    try {
+      await this.localConfigServer.start();
+    } catch (error) {
+      this.error('Could not start local configuration server', error);
+    }
     this._recordStartupRecoveryIfNeeded();
     this._markDiagnostics('app_init', { version: this.homey.manifest && this.homey.manifest.version });
-    this._startDiagnosticsHeartbeat();
+    // Diagnostics are event-driven; no permanent heartbeat is needed in normal operation.
     this._startMotionPolling();
+    this._rebuildContactCapabilityListeners().catch(error => this.error('Initial contact listener setup failed', error));
     this._startSchedulerPolling();
+    this._startSwitchPolling();
     this._startAppliancePolling();
+    this._startGroupWatchMonitoring();
+    this._rebuildAVDCapabilityListeners().catch(error => this.error('Initial AVD listener setup failed', error));
 
     this.log(`Mode Switch app v${this.homey.manifest?.version || '3.1.0'} is ready`);
   }
@@ -145,7 +194,7 @@ class ModeSwitchApp extends Homey.App {
         const options = [{
           id: 'controller',
           name: this._getHomeyLanguage() === 'en' ? 'Mode Controller' : 'Modus controller',
-          description: this._getHomeyLanguage() === 'en' ? 'Main modes and sub modes' : 'Hoofdmodussen en submodussen',
+          description: this._getHomeyLanguage() === 'en' ? 'Main modes and sub modes' : 'Hoofdmodi en submodi',
           sourceType: 'controller',
         }];
         for (const device of getModeSwitchDevices()) {
@@ -167,8 +216,8 @@ class ModeSwitchApp extends Homey.App {
         if (sourceId === 'controller') {
           const item = {
             id: 'controller_main',
-            name: this._getHomeyLanguage() === 'en' ? 'Main modes' : 'Hoofdmodussen',
-            description: this._getHomeyLanguage() === 'en' ? 'Includes configured sub modes' : 'Inclusief ingestelde submodussen',
+            name: this._getHomeyLanguage() === 'en' ? 'Main modes' : 'Hoofdmodi',
+            description: this._getHomeyLanguage() === 'en' ? 'Includes configured sub modes' : 'Inclusief ingestelde submodi',
           };
           return matches(item, query) ? [item] : [];
         }
@@ -185,7 +234,7 @@ class ModeSwitchApp extends Homey.App {
           .map(list => ({
             id: list.id,
             name: list.name,
-            description: `${Array.isArray(list.buttons) ? list.buttons.length : 0} ${this._getHomeyLanguage() === 'en' ? 'modes' : 'modussen'}`,
+            description: `${Array.isArray(list.buttons) ? list.buttons.length : 0} ${this._getHomeyLanguage() === 'en' ? 'modes' : 'modi'}`,
             isDefault: list.id === exported.defaultListId,
           }))
           .filter(item => item.id && matches(item, query));
@@ -224,11 +273,33 @@ class ModeSwitchApp extends Homey.App {
     this._markDiagnostics('app_uninit');
     if (this.pollTimer) clearInterval(this.pollTimer);
     if (this.schedulerTimer) clearInterval(this.schedulerTimer);
-    if (this.applianceTimer) clearInterval(this.applianceTimer);
+    if (this.applianceTimer) clearTimeout(this.applianceTimer);
+    if (this.switchTimer) clearInterval(this.switchTimer);
+    if (this.diagnosticsTimer) clearInterval(this.diagnosticsTimer);
+    if (this.groupWatchTimer) clearInterval(this.groupWatchTimer);
+    for (const listener of this.avdCapabilityListeners.values()) { try { listener.destroy?.(); } catch (_) {} }
+    this.avdCapabilityListeners.clear();
+    this.avdSuppressedCapabilityEvents.clear();
+    this.avdCapabilityState.clear();
+    this.avdGroupAllOffState.clear();
+    this._clearGroupWatchCapabilityListeners();
+    this._clearContactCapabilityListeners();
+    this.contactEventQueues.clear();
     for (const timer of this.contactRetryTimers.values()) {
       clearTimeout(timer);
     }
     this.contactRetryTimers.clear();
+    if (this.localConfigServer) this.localConfigServer.close().catch(() => {});
+  }
+
+  getLocalConfigServerInfo() {
+    return this.localConfigServer ? this.localConfigServer.getInfo() : { running: false, port: null, address: '', url: '', urls: [] };
+  }
+
+  regenerateLocalConfigToken() {
+    if (!this.localConfigServer) return '';
+    this.localConfigServer.regenerateToken();
+    return this.localConfigServer.getInfo();
   }
 
   _registerProcessErrorGuards() {
@@ -484,6 +555,17 @@ class ModeSwitchApp extends Homey.App {
       this.homey.settings.set(SETTINGS_KEYS.AUTO_STATE, {});
     }
 
+    if (!this.homey.settings.get(SETTINGS_KEYS.CONTACT_COUNTER_STATE)) {
+      this.homey.settings.set(SETTINGS_KEYS.CONTACT_COUNTER_STATE, {});
+    }
+
+    if (!Array.isArray(this.homey.settings.get(SETTINGS_KEYS.GROUP_WATCH_RULES))) {
+      this.homey.settings.set(SETTINGS_KEYS.GROUP_WATCH_RULES, []);
+    }
+    if (!this.homey.settings.get(SETTINGS_KEYS.GROUP_WATCH_STATE)) {
+      this.homey.settings.set(SETTINGS_KEYS.GROUP_WATCH_STATE, {});
+    }
+
     if (!this.homey.settings.get(SETTINGS_KEYS.DISPLAY_SETTINGS)) {
       this.homey.settings.set(SETTINGS_KEYS.DISPLAY_SETTINGS, this._createDefaultDisplaySettings());
     }
@@ -512,7 +594,30 @@ class ModeSwitchApp extends Homey.App {
   }
 
   _registerFlowRunListeners() {
+    this.mainModeActivatedTrigger.registerRunListener(async (args, state) => {
+      const selectedMainMode = args.mode?.id || args.mode;
+      return !!selectedMainMode && selectedMainMode === state?.main_mode;
+    });
+
     this.isModeCondition.registerRunListener(async args => this.getCurrentMode() === args.mode.id);
+    this.isMainModeCondition.registerRunListener(async args => this.getParentMode(this.getCurrentMode()) === args.mode.id);
+    this.isMainSubModeCondition.registerRunListener(async args => {
+      const selectedMainMode = args.main_mode?.id || args.main_mode;
+      const selectedSubMode = args.sub_mode?.id || args.sub_mode;
+      // Backwards compatible: flows created before 3.3.14 do not have
+      // main_comparison and therefore keep the old default: main mode IS.
+      const mainComparison = args.main_comparison || 'is';
+      const subComparison = args.comparison || 'is';
+      const currentMode = this.getCurrentMode();
+      const currentMainMode = this.getParentMode(currentMode);
+      if (!selectedMainMode || !selectedSubMode) return false;
+
+      const mainModeMatches = currentMainMode === selectedMainMode;
+      const subModeMatches = currentMode === selectedSubMode;
+      const mainResult = mainComparison === 'is_not' ? !mainModeMatches : mainModeMatches;
+      const subResult = subComparison === 'is_not' ? !subModeMatches : subModeMatches;
+      return mainResult && subResult;
+    });
 
     this.zoneHasMotionCondition.registerRunListener(async args => {
       const zoneId = args.zone?.id;
@@ -543,8 +648,26 @@ class ModeSwitchApp extends Homey.App {
     this.activityRunningCondition.registerRunListener(async args => getActivityStatus(args) === 'active');
     this.activityStandbyCondition.registerRunListener(async args => getActivityStatus(args) !== 'active');
 
+    this.groupWatchProblemCondition.registerRunListener(async args => {
+      const groupId = args.group?.id || args.group || '';
+      const status = this.getGroupWatchState()[groupId]?.status || 'ok';
+      return status === 'suspect' || status === 'outage';
+    });
+    this.groupWatchOkCondition.registerRunListener(async args => {
+      const groupId = args.group?.id || args.group || '';
+      const status = this.getGroupWatchState()[groupId]?.status || 'ok';
+      return status === 'ok';
+    });
+
     this.setModeAction.registerRunListener(async args => {
       await this.applyMode(args.mode.id, { source: 'flow' });
+      return true;
+    });
+
+    this.setMainModeAction.registerRunListener(async args => {
+      const mainMode = args.mode?.id || args.mode;
+      if (!DEFAULT_MODES.includes(mainMode)) throw new Error(`Unsupported main mode: ${mainMode}`);
+      await this.applyMode(mainMode, { source: 'flow-main-mode' });
       return true;
     });
 
@@ -566,14 +689,83 @@ class ModeSwitchApp extends Homey.App {
       await this.runZoneRulesForZone(args.zone.id, { source: 'flow' });
       return true;
     });
+
+    this.startApplianceAction.registerRunListener(async args => {
+      await this._setApplianceFlowState(args.appliance, 'start');
+      return true;
+    });
+
+    this.stopApplianceAction.registerRunListener(async args => {
+      await this._setApplianceFlowState(args.appliance, 'stop');
+      return true;
+    });
   }
 
   _registerFlowArgumentAutocomplete() {
     const modeAutocomplete = async query => {
       const q = String(query || '').trim().toLowerCase();
-      return this.getAvailableModes()
-        .filter(mode => !q || this.getModeLabel(mode).toLowerCase().includes(q) || mode.includes(q))
+      const orderedModes = DEFAULT_MODES.flatMap(mainMode => [
+        mainMode,
+        ...this.getSubModesForParent(mainMode).map(subMode => subMode.id)
+      ]);
+      return orderedModes
+        .filter(mode => !q || this.getModeLabel(mode).toLowerCase().includes(q) || mode.toLowerCase().includes(q))
         .map(mode => ({ id: mode, name: this.getModeLabel(mode) }));
+    };
+
+    const setModeAutocomplete = async query => {
+      const q = String(query || '').trim().toLowerCase();
+      const language = this._getHomeyLanguage();
+      const typeLabels = {
+        nl: { main: 'Hoofdmodus', sub: 'Submodus' },
+        en: { main: 'Main mode', sub: 'Sub mode' },
+        de: { main: 'Hauptmodus', sub: 'Untermodus' },
+        fr: { main: 'Mode principal', sub: 'Sous-mode' },
+        es: { main: 'Modo principal', sub: 'Submodo' },
+        it: { main: 'Modalita principale', sub: 'Sottomodalita' },
+        sv: { main: 'Huvudlage', sub: 'Underlage' },
+        no: { main: 'Hovedmodus', sub: 'Undermodus' },
+        nb: { main: 'Hovedmodus', sub: 'Undermodus' }
+      };
+      const words = typeLabels[language] || typeLabels.en;
+      const labels = this.getMainModeLabels();
+      const result = [];
+
+      for (const mainMode of DEFAULT_MODES) {
+        const mainLabel = labels[mainMode] || this.getModeLabel(mainMode);
+        const mainSearch = `${mainLabel} ${words.main} ${mainMode}`.toLowerCase();
+        if (!q || mainSearch.includes(q)) {
+          result.push({ id: mainMode, name: `● ${mainLabel} · ${words.main}` });
+        }
+
+        for (const subMode of this.getSubModesForParent(mainMode)) {
+          const subLabel = this.getModeLabel(subMode.id);
+          const subSearch = `${subLabel} ${words.sub} ${mainLabel} ${mainMode} ${subMode.id}`.toLowerCase();
+          if (!q || subSearch.includes(q)) {
+            // Prefix + explicit type remains visible after the option has been selected,
+            // so it is immediately obvious that this is a sub mode.
+            result.push({ id: subMode.id, name: `↳ ${subLabel} · ${words.sub}` });
+          }
+        }
+      }
+      return result;
+    };
+
+    const mainModeAutocomplete = async query => {
+      const q = String(query || '').trim().toLowerCase();
+      const labels = this.getMainModeLabels();
+      return DEFAULT_MODES
+        .filter(mode => !q || String(labels[mode] || mode).toLowerCase().includes(q) || mode.includes(q))
+        .map(mode => ({ id: mode, name: labels[mode] || mode }));
+    };
+
+    const subModeForMainAutocomplete = async (query, args) => {
+      const q = String(query || '').trim().toLowerCase();
+      const selectedMainMode = args?.main_mode?.id || args?.main_mode || '';
+      if (!selectedMainMode || !DEFAULT_MODES.includes(selectedMainMode)) return [];
+      return this.getSubModesForParent(selectedMainMode)
+        .filter(mode => !q || this.getModeLabel(mode.id).toLowerCase().includes(q) || String(mode.id || '').toLowerCase().includes(q))
+        .map(mode => ({ id: mode.id, name: this.getModeLabel(mode.id) }));
     };
 
     const zoneAutocomplete = async query => {
@@ -599,8 +791,20 @@ class ModeSwitchApp extends Homey.App {
         .map(rule => ({ id: rule.id, name: rule.name || 'Activity' }));
     };
 
+    const groupWatchAutocomplete = async query => {
+      const q = String(query || '').trim().toLowerCase();
+      return this.getGroupWatchRules()
+        .filter(rule => !q || String(rule.name || '').toLowerCase().includes(q))
+        .map(rule => ({ id: rule.id, name: rule.name || rule.id }));
+    };
+
+    this.mainModeActivatedTrigger.getArgument('mode').registerAutocompleteListener(mainModeAutocomplete);
     this.isModeCondition.getArgument('mode').registerAutocompleteListener(modeAutocomplete);
-    this.setModeAction.getArgument('mode').registerAutocompleteListener(modeAutocomplete);
+    this.isMainModeCondition.getArgument('mode').registerAutocompleteListener(mainModeAutocomplete);
+    this.isMainSubModeCondition.getArgument('main_mode').registerAutocompleteListener(mainModeAutocomplete);
+    this.isMainSubModeCondition.getArgument('sub_mode').registerAutocompleteListener(subModeForMainAutocomplete);
+    this.setModeAction.getArgument('mode').registerAutocompleteListener(setModeAutocomplete);
+    this.setMainModeAction.getArgument('mode').registerAutocompleteListener(mainModeAutocomplete);
     this.zoneHasMotionCondition.getArgument('zone').registerAutocompleteListener(zoneAutocomplete);
     this.zoneLightsOnAction.getArgument('zone').registerAutocompleteListener(zoneAutocomplete);
     this.zoneLightsOffAction.getArgument('zone').registerAutocompleteListener(zoneAutocomplete);
@@ -608,8 +812,12 @@ class ModeSwitchApp extends Homey.App {
     this.applianceRunningCondition.getArgument('appliance').registerAutocompleteListener(applianceAutocomplete);
     this.applianceReadyCondition.getArgument('appliance').registerAutocompleteListener(applianceAutocomplete);
     this.applianceWaitingResetCondition.getArgument('appliance').registerAutocompleteListener(applianceAutocomplete);
+    this.startApplianceAction.getArgument('appliance').registerAutocompleteListener(applianceAutocomplete);
+    this.stopApplianceAction.getArgument('appliance').registerAutocompleteListener(applianceAutocomplete);
     this.activityRunningCondition.getArgument('activity').registerAutocompleteListener(activityAutocomplete);
     this.activityStandbyCondition.getArgument('activity').registerAutocompleteListener(activityAutocomplete);
+    this.groupWatchProblemCondition.getArgument('group').registerAutocompleteListener(groupWatchAutocomplete);
+    this.groupWatchOkCondition.getArgument('group').registerAutocompleteListener(groupWatchAutocomplete);
   }
 
   _dashboardTimestamp(value) {
@@ -796,6 +1004,8 @@ class ModeSwitchApp extends Homey.App {
   async saveSubModes(subModes) {
     const normalized = this._normalizeSubModes(subModes);
     this.homey.settings.set(SETTINGS_KEYS.SUB_MODES, normalized);
+    this._startAppliancePolling();
+    this._startGroupWatchMonitoring();
     return normalized;
   }
 
@@ -909,14 +1119,32 @@ class ModeSwitchApp extends Homey.App {
     if (!on) return;
     if (profile.dim !== null && profile.dim !== undefined && caps.has('dim')) await this._setDeviceCapabilityValue(deviceId, 'dim', Math.max(0, Math.min(1, Number(profile.dim))));
     const wantsColor = profile.hue !== null && profile.hue !== undefined;
-    const wantsTemperature = profile.lightTemperature !== null && profile.lightTemperature !== undefined;
-    if (caps.has('light_mode')) {
-      if (wantsColor) await this._setDeviceCapabilityValue(deviceId, 'light_mode', 'color');
-      else if (wantsTemperature) await this._setDeviceCapabilityValue(deviceId, 'light_mode', 'temperature');
+    const wantsTemperature = !wantsColor && profile.lightTemperature !== null && profile.lightTemperature !== undefined;
+
+    // Some Homey light drivers expose light_mode but do not allow it to be
+    // written directly. Treat switching the mode as best-effort so a rejected
+    // light_mode write never prevents the actual colour/temperature value from
+    // being sent. Most drivers automatically switch mode when hue/saturation or
+    // light_temperature is changed.
+    if (caps.has('light_mode') && (wantsColor || wantsTemperature)) {
+      const targetMode = wantsColor ? 'color' : 'temperature';
+      try {
+        await this._setDeviceCapabilityValue(deviceId, 'light_mode', targetMode);
+      } catch (error) {
+        this.log(`Light ${deviceId} did not accept direct light_mode=${targetMode}; continuing with light capabilities.`);
+      }
     }
-    if (!wantsColor && wantsTemperature && caps.has('light_temperature')) await this._setDeviceCapabilityValue(deviceId, 'light_temperature', Math.max(0, Math.min(1, Number(profile.lightTemperature))));
-    if (wantsColor && caps.has('light_hue')) await this._setDeviceCapabilityValue(deviceId, 'light_hue', Math.max(0, Math.min(1, Number(profile.hue))));
-    if (profile.saturation !== null && profile.saturation !== undefined && caps.has('light_saturation')) await this._setDeviceCapabilityValue(deviceId, 'light_saturation', Math.max(0, Math.min(1, Number(profile.saturation))));
+
+    if (wantsColor) {
+      if (caps.has('light_hue')) {
+        await this._setDeviceCapabilityValue(deviceId, 'light_hue', Math.max(0, Math.min(1, Number(profile.hue))));
+      }
+      if (profile.saturation !== null && profile.saturation !== undefined && caps.has('light_saturation')) {
+        await this._setDeviceCapabilityValue(deviceId, 'light_saturation', Math.max(0, Math.min(1, Number(profile.saturation))));
+      }
+    } else if (wantsTemperature && caps.has('light_temperature')) {
+      await this._setDeviceCapabilityValue(deviceId, 'light_temperature', Math.max(0, Math.min(1, Number(profile.lightTemperature))));
+    }
   }
 
   async _scheduleModeLightActions(mode, actions, results) {
@@ -1036,7 +1264,7 @@ class ModeSwitchApp extends Homey.App {
 
   resetContactCounter(ruleId) {
     const state = this.motionStateByRule.get(ruleId) || {};
-    this.motionStateByRule.set(ruleId, { ...state, contactSequenceCount: 0, contactSequenceStartedAt: null });
+    this.motionStateByRule.set(ruleId, { ...state, contactSequenceCount: 0, contactSequenceStartedAt: null, contactSequenceLocked: false });
     return this.getContactCounterStatus().find(item => item.ruleId === ruleId) || null;
   }
 
@@ -1051,6 +1279,8 @@ class ModeSwitchApp extends Homey.App {
       ? rules.map(rule => this._normalizeZoneRule(rule)).filter(Boolean)
       : [];
     this.homey.settings.set(SETTINGS_KEYS.ZONE_RULES, normalized);
+    this._startMotionPolling();
+    this._rebuildContactCapabilityListeners().catch(error => this.error('Contact listener rebuild failed', error));
     return normalized;
   }
 
@@ -1068,6 +1298,7 @@ class ModeSwitchApp extends Homey.App {
     // Rebuild the window/contact baseline after editing rules. The next poll then
     // evaluates the actual contact state without carrying stale rule state.
     if (this.temperatureWindowStateByRule) this.temperatureWindowStateByRule.clear();
+    this._startMotionPolling();
     return normalized;
   }
 
@@ -1082,6 +1313,8 @@ class ModeSwitchApp extends Homey.App {
       ? rules.map(rule => this._normalizeApplianceRule(rule)).filter(Boolean)
       : [];
     this.homey.settings.set(SETTINGS_KEYS.APPLIANCE_RULES, normalized);
+    this._startAppliancePolling();
+    this._startGroupWatchMonitoring();
     return normalized;
   }
 
@@ -1096,6 +1329,266 @@ class ModeSwitchApp extends Homey.App {
     return history && typeof history === 'object' ? history : {};
   }
 
+  _normalizeGroupWatchRule(rule) {
+    if (!rule || typeof rule !== 'object') return null;
+    const id = typeof rule.id === 'string' && rule.id ? rule.id : `group-watch-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const deviceIds = Array.isArray(rule.deviceIds) ? [...new Set(rule.deviceIds.map(String).filter(Boolean))] : [];
+    const minAffected = Math.max(1, Math.min(Number(rule.minAffected || 2), Math.max(1, deviceIds.length || 1)));
+    const suspectAfterSeconds = Math.max(30, Math.min(3600, Number(rule.suspectAfterSeconds || 90)));
+    const outageAfterSeconds = Math.max(suspectAfterSeconds, Math.min(7200, Number(rule.outageAfterSeconds || 180)));
+    return {
+      id,
+      name: String(rule.name || '').trim() || 'Groep',
+      enabled: rule.enabled !== false,
+      deviceIds,
+      minAffected,
+      checkAvailability: rule.checkAvailability !== false,
+      checkVoltage: rule.checkVoltage !== false,
+      minimumVoltage: Math.max(0, Math.min(260, Number(rule.minimumVoltage ?? 100))),
+      checkFreshness: rule.checkFreshness === true,
+      freshnessMinutes: Math.max(1, Math.min(1440, Number(rule.freshnessMinutes || 10))),
+      suspectAfterSeconds,
+      outageAfterSeconds,
+      recoveryAfterSeconds: Math.max(0, Math.min(3600, Number(rule.recoveryAfterSeconds ?? 60))),
+      notifySuspect: rule.notifySuspect !== false,
+      notifyOutage: rule.notifyOutage !== false,
+      notifyRecovery: rule.notifyRecovery !== false,
+    };
+  }
+
+  getGroupWatchRules() {
+    const rules = this.homey.settings.get(SETTINGS_KEYS.GROUP_WATCH_RULES);
+    if (!Array.isArray(rules)) return [];
+    return rules.map(rule => this._normalizeGroupWatchRule(rule)).filter(Boolean);
+  }
+
+  async saveGroupWatchRules(rules) {
+    const normalized = Array.isArray(rules) ? rules.map(rule => this._normalizeGroupWatchRule(rule)).filter(Boolean) : [];
+    this.homey.settings.set(SETTINGS_KEYS.GROUP_WATCH_RULES, normalized);
+    const validIds = new Set(normalized.map(rule => rule.id));
+    const state = this.getGroupWatchState();
+    for (const id of Object.keys(state)) if (!validIds.has(id)) delete state[id];
+    this.homey.settings.set(SETTINGS_KEYS.GROUP_WATCH_STATE, state);
+    this.groupWatchRuntimeState = state;
+    this._startGroupWatchMonitoring();
+    return normalized;
+  }
+
+  getGroupWatchState() {
+    if (this.groupWatchRuntimeState && typeof this.groupWatchRuntimeState === 'object') return this.groupWatchRuntimeState;
+    const state = this.homey.settings.get(SETTINGS_KEYS.GROUP_WATCH_STATE);
+    this.groupWatchRuntimeState = state && typeof state === 'object' ? state : {};
+    return this.groupWatchRuntimeState;
+  }
+
+  _clearGroupWatchCapabilityListeners() {
+    if (!this.groupWatchCapabilityListeners) return;
+    for (const listener of this.groupWatchCapabilityListeners.values()) {
+      try {
+        if (listener && typeof listener.destroy === 'function') listener.destroy();
+        else if (listener && typeof listener.unregister === 'function') listener.unregister();
+      } catch (error) { this.error('Could not remove group-watch capability listener', error); }
+    }
+    this.groupWatchCapabilityListeners.clear();
+  }
+
+  _groupWatchSignalCapabilities(device) {
+    const capabilities = Array.isArray(device?.capabilities) ? device.capabilities.map(String) : [];
+    const preferred = capabilities.filter(cap =>
+      cap === 'measure_voltage' || cap.startsWith('measure_voltage.') ||
+      cap === 'measure_power' || cap.startsWith('measure_power.') ||
+      cap === 'measure_current' || cap.startsWith('measure_current.') ||
+      cap === 'meter_power' || cap.startsWith('meter_power.') ||
+      cap === 'onoff' || cap.startsWith('onoff.')
+    );
+    return preferred.slice(0, 4);
+  }
+
+  async _rebuildGroupWatchCapabilityListeners() {
+    this._clearGroupWatchCapabilityListeners();
+    const rules = this.getGroupWatchRules().filter(rule => rule.enabled && rule.deviceIds.length);
+    if (!rules.length || !this.homeyApi?.devices) return;
+    const deviceIds = [...new Set(rules.flatMap(rule => rule.deviceIds))];
+    const now = Date.now();
+    for (const deviceId of deviceIds) {
+      try {
+        const device = await this.homeyApi.devices.getDevice({ id: deviceId });
+        if (!device) continue;
+        const caps = this._groupWatchSignalCapabilities(device);
+        const current = this.groupWatchSignalState.get(deviceId) || {};
+        this.groupWatchSignalState.set(deviceId, { ...current, lastSeenAt: current.lastSeenAt || now, listenerCapabilities: caps });
+        if (typeof device.makeCapabilityInstance !== 'function') continue;
+        for (const capabilityId of caps) {
+          try {
+            const key = `${deviceId}:${capabilityId}`;
+            const instance = device.makeCapabilityInstance(capabilityId, value => {
+              const previous = this.groupWatchSignalState.get(deviceId) || {};
+              this.groupWatchSignalState.set(deviceId, {
+                ...previous,
+                lastSeenAt: Date.now(),
+                lastCapabilityId: capabilityId,
+                lastValue: value,
+              });
+            });
+            this.groupWatchCapabilityListeners.set(key, instance);
+          } catch (error) { this.error(`Could not listen to group-watch capability ${deviceId}/${capabilityId}`, error); }
+        }
+      } catch (error) {
+        this.error('Could not prepare group-watch device ' + deviceId, error);
+      }
+    }
+  }
+
+  _startGroupWatchMonitoring() {
+    if (this.groupWatchTimer) clearInterval(this.groupWatchTimer);
+    this.groupWatchTimer = null;
+    this._rebuildGroupWatchCapabilityListeners().catch(error => this.error('Group watch listener setup failed', error));
+    if (!this.getGroupWatchRules().some(rule => rule.enabled && rule.deviceIds.length)) return;
+    this.groupWatchTimer = setInterval(() => {
+      this._pollGroupWatch().catch(error => this.error('Group watch polling failed', error));
+    }, GROUP_WATCH_INTERVAL_MS);
+    this._pollGroupWatch().catch(error => this.error('Initial group watch poll failed', error));
+  }
+
+  _groupWatchVoltageValues(device) {
+    const cap = device?.capabilitiesObj || {};
+    const ids = Array.isArray(device?.capabilities) ? device.capabilities.filter(id => id === 'measure_voltage' || String(id).startsWith('measure_voltage.')) : [];
+    return ids.map(id => Number(cap[id]?.value)).filter(Number.isFinite);
+  }
+
+  async _readGroupWatchDevice(deviceId) {
+    try {
+      const device = await this.homeyApi.devices.getDevice({ id: deviceId });
+      if (!device) return { id: deviceId, reachable: false, available: false, voltageValues: [], capabilities: [] };
+      return {
+        id: deviceId,
+        name: device.name || deviceId,
+        reachable: true,
+        available: device.available !== false,
+        voltageValues: this._groupWatchVoltageValues(device),
+        capabilities: Array.isArray(device.capabilities) ? device.capabilities.map(String) : [],
+      };
+    } catch (error) {
+      return { id: deviceId, name: deviceId, reachable: false, available: false, voltageValues: [], capabilities: [], error: error.message };
+    }
+  }
+
+  _evaluateGroupWatchDevice(rule, device, now) {
+    const reasons = [];
+    if (rule.checkAvailability && (!device.reachable || device.available === false)) reasons.push('unavailable');
+    if (rule.checkVoltage && device.voltageValues.length && device.voltageValues.every(v => v <= rule.minimumVoltage)) reasons.push('low_voltage');
+    const signal = this.groupWatchSignalState.get(device.id) || {};
+    const hasFreshnessSignal = Array.isArray(signal.listenerCapabilities) && signal.listenerCapabilities.length > 0;
+    if (rule.checkFreshness && hasFreshnessSignal) {
+      const lastSeenAt = Number(signal.lastSeenAt || 0);
+      if (lastSeenAt && (now - lastSeenAt) > rule.freshnessMinutes * 60000) reasons.push('stale');
+    }
+    return {
+      id: device.id,
+      name: device.name || device.id,
+      problem: reasons.length > 0,
+      reasons,
+      available: device.available !== false && device.reachable !== false,
+      voltage: device.voltageValues.length ? Math.min(...device.voltageValues) : null,
+      lastSignalAt: Number(signal.lastSeenAt || 0) || null,
+    };
+  }
+
+  async _triggerGroupWatchEvent(rule, status, groupState) {
+    const affected = Array.isArray(groupState.affectedDevices) ? groupState.affectedDevices : [];
+    const tokens = {
+      group: rule.name,
+      status,
+      affected_count: affected.length,
+      total_devices: rule.deviceIds.length,
+      affected_devices: affected.map(item => item.name || item.id).join(', '),
+      duration_seconds: Math.max(0, Math.round((Date.now() - Number(groupState.problemSince || Date.now())) / 1000)),
+    };
+    const trigger = status === 'suspect' ? this.groupWatchSuspectTrigger : status === 'outage' ? this.groupWatchOutageTrigger : this.groupWatchRecoveredTrigger;
+    if (trigger && typeof trigger.trigger === 'function') {
+      try { await trigger.trigger(tokens); } catch (error) { this.error('Could not trigger group-watch Flow', error); }
+    }
+    const shouldNotify = status === 'suspect' ? rule.notifySuspect : status === 'outage' ? rule.notifyOutage : rule.notifyRecovery;
+    if (!shouldNotify) return;
+    const notifications = this.homey?.notifications;
+    if (!notifications || typeof notifications.createNotification !== 'function') return;
+    const locale = this._getHomeyLanguage();
+    let excerpt;
+    if (locale === 'nl') {
+      excerpt = status === 'suspect'
+        ? `Groep ${rule.name} is mogelijk uitgevallen (${affected.length}/${rule.deviceIds.length} apparaten geven een probleem).`
+        : status === 'outage'
+          ? `Groep ${rule.name} lijkt uitgevallen (${affected.map(item => item.name || item.id).join(', ')}).`
+          : `Groep ${rule.name} is hersteld.`;
+    } else {
+      excerpt = status === 'suspect'
+        ? `Circuit ${rule.name} may be down (${affected.length}/${rule.deviceIds.length} devices indicate a problem).`
+        : status === 'outage'
+          ? `Circuit ${rule.name} appears to be down (${affected.map(item => item.name || item.id).join(', ')}).`
+          : `Circuit ${rule.name} has recovered.`;
+    }
+    try { await notifications.createNotification({ excerpt }); } catch (error) { this.error('Could not create group-watch notification', error); }
+  }
+
+  async _pollGroupWatch() {
+    if (this.groupWatchPolling) return;
+    const rules = this.getGroupWatchRules().filter(rule => rule.enabled && rule.deviceIds.length);
+    if (!rules.length) return;
+    this.groupWatchPolling = true;
+    try {
+      const deviceIds = [...new Set(rules.flatMap(rule => rule.deviceIds))];
+      const readings = await Promise.all(deviceIds.map(id => this._readGroupWatchDevice(id)));
+      const byId = new Map(readings.map(item => [item.id, item]));
+      const state = this.getGroupWatchState();
+      const now = Date.now();
+      let persistChanged = false;
+      for (const rule of rules) {
+        const deviceStates = rule.deviceIds.map(id => this._evaluateGroupWatchDevice(rule, byId.get(id) || { id, reachable: false, available: false, voltageValues: [] }, now));
+        const affected = deviceStates.filter(item => item.problem);
+        const hasProblem = affected.length >= Math.min(rule.minAffected, rule.deviceIds.length);
+        const current = state[rule.id] || { status: 'ok', problemSince: null, recoverySince: null, lastChangedAt: now };
+        let nextStatus = current.status || 'ok';
+        let problemSince = current.problemSince || null;
+        let recoverySince = current.recoverySince || null;
+        if (hasProblem) {
+          recoverySince = null;
+          if (!problemSince) problemSince = now;
+          const ageSec = (now - problemSince) / 1000;
+          if (ageSec >= rule.outageAfterSeconds) nextStatus = 'outage';
+          else if (ageSec >= rule.suspectAfterSeconds) nextStatus = 'suspect';
+          else nextStatus = 'ok';
+        } else {
+          problemSince = null;
+          if (current.status === 'suspect' || current.status === 'outage') {
+            if (!recoverySince) recoverySince = now;
+            if ((now - recoverySince) / 1000 >= rule.recoveryAfterSeconds) nextStatus = 'ok';
+          } else {
+            recoverySince = null;
+            nextStatus = 'ok';
+          }
+        }
+        const next = {
+          status: nextStatus,
+          problemSince,
+          recoverySince,
+          lastCheckedAt: now,
+          lastChangedAt: nextStatus !== current.status ? now : (current.lastChangedAt || now),
+          affectedDevices: affected,
+          devices: deviceStates,
+        };
+        const previousAffectedSignature = JSON.stringify((current.affectedDevices || []).map(item => [item.id, item.reasons || []]));
+        const nextAffectedSignature = JSON.stringify((affected || []).map(item => [item.id, item.reasons || []]));
+        if (nextStatus !== current.status || previousAffectedSignature !== nextAffectedSignature) persistChanged = true;
+        state[rule.id] = next;
+        if (nextStatus !== current.status) await this._triggerGroupWatchEvent(rule, nextStatus === 'ok' ? 'recovered' : nextStatus, next);
+      }
+      this.groupWatchRuntimeState = state;
+      if (persistChanged) this.homey.settings.set(SETTINGS_KEYS.GROUP_WATCH_STATE, state);
+    } finally {
+      this.groupWatchPolling = false;
+    }
+  }
+
   getActivityRules() {
     const rules = this.homey.settings.get(SETTINGS_KEYS.ACTIVITY_RULES);
     if (!Array.isArray(rules)) return [];
@@ -1105,6 +1598,8 @@ class ModeSwitchApp extends Homey.App {
   async saveActivityRules(rules) {
     const normalized = Array.isArray(rules) ? rules.map(rule => this._normalizeActivityRule(rule)).filter(Boolean) : [];
     this.homey.settings.set(SETTINGS_KEYS.ACTIVITY_RULES, normalized);
+    this._startAppliancePolling();
+    this._startGroupWatchMonitoring();
     return normalized;
   }
 
@@ -1129,6 +1624,7 @@ class ModeSwitchApp extends Homey.App {
       ? rules.map(rule => this._normalizeScheduleRule(rule)).filter(Boolean)
       : [];
     this.homey.settings.set(SETTINGS_KEYS.SCHEDULE_RULES, normalized);
+    this._startSchedulerPolling();
     return normalized;
   }
 
@@ -1143,7 +1639,7 @@ class ModeSwitchApp extends Homey.App {
       ? rules.map(rule => this._normalizeSwitchRule(rule)).filter(Boolean)
       : [];
     this.homey.settings.set(SETTINGS_KEYS.SWITCH_RULES, normalized);
-    this._rebuildSwitchCapabilityListeners().catch(error => this.error('Could not rebuild switch listeners after saving rules', error));
+    this._startSwitchPolling();
     return normalized;
   }
 
@@ -1173,6 +1669,7 @@ class ModeSwitchApp extends Homey.App {
   async saveAutoModeSettings(settings) {
     const normalized = this._normalizeAutoModeSettings(settings);
     this.homey.settings.set(SETTINGS_KEYS.AUTO_MODE, normalized);
+    this._startSchedulerPolling();
     return normalized;
   }
 
@@ -1180,6 +1677,8 @@ class ModeSwitchApp extends Homey.App {
     if (!this.getAvailableModes().includes(mode)) throw new Error(`Unsupported mode: ${mode}`);
 
     const previousMode = this.getCurrentMode();
+    const previousMainMode = this.getParentMode(previousMode);
+    const nextMainMode = this.getParentMode(mode);
     const selectedRules = this.getModeRules()[mode] || { on: [], off: [], delayed: [], lights: [] };
     this._clearModeDelayTimers();
     const results = { turnedOn: [], turnedOff: [], delayed: [], lights: [], failed: [] };
@@ -1215,11 +1714,18 @@ class ModeSwitchApp extends Homey.App {
     await this.applyTemperatureRulesForCurrentMode({ source: 'mode-change' });
     await this._syncModeDevices(mode);
     await this._triggerModeChangedForControllers({ mode, previous_mode: previousMode, source });
+    if (previousMode !== mode && previousMainMode !== nextMainMode) {
+      await this._triggerMainModeActivatedForControllers({
+        main_mode: nextMainMode,
+        previous_main_mode: previousMainMode,
+        source,
+      }, { main_mode: nextMainMode });
+    }
     if (previousMode !== mode) {
       const resetIds = new Set(this.getZoneRules().filter(rule => rule.contactSequenceEnabled && rule.contactSequenceResetOnModeChange).map(rule => rule.id));
       for (const ruleId of resetIds) {
         const state = this.motionStateByRule.get(ruleId);
-        if (state) this.motionStateByRule.set(ruleId, { ...state, contactSequenceCount: 0, contactSequenceStartedAt: null });
+        if (state) this.motionStateByRule.set(ruleId, { ...state, contactSequenceCount: 0, contactSequenceStartedAt: null, contactSequenceLocked: false });
       }
     }
     await this.runZoneRulesForCurrentMode({ source: 'mode-change' });
@@ -1246,9 +1752,33 @@ class ModeSwitchApp extends Homey.App {
     }));
   }
 
-  async getEnvironment({ includeHomeyUsers = false, force = false } = {}) {
+  async _triggerMainModeActivatedForControllers(tokens, state) {
+    let devices = [];
+    try {
+      const driver = this.homey.drivers.getDriver('mode_controller');
+      devices = driver && typeof driver.getDevices === 'function' ? driver.getDevices() : [];
+    } catch (error) {
+      this.error('Could not load Mode Controller devices for main_mode_activated trigger', error);
+      return;
+    }
+
+    await Promise.all(devices.map(async device => {
+      try {
+        await this.mainModeActivatedTrigger.trigger(device, tokens, state);
+      } catch (error) {
+        this.error(`Could not trigger main_mode_activated for device ${device.getName?.() || device.getData?.().id || 'unknown'}`, error);
+      }
+    }));
+  }
+
+  async getEnvironment({ includeHomeyUsers = false, force = false, includeWeather = false, weatherRefreshHours = DEFAULT_WEATHER_REFRESH_HOURS } = {}) {
     const now = Date.now();
     if (!force && this.environmentCache && (now - this.environmentCacheTs) < ENV_CACHE_TTL_MS && (!includeHomeyUsers || this.environmentCache.homeyUsersLoaded)) {
+      if (includeWeather) {
+        this.environmentCache.weather = await this._getCachedHomeyWeather(this.environmentCache.location || this._getHomeyLocation(), weatherRefreshHours);
+      } else if (Object.prototype.hasOwnProperty.call(this.environmentCache, 'weather')) {
+        delete this.environmentCache.weather;
+      }
       return this.environmentCache;
     }
 
@@ -1318,7 +1848,7 @@ class ModeSwitchApp extends Homey.App {
       location: this._getHomeyLocation(),
     };
 
-    environment.weather = await this._withTimeout(this._getHomeyWeatherSafe(environment.location), 3000, 'weather_read', {}, this._normalizeHomeyWeather(null, environment.location));
+    if (includeWeather) environment.weather = await this._getCachedHomeyWeather(environment.location, weatherRefreshHours);
 
     this.environmentCache = environment;
     this.environmentCacheTs = now;
@@ -1334,6 +1864,23 @@ class ModeSwitchApp extends Homey.App {
       longitude: typeof longitude === 'number' ? longitude : 5.0,
       timezone: this._getHomeyTimezone(),
     };
+  }
+
+  async _getCachedHomeyWeather(location = {}, refreshHours = DEFAULT_WEATHER_REFRESH_HOURS) {
+    const now = Date.now();
+    const normalizedRefreshHours = Number.isFinite(Number(refreshHours))
+      ? Math.max(1, Math.min(24, Number(refreshHours)))
+      : DEFAULT_WEATHER_REFRESH_HOURS;
+    const ttlMs = normalizedRefreshHours * 60 * 60 * 1000;
+    if (this.homeyWeatherCache && (now - this.homeyWeatherCacheTs) < ttlMs) {
+      return this.homeyWeatherCache;
+    }
+
+    const fallback = this.homeyWeatherCache || this._normalizeHomeyWeather(null, location);
+    const weather = await this._withTimeout(this._getHomeyWeatherSafe(location), 3000, 'weather_read', {}, fallback);
+    this.homeyWeatherCache = weather;
+    this.homeyWeatherCacheTs = now;
+    return weather;
   }
 
   async _getHomeyWeatherSafe(location = {}) {
@@ -1580,11 +2127,102 @@ const isDay = hour >= 7 && hour < 18;
 
   _startMotionPolling() {
     if (this.pollTimer) clearInterval(this.pollTimer);
+    this.pollTimer = null;
+
+    const hasZoneWork = this.getZoneRules().some(rule => rule.enabled);
+    const hasLiveTemperatureWork = this.getTemperatureRules().some(rule =>
+      rule.enabled && rule.liveWindowContact === true && rule.windowMode && rule.windowMode !== 'ignore'
+    );
+    if (!hasZoneWork && !hasLiveTemperatureWork) return;
+
     this.pollTimer = setInterval(() => {
       this._pollMotionRules().catch(error => this.error('Motion polling failed', error));
     }, POLL_INTERVAL_MS);
 
     this._pollMotionRules().catch(error => this.error('Initial motion polling failed', error));
+  }
+
+  _clearContactCapabilityListeners() {
+    if (!this.contactCapabilityListeners) return;
+    for (const listener of this.contactCapabilityListeners.values()) {
+      try {
+        if (listener && typeof listener.destroy === 'function') listener.destroy();
+        else if (listener && typeof listener.unregister === 'function') listener.unregister();
+      } catch (error) {
+        this.error('Could not remove contact capability listener', error);
+      }
+    }
+    this.contactCapabilityListeners.clear();
+  }
+
+  async _rebuildContactCapabilityListeners() {
+    this._clearContactCapabilityListeners();
+    const rules = this.getZoneRules().filter(rule => rule.enabled && rule.contactSequenceEnabled === true);
+    if (!rules.length || !this.homeyApi || !this.homeyApi.devices) return;
+
+    const deviceIds = new Set();
+    for (const rule of rules) {
+      for (const id of (rule.contactDeviceIds || [])) if (id) deviceIds.add(id);
+    }
+    // An empty contact selection means all contacts in the configured zone. Resolve
+    // those once here so they receive realtime listeners as well.
+    if (rules.some(rule => !(rule.contactDeviceIds || []).length)) {
+      try {
+        const environment = await this.getEnvironment({ force: true });
+        for (const rule of rules) {
+          if ((rule.contactDeviceIds || []).length) continue;
+          const zoneIds = this._getZoneAndSubZoneIds(rule.zoneId, environment.zones, rule.includeSubzones);
+          for (const device of (environment.contactDevices || [])) {
+            if (zoneIds.has(device.zone)) deviceIds.add(device.id);
+          }
+        }
+      } catch (error) {
+        this.error('Could not resolve contact devices for realtime listeners', error);
+      }
+    }
+
+    for (const deviceId of deviceIds) {
+      try {
+        const device = await this.homeyApi.devices.getDevice({ id: deviceId });
+        if (!device || typeof device.makeCapabilityInstance !== 'function' || !(device.capabilities || []).includes('alarm_contact')) continue;
+        const instance = device.makeCapabilityInstance('alarm_contact', value => {
+          // Homey can deliver a fast open/close pair before the async handler for the
+          // first event has completed. Serialize events per device so an OPEN edge can
+          // never be overwritten by the following CLOSED edge.
+          const previousQueue = this.contactEventQueues.get(deviceId) || Promise.resolve();
+          const nextQueue = previousQueue.catch(() => null).then(async () => {
+            try {
+              const environment = await this.getEnvironment();
+              const contact = (environment.contactDevices || []).find(item => item.id === deviceId);
+              if (contact) {
+                contact.contact = value === true;
+                if (contact.capabilityValues) contact.capabilityValues.alarm_contact = value === true;
+              }
+              const currentMode = this.getCurrentMode();
+              const affected = this.getZoneRules().filter(rule => {
+                if (!rule.enabled || !rule.contactSequenceEnabled || !rule.modeIds.includes(currentMode)) return false;
+                const zoneIds = this._getZoneAndSubZoneIds(rule.zoneId, environment.zones, rule.includeSubzones);
+                return zoneIds.has(contact?.zone) && (!(rule.contactDeviceIds || []).length || rule.contactDeviceIds.includes(deviceId));
+              });
+              for (const rule of affected) {
+                await this._evaluateZoneRule(rule, environment, { source: 'contact-listener' });
+                const state = this.motionStateByRule.get(rule.id) || {};
+                this.log(`Contact counter event for ${rule.name || rule.id}: ${value ? 'open' : 'closed'}, count=${Number(state.contactSequenceCount) || 0}/${rule.contactSequenceCount}`);
+              }
+              this.environmentCacheTs = 0;
+            } catch (error) {
+              this.error('Contact capability event failed for ' + deviceId, error);
+            }
+          }).finally(() => {
+            if (this.contactEventQueues.get(deviceId) === nextQueue) this.contactEventQueues.delete(deviceId);
+          });
+          this.contactEventQueues.set(deviceId, nextQueue);
+        });
+        this.contactCapabilityListeners.set(deviceId, instance);
+      } catch (error) {
+        this.error('Could not listen to contact ' + deviceId, error);
+      }
+    }
   }
 
   async _pollMotionRules() {
@@ -1604,8 +2242,17 @@ const isDay = hour >= 7 && hour < 18;
       // Contact-driven temperature rules must see fresh alarm_contact values.
       // Only force a device refresh when such a rule is active, so normal polling
       // keeps using the existing environment cache.
-      const environment = await this.getEnvironment({ force: dynamicTemperatureRules.length > 0 });
-      const rules = this.getZoneRules().filter(rule => rule.enabled && rule.modeIds.includes(currentMode));
+      const allZoneRules = this.getZoneRules();
+      const hasActiveContactCounters = allZoneRules.some(rule =>
+        rule.enabled && rule.contactSequenceEnabled === true && rule.modeIds.includes(currentMode)
+      );
+      // Contact counters need fresh values as a fallback for realtime listeners.
+      // This also repairs state when a device/driver did not deliver a capability event.
+      const now = Date.now();
+      const contactFallbackDue = hasActiveContactCounters && (now - this.lastContactFallbackRefreshAt >= CONTACT_FALLBACK_REFRESH_MS);
+      if (contactFallbackDue) this.lastContactFallbackRefreshAt = now;
+      const environment = await this.getEnvironment({ force: dynamicTemperatureRules.length > 0 || contactFallbackDue });
+      const rules = allZoneRules.filter(rule => rule.enabled && rule.modeIds.includes(currentMode));
 
       for (const rule of rules) {
         await this._evaluateZoneRule(rule, environment, { source: 'poll' });
@@ -1649,7 +2296,12 @@ const isDay = hour >= 7 && hour < 18;
 
   async _evaluateZoneRule(rule, environment, { source = 'poll', force = false } = {}) {
     const now = Date.now();
-    const previous = this.motionStateByRule.get(rule.id) || {};
+    let previous = this.motionStateByRule.get(rule.id) || {};
+    if (rule.contactSequenceEnabled && !this.motionStateByRule.has(rule.id)) {
+      const persistedCounters = this.homey.settings.get(SETTINGS_KEYS.CONTACT_COUNTER_STATE) || {};
+      const persisted = persistedCounters[rule.id];
+      if (persisted && typeof persisted === 'object') previous = { ...previous, ...persisted };
+    }
     const motionDevices = this._getRuleMotionDevices(rule, environment);
     const contactDevices = this._getRuleContactDevices(rule, environment);
     const motionActive = motionDevices.some(device => device.motion === true);
@@ -1662,19 +2314,38 @@ const isDay = hour >= 7 && hour < 18;
 
     let sequenceCount = Number(previous.contactSequenceCount) || 0;
     let sequenceStartedAt = Number(previous.contactSequenceStartedAt) || null;
+    let sequenceLocked = previous.contactSequenceLocked === true;
+
+    // Apply the same inverted contact meaning to the counter as to the normal
+    // zone contact actions. With invert enabled, a physically closed contact is
+    // the logical "open/active" state and a physically open contact is logical
+    // "closed/inactive". Counter labels therefore always follow rule logic.
+    const sequenceLogicalOpen = contactInverted ? allContactsClosed : contactOpen;
+    const sequenceLogicalClosed = contactInverted ? contactOpen : allContactsClosed;
+
+    // After the counter reaches its target, keep the contact action locked while
+    // the logical contact remains in the state that completed the sequence. The
+    // opposite logical state arms a new cycle.
+    if (sequenceLocked) {
+      const releaseLock = rule.contactSequenceEvent === 'closed' ? sequenceLogicalOpen : sequenceLogicalClosed;
+      if (releaseLock) sequenceLocked = false;
+    }
     if (sequenceStartedAt && rule.contactSequenceResetSeconds > 0 && now - sequenceStartedAt >= rule.contactSequenceResetSeconds * 1000) {
       sequenceCount = 0;
       sequenceStartedAt = null;
     }
     const contactOpenedEdge = contactDevices.length > 0 && contactOpen === true && previous.wasContactOpen === false;
     const contactClosedEdge = contactDevices.length > 0 && contactOpen === false && previous.wasContactOpen === true;
-    const sequenceEdge = rule.contactSequenceEvent === 'closed' ? contactClosedEdge : contactOpenedEdge;
+    const sequenceOpenedEdge = contactInverted ? contactClosedEdge : contactOpenedEdge;
+    const sequenceClosedEdge = contactInverted ? contactOpenedEdge : contactClosedEdge;
+    const sequenceEdge = rule.contactSequenceEvent === 'closed' ? sequenceClosedEdge : sequenceOpenedEdge;
     let sequenceTriggerOff = false;
     if (rule.contactSequenceEnabled && sequenceEdge) {
       if (!sequenceStartedAt) sequenceStartedAt = now;
       sequenceCount += 1;
       if (sequenceCount >= rule.contactSequenceCount) {
         sequenceTriggerOff = true;
+        sequenceLocked = true;
         sequenceCount = 0;
         sequenceStartedAt = null;
       }
@@ -1689,6 +2360,7 @@ const isDay = hour >= 7 && hour < 18;
       offTriggeredForNoMotionSince: previous.offTriggeredForNoMotionSince || null,
       contactSequenceCount: sequenceCount,
       contactSequenceStartedAt: sequenceStartedAt,
+      contactSequenceLocked: sequenceLocked,
     };
 
     if (motionActive) {
@@ -1715,7 +2387,7 @@ const isDay = hour >= 7 && hour < 18;
       }
     }
 
-    if (!sequenceTriggerOff && contactTurnOnState && rule.turnOnOnContact && this._conditionsPass(rule, environment, now)) {
+    if (!sequenceTriggerOff && !sequenceLocked && contactTurnOnState && rule.turnOnOnContact && this._conditionsPass(rule, environment, now)) {
       const selectedLights = this._getRuleLightDevices(rule, environment);
       const anySelectedLightOff = selectedLights.length === 0 || selectedLights.some(light => light.onoff !== true);
       const shouldTurnOnContact = force || previous.wasContactTurnOnState !== true || anySelectedLightOff;
@@ -1742,13 +2414,37 @@ const isDay = hour >= 7 && hour < 18;
     }
 
     this.motionStateByRule.set(rule.id, next);
+    if (rule.contactSequenceEnabled) {
+      try {
+        const persistedCounters = this.homey.settings.get(SETTINGS_KEYS.CONTACT_COUNTER_STATE) || {};
+        const persisted = {
+          contactSequenceCount: next.contactSequenceCount,
+          contactSequenceStartedAt: next.contactSequenceStartedAt,
+          contactSequenceLocked: next.contactSequenceLocked,
+          wasContactOpen: next.wasContactOpen,
+        };
+        const old = persistedCounters[rule.id] || {};
+        if (old.contactSequenceCount !== persisted.contactSequenceCount ||
+            old.contactSequenceStartedAt !== persisted.contactSequenceStartedAt ||
+            old.contactSequenceLocked !== persisted.contactSequenceLocked ||
+            old.wasContactOpen !== persisted.wasContactOpen) {
+          persistedCounters[rule.id] = persisted;
+          this.homey.settings.set(SETTINGS_KEYS.CONTACT_COUNTER_STATE, persistedCounters);
+        }
+      } catch (error) {
+        this.error('Could not persist contact counter state for ' + rule.id, error);
+      }
+    }
   }
 
   _scheduleContactRetries(rule, turnOn, { source = 'poll' } = {}) {
     const baseKey = rule.id + ':contact:' + (turnOn ? 'on' : 'off');
+    const rulePrefix = rule.id + ':contact:';
 
+    // A new contact action supersedes all pending retries for this rule. In
+    // particular, a counter-triggered OFF must cancel earlier ON retries.
     for (const [key, timer] of this.contactRetryTimers.entries()) {
-      if (key.startsWith(baseKey + ':')) {
+      if (key.startsWith(rulePrefix)) {
         clearTimeout(timer);
         this.contactRetryTimers.delete(key);
       }
@@ -1783,6 +2479,8 @@ const isDay = hour >= 7 && hour < 18;
     const contactTurnOffState = contactInverted ? contactOpen : allContactsClosed;
 
     if (turnOn) {
+      const state = this.motionStateByRule.get(rule.id) || {};
+      if (state.contactSequenceLocked === true) return;
       if (!contactTurnOnState || !rule.turnOnOnContact || !this._conditionsPass(rule, environment, Date.now())) return;
 
       const selectedLights = this._getRuleLightDevices(rule, environment);
@@ -1798,7 +2496,7 @@ const isDay = hour >= 7 && hour < 18;
   }
 
   _conditionsPass(rule, environment, now) {
-    if (rule.timeEnabled && !this._isWithinTimeWindow(rule.timeFrom, rule.timeTo, now)) return false;
+    if (rule.timeEnabled && !this._isWithinZoneActivePeriod(rule, environment, now)) return false;
 
     if (rule.onlyIfLightsOff) {
       const selected = new Set(this._getZoneRuleLightIds(rule));
@@ -1823,6 +2521,25 @@ const isDay = hour >= 7 && hour < 18;
 
     const date = new Date(now);
     const current = date.getHours() * 60 + date.getMinutes();
+    if (from === to) return true;
+    if (from < to) return current >= from && current <= to;
+    return current >= from || current <= to;
+  }
+
+  _isWithinZoneActivePeriod(rule, environment, now) {
+    const startType = ['fixed', 'sunrise', 'sunset'].includes(rule.timeStartType) ? rule.timeStartType : 'fixed';
+    const endType = ['fixed', 'sunrise', 'sunset'].includes(rule.timeEndType) ? rule.timeEndType : 'fixed';
+    const sun = (startType === 'fixed' && endType === 'fixed') ? null : this._calculateSunTimes(new Date(now), environment && environment.location);
+    const resolve = (type, fixedTime, offset) => {
+      if (type === 'sunrise') return this._wrapMinutes(sun.sunriseMinutes + Number(offset || 0));
+      if (type === 'sunset') return this._wrapMinutes(sun.sunsetMinutes + Number(offset || 0));
+      return this._minutesFromTime(fixedTime);
+    };
+    const from = resolve(startType, rule.timeFrom, rule.timeStartOffsetMinutes);
+    const to = resolve(endType, rule.timeTo, rule.timeEndOffsetMinutes);
+    if (from === null || to === null) return true;
+    const timezone = this._getHomeyTimezone();
+    const current = this._getLocalDateParts(new Date(now), timezone).minutes;
     if (from === to) return true;
     if (from < to) return current >= from && current <= to;
     return current >= from || current <= to;
@@ -1931,6 +2648,10 @@ const isDay = hour >= 7 && hour < 18;
 
   _startSchedulerPolling() {
     if (this.schedulerTimer) clearInterval(this.schedulerTimer);
+    this.schedulerTimer = null;
+    const hasSchedules = this.getScheduleRules().some(rule => rule.enabled);
+    const hasAutoMode = this.getAutoModeSettings().enabled === true;
+    if (!hasSchedules && !hasAutoMode) return;
     this.schedulerTimer = setInterval(() => {
       this._pollScheduleAndAutoMode().catch(error => this.error('Scheduler polling failed', error));
     }, SCHEDULER_INTERVAL_MS);
@@ -1980,11 +2701,26 @@ const isDay = hour >= 7 && hour < 18;
       }
       if (pendingEntry.autoOffAt && now.getTime() >= pendingEntry.autoOffAt) {
         await this._applyDeviceAction(rule.deviceIds, false);
+        // Schedule light profiles are separate from deviceIds. Apply the follow-up
+        // action to those lights as well; otherwise a scheduled light can turn on
+        // correctly but remain on when the automatic end time is reached.
+        for (const lightProfile of this._normalizeModeLightActions(rule.lights)) {
+          try { await this._applyLightProfile(lightProfile.deviceId, { ...lightProfile, on: false, delaySeconds: 0 }); }
+          catch (error) { this.error(`Failed scheduled auto-off light action for ${lightProfile.deviceId}`, error); }
+        }
+        // A delayed start action must not be allowed to turn a light back on after
+        // the schedule has already ended.
+        pendingEntry = { ...pendingEntry, pendingLightActions: [] };
         state[rule.id] = { ...pendingEntry, autoOffAt: null, autoOffRunAt: now.getTime() };
         changedState = true;
       }
       if (pendingEntry.autoOnAt && now.getTime() >= pendingEntry.autoOnAt) {
         await this._applyDeviceAction(rule.deviceIds, true);
+        for (const lightProfile of this._normalizeModeLightActions(rule.lights)) {
+          try { await this._applyLightProfile(lightProfile.deviceId, { ...lightProfile, on: true, delaySeconds: 0 }); }
+          catch (error) { this.error(`Failed scheduled auto-on light action for ${lightProfile.deviceId}`, error); }
+        }
+        pendingEntry = { ...pendingEntry, pendingLightActions: [] };
         state[rule.id] = { ...pendingEntry, autoOnAt: null, autoOnRunAt: now.getTime() };
         changedState = true;
       }
@@ -2305,11 +3041,14 @@ const isDay = hour >= 7 && hour < 18;
 
   _startSwitchPolling() {
     if (this.switchTimer) clearInterval(this.switchTimer);
+    this.switchTimer = null;
     this._rebuildSwitchCapabilityListeners().catch(error => this.error('Initial switch listener setup failed', error));
+    const hasSwitchRules = this.getSwitchRules().some(rule => rule.enabled !== false && rule.triggerDeviceId && rule.triggerEvent);
+    if (!hasSwitchRules) return;
     this.switchTimer = setInterval(() => {
-      // Polling remains as a fallback for devices that do not support realtime capability listeners.
+      // Realtime listeners are primary; this slow poll is only a safety net.
       this._pollSwitchInputs().catch(error => this.error('Switch input polling failed', error));
-    }, POLL_INTERVAL_MS);
+    }, SWITCH_FALLBACK_INTERVAL_MS);
     this._pollSwitchInputs().catch(error => this.error('Initial switch input polling failed', error));
   }
 
@@ -2691,6 +3430,8 @@ const isDay = hour >= 7 && hour < 18;
       icon: device.iconObj?.url || device.icon || null,
       capabilities,
       capabilityTitles: Object.fromEntries(capabilities.map(id => [id, (cap[id] && (cap[id].title || cap[id].name)) ? String(cap[id].title || cap[id].name) : ''])),
+      capabilityUnits: Object.fromEntries(capabilities.map(id => [id, cap[id] ? String(cap[id].units || cap[id].unit || cap[id].options?.units || '') : ''])),
+      capabilitySetable: Object.fromEntries(capabilities.map(id => [id, cap[id] && typeof cap[id].setable === 'boolean' ? cap[id].setable : null])),
       available: device.available !== false,
       onoff: cap.onoff ? cap.onoff.value : null,
       dim: cap.dim ? cap.dim.value : null,
@@ -2848,6 +3589,103 @@ const isDay = hour >= 7 && hour < 18;
     throw new Error('HomeyAPI does not expose setCapabilityValue on this Homey version');
   }
 
+  _coerceApplianceControlValue(rawValue, currentValue) {
+    if (typeof rawValue !== 'string') return rawValue;
+    const text = rawValue.trim();
+    if (typeof currentValue === 'boolean') {
+      if (/^(true|1|on|yes)$/i.test(text)) return true;
+      if (/^(false|0|off|no)$/i.test(text)) return false;
+    }
+    if (typeof currentValue === 'number') {
+      const n = Number(text);
+      if (Number.isFinite(n)) return n;
+    }
+    if (/^(true|false)$/i.test(text)) return text.toLowerCase() === 'true';
+    if (/^-?\d+(?:\.\d+)?$/.test(text)) return Number(text);
+    return text;
+  }
+
+  async _setApplianceFlowState(applianceArg, action) {
+    const applianceId = applianceArg && typeof applianceArg === 'object' ? applianceArg.id : applianceArg;
+    const rule = this.getApplianceRules().find(item => item && item.id === applianceId);
+    if (!rule) throw new Error('Monitoring appliance not found');
+
+    const state = this.getApplianceState();
+    const history = this.getApplianceHistory();
+    const now = Date.now();
+    const current = state[rule.id] || { status: 'idle', aboveSince: null, belowSince: null };
+    const power = Number.isFinite(Number(current.lastPower)) ? Number(current.lastPower) : 0;
+    const displayDevice = { name: rule.name || this._getApplianceTypeLabel(rule.type, this._getHomeyLanguage()) };
+
+    if (action === 'start') {
+      if (current.status !== 'running') {
+        current.status = 'running';
+        current.startedAt = now;
+        current.runStartedAt = now;
+        current.durationMs = 0;
+        current.finalDurationMs = null;
+        current.energyKwh = 0;
+        current.finalEnergyKwh = null;
+        // A Flow-started run must never reuse the cumulative-meter baseline from
+        // a previous cycle. The next monitoring pass establishes a fresh baseline.
+        current.meterStartKwh = null;
+        current.lastEnergyUpdateAt = now;
+        current.aboveSince = now;
+        current.belowSince = null;
+        current.readyAt = null;
+        current.resetAt = null;
+        current.readyReminderAt = null;
+      }
+      current.manualFlowState = 'running';
+      current.updatedAt = now;
+      state[rule.id] = current;
+      this.homey.settings.set(SETTINGS_KEYS.APPLIANCE_STATE, state);
+      await this._createApplianceTimelineNotification(rule, displayDevice, 'started', power, current);
+      this.log(`[Monitoring] ${rule.name || applianceId} manually started by Flow`);
+      return true;
+    }
+
+    if (action === 'stop') {
+      const runStartedAt = typeof current.runStartedAt === 'number'
+        ? current.runStartedAt
+        : (typeof current.startedAt === 'number' ? current.startedAt : now);
+      current.durationMs = Math.max(0, now - runStartedAt);
+      current.finalDurationMs = current.durationMs;
+      current.finalEnergyKwh = Math.max(0, Number(current.energyKwh || 0));
+      current.status = 'ready';
+      current.readyAt = now;
+      current.belowSince = null;
+      current.aboveSince = null;
+      current.lastEnergyUpdateAt = null;
+      current.manualFlowState = 'ready';
+      current.readyReminderAt = rule.repeatReadyNotification === true && rule.readyReminderSeconds > 0
+        ? now + rule.readyReminderSeconds * 1000
+        : null;
+      current.resetAt = rule.resetAfterReadySeconds > 0 ? now + rule.resetAfterReadySeconds * 1000 : null;
+      current.updatedAt = now;
+
+      const historyEntry = {
+        startTime: runStartedAt,
+        endTime: now,
+        durationMs: current.finalDurationMs,
+        energyKwh: Math.round(current.finalEnergyKwh * 1000) / 1000,
+        averagePower: current.finalDurationMs > 0 && current.finalEnergyKwh > 0
+          ? Math.round((current.finalEnergyKwh * 3600000000) / current.finalDurationMs)
+          : null,
+      };
+      const entries = Array.isArray(history[rule.id]) ? history[rule.id] : [];
+      history[rule.id] = [historyEntry, ...entries].slice(0, rule.historyLimit || APPLIANCE_HISTORY_LIMIT);
+      state[rule.id] = current;
+      this.homey.settings.set(SETTINGS_KEYS.APPLIANCE_STATE, state);
+      this.homey.settings.set(SETTINGS_KEYS.APPLIANCE_HISTORY, history);
+      await this._createApplianceTimelineNotification(rule, displayDevice, 'ready', power, current);
+      this.log(`[Monitoring] ${rule.name || applianceId} manually stopped by Flow`);
+      return true;
+    }
+
+    throw new Error(`Unsupported monitoring Flow action: ${action}`);
+  }
+
   async _syncModeDevices(mode) {
     const driver = this.homey.drivers.getDriver('mode_controller');
     if (!driver) return;
@@ -2922,13 +3760,132 @@ const isDay = hour >= 7 && hour < 18;
 
 
 
-  _startAppliancePolling() {
-    if (this.applianceTimer) clearInterval(this.applianceTimer);
-    this.applianceTimer = setInterval(() => {
-      this._pollApplianceRules().catch(error => { this._recordCrashLog('appliance_polling_failed', error, { source: 'interval' }); this.error('Appliance polling failed', error); });
-    }, APPLIANCE_INTERVAL_MS);
+  _hasMonitoringWork() {
+    return this.getApplianceRules().some(rule => rule.enabled && (rule.deviceId || rule.statusDeviceId))
+      || this.getActivityRules().some(rule => rule.enabled && rule.conditions.length)
+      || this.getSubModes().some(rule => rule.autoEnabled && rule.autoDeviceId);
+  }
 
-    this._pollApplianceRules().catch(error => { this._recordCrashLog('initial_appliance_polling_failed', error, { source: 'startup' }); this.error('Initial appliance polling failed', error); });
+  _getMonitoringPollInterval() {
+    if (!this._hasMonitoringWork()) return 0;
+    const applianceRules = this.getApplianceRules().filter(rule => rule.enabled && (rule.deviceId || rule.statusDeviceId));
+    const applianceState = this.getApplianceState();
+    const hasRunningAppliance = applianceRules.some(rule => applianceState[rule.id]?.status === 'running');
+    if (hasRunningAppliance) return APPLIANCE_RUNNING_INTERVAL_MS;
+    const hasActivityOrSubModeWork = this.getActivityRules().some(rule => rule.enabled && rule.conditions.length)
+      || this.getSubModes().some(rule => rule.autoEnabled && rule.autoDeviceId);
+    return hasActivityOrSubModeWork ? APPLIANCE_INTERVAL_MS : APPLIANCE_IDLE_INTERVAL_MS;
+  }
+
+  _scheduleNextMonitoringPoll(delayMs = null) {
+    if (this.applianceTimer) clearTimeout(this.applianceTimer);
+    this.applianceTimer = null;
+    const interval = delayMs == null ? this._getMonitoringPollInterval() : delayMs;
+    if (!interval && interval !== 0) return;
+    if (!this._hasMonitoringWork()) return;
+    this.applianceTimer = setTimeout(async () => {
+      this.applianceTimer = null;
+      try {
+        await this._pollApplianceRules();
+      } catch (error) {
+        this._recordCrashLog('appliance_polling_failed', error, { source: 'adaptive_timer' });
+        this.error('Monitoring polling failed', error);
+      } finally {
+        this._scheduleNextMonitoringPoll();
+      }
+    }, Math.max(0, Number(interval) || 0));
+  }
+
+  _startAppliancePolling() {
+    if (this.applianceTimer) clearTimeout(this.applianceTimer);
+    this.applianceTimer = null;
+    if (!this._hasMonitoringWork()) return;
+    this._scheduleNextMonitoringPoll(0);
+  }
+
+  _applianceCapabilityValue(device, capabilityId) {
+    if (!device || !capabilityId) return null;
+    return device.capabilityValues && Object.prototype.hasOwnProperty.call(device.capabilityValues, capabilityId)
+      ? device.capabilityValues[capabilityId]
+      : null;
+  }
+
+  _applianceValueMatches(actual, expected) {
+    if (expected === '' || expected === null || expected === undefined) return false;
+    const normalize = value => typeof value === 'boolean' ? (value ? 'true' : 'false') : String(value ?? '').trim().toLowerCase();
+    return normalize(actual) === normalize(expected);
+  }
+
+  _formatDurationHms(totalSeconds) {
+    const seconds = Math.max(0, Math.round(Number(totalSeconds) || 0));
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+
+  _formatRemainingTimeValue(value, unit = '', capabilityId = '') {
+    if (value === null || value === undefined || value === '') return null;
+
+    const normalizedUnit = String(unit || '').trim().toLowerCase();
+    const normalizedCapability = String(capabilityId || '').trim().toLowerCase();
+
+    const numericToSeconds = numberValue => {
+      const n = Number(numberValue);
+      if (!Number.isFinite(n)) return null;
+
+      if (['ms', 'millisecond', 'milliseconds'].includes(normalizedUnit)) return n / 1000;
+      if (['s', 'sec', 'secs', 'second', 'seconds'].includes(normalizedUnit)) return n;
+      if (['m', 'min', 'mins', 'minute', 'minutes'].includes(normalizedUnit)) return n * 60;
+      if (['h', 'hr', 'hrs', 'hour', 'hours'].includes(normalizedUnit)) return n * 3600;
+
+      // Capability-name hints are useful for custom capabilities without unit metadata.
+      if (normalizedCapability.includes('millisecond')) return n / 1000;
+      if (normalizedCapability.includes('second')) return n;
+      if (normalizedCapability.includes('minute')) return n * 60;
+      if (normalizedCapability.includes('hour')) return n * 3600;
+
+      // Backwards-compatible fallback used by earlier Mode Switch versions:
+      // larger values are most likely seconds, smaller values minutes.
+      return n > 1440 ? n : n * 60;
+    };
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      const seconds = numericToSeconds(value);
+      return seconds === null ? String(value) : this._formatDurationHms(seconds);
+    }
+
+    const text = String(value).trim();
+    if (!text) return null;
+
+    // ISO-8601 duration, e.g. PT1H24M36S.
+    const iso = text.match(/^P(?:(\d+(?:\.\d+)?)D)?(?:T(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?)?$/i);
+    if (iso) {
+      const seconds = (Number(iso[1] || 0) * 86400) + (Number(iso[2] || 0) * 3600) + (Number(iso[3] || 0) * 60) + Number(iso[4] || 0);
+      return this._formatDurationHms(seconds);
+    }
+
+    // Already formatted clock value. Normalize to HH:MM:SS.
+    const clock = text.match(/^(\d+):(\d{1,2}):(\d{1,2})$/);
+    if (clock) {
+      return this._formatDurationHms((Number(clock[1]) * 3600) + (Number(clock[2]) * 60) + Number(clock[3]));
+    }
+
+    // Common textual durations such as '1h 24m 36s' or '84 min'.
+    const durationText = text.match(/^\s*(?:(\d+(?:[.,]\d+)?)\s*h(?:ours?)?)?\s*(?:(\d+(?:[.,]\d+)?)\s*m(?:in(?:utes?)?)?)?\s*(?:(\d+(?:[.,]\d+)?)\s*s(?:ec(?:onds?)?)?)?\s*$/i);
+    if (durationText && (durationText[1] || durationText[2] || durationText[3])) {
+      const num = x => Number(String(x || 0).replace(',', '.'));
+      return this._formatDurationHms((num(durationText[1]) * 3600) + (num(durationText[2]) * 60) + num(durationText[3]));
+    }
+
+    // Numeric strings use the same unit-aware conversion as numeric capability values.
+    if (/^-?\d+(?:[.,]\d+)?$/.test(text)) {
+      const seconds = numericToSeconds(Number(text.replace(',', '.')));
+      return seconds === null ? text : this._formatDurationHms(seconds);
+    }
+
+    // Unknown custom format: preserve the source value rather than guessing.
+    return text;
   }
 
   async _pollApplianceRules() {
@@ -2940,15 +3897,17 @@ const isDay = hour >= 7 && hour < 18;
     const pollStartedAt = Date.now();
     this._markDiagnostics('appliance_poll_start');
     try {
-      const rules = this.getApplianceRules().filter(rule => rule.enabled && rule.deviceId);
+      const rules = this.getApplianceRules().filter(rule => rule.enabled && (rule.deviceId || rule.statusDeviceId));
       const activityRules = this.getActivityRules().filter(rule => rule.enabled && rule.conditions.length);
       const subModeAutoRules = this.getSubModes().filter(rule => rule.autoEnabled && rule.autoDeviceId);
       if (!rules.length && !activityRules.length && !subModeAutoRules.length) return;
 
       const environmentStartedAt = Date.now();
       this._markDiagnostics('environment_read_start', { source: 'monitoring' });
+      const persistedApplianceState = this.getApplianceState();
+      const hasRunningAppliance = rules.some(rule => persistedApplianceState[rule.id]?.status === 'running');
       const environment = await this._withTimeout(
-        this.getEnvironment({ force: false }),
+        this.getEnvironment({ force: hasRunningAppliance }),
         MONITORING_ENV_TIMEOUT_MS,
         'environment_read',
         { source: 'appliance_poll' },
@@ -2960,6 +3919,7 @@ const isDay = hour >= 7 && hour < 18;
       if (!environment) return;
 
       const deviceById = new Map(((environment.powerTargets || environment.powerEndpoints || environment.powerDevices) || []).map(device => [device.id, device]));
+      const allDeviceById = new Map((environment.activityDevices || []).map(device => [device.id, device]));
       const state = this.homey.settings.get(SETTINGS_KEYS.APPLIANCE_STATE) || {};
       const applianceHistory = this.getApplianceHistory();
       let historyChanged = false;
@@ -2970,22 +3930,49 @@ const isDay = hour >= 7 && hour < 18;
       this._markDiagnostics('appliance_rules_start', { count: rules.length });
       for (const rule of rules) {
         try {
-          const device = deviceById.get(rule.deviceId);
-          if (!device || !Number.isFinite(Number(device.measurePower))) continue;
+          const device = rule.deviceId ? deviceById.get(rule.deviceId) : null;
+          const statusDevice = rule.statusDeviceId ? allDeviceById.get(rule.statusDeviceId) : null;
+          const remainingDevice = rule.remainingTimeDeviceId ? allDeviceById.get(rule.remainingTimeDeviceId) : statusDevice;
+          const hasPower = !!device && Number.isFinite(Number(device.measurePower));
+          const power = hasPower ? Number(device.measurePower) : 0;
+          const statusValue = statusDevice && rule.statusCapabilityId ? this._applianceCapabilityValue(statusDevice, rule.statusCapabilityId) : null;
+          const statusSaysRunning = !!statusDevice && !!rule.statusCapabilityId && this._applianceValueMatches(statusValue, rule.statusActiveValue);
+          const statusSaysReady = !!statusDevice && !!rule.statusCapabilityId && this._applianceValueMatches(statusValue, rule.statusReadyValue);
+          if (!hasPower && !statusDevice) continue;
           const current = state[rule.id] || { status: 'idle', aboveSince: null, belowSince: null };
-          const power = Number(device.measurePower);
+          current.statusSourceValue = statusValue;
+          const remainingValue = remainingDevice && rule.remainingTimeCapabilityId ? this._applianceCapabilityValue(remainingDevice, rule.remainingTimeCapabilityId) : null;
+          current.remainingTimeRaw = remainingValue;
+          const remainingUnit = remainingDevice?.capabilityUnits?.[rule.remainingTimeCapabilityId] || '';
+          current.remainingTime = this._formatRemainingTimeValue(remainingValue, remainingUnit, rule.remainingTimeCapabilityId);
           if (current.status === 'running') {
             const previousPower = typeof current.lastPower === 'number' ? current.lastPower : power;
             const lastEnergyUpdateAt = typeof current.lastEnergyUpdateAt === 'number'
               ? current.lastEnergyUpdateAt
               : (typeof current.startedAt === 'number' ? current.startedAt : now);
             const deltaMs = Math.max(0, now - lastEnergyUpdateAt);
-            const liveMeterPower = Number.isFinite(Number(device.meterPower)) ? Number(device.meterPower) : null;
-            if (liveMeterPower !== null && Number.isFinite(Number(current.meterStartKwh))) {
-              current.energyKwh = Math.max(0, liveMeterPower - Number(current.meterStartKwh));
+            const liveMeterPower = hasPower && typeof device.meterPower === 'number' && Number.isFinite(device.meterPower)
+              ? device.meterPower
+              : null;
+            const hasMeterBaseline = typeof current.meterStartKwh === 'number' && Number.isFinite(current.meterStartKwh);
+
+            if (liveMeterPower !== null && hasMeterBaseline) {
+              current.energyKwh = Math.max(0, liveMeterPower - current.meterStartKwh);
               changed = true;
             } else if (deltaMs > 0 && Number.isFinite(previousPower)) {
+              // Fallback to integrating measure_power when there is no valid meter baseline.
+              // null must never be treated as 0, otherwise the full cumulative meter reading
+              // would incorrectly be shown as the consumption of the current run.
               current.energyKwh = Math.max(0, Number(current.energyKwh || 0) + (Math.max(0, previousPower) * deltaMs / 3600000000));
+              changed = true;
+
+              // If a cumulative meter is available, establish a baseline without losing the
+              // energy already integrated for this run. Future updates can then use meter delta.
+              if (liveMeterPower !== null) {
+                current.meterStartKwh = liveMeterPower - Math.max(0, Number(current.energyKwh || 0));
+              }
+            } else if (liveMeterPower !== null && !hasMeterBaseline) {
+              current.meterStartKwh = liveMeterPower - Math.max(0, Number(current.energyKwh || 0));
               changed = true;
             }
             current.lastEnergyUpdateAt = now;
@@ -2998,7 +3985,7 @@ const isDay = hour >= 7 && hour < 18;
             if (current.status === 'ready') {
               const resetByActivity = this._shouldResetApplianceByActivity(rule, environment);
               const resetByTimer = rule.resetAfterReadySeconds > 0 && current.resetAt && now >= current.resetAt;
-              const resetByNewRun = power >= rule.startThreshold;
+              const resetByNewRun = current.manualFlowState ? false : (statusSaysRunning || (hasPower && power >= rule.startThreshold));
               if (resetByActivity || resetByTimer || resetByNewRun) {
                 current.status = 'idle';
                 current.resetAt = null;
@@ -3011,38 +3998,45 @@ const isDay = hour >= 7 && hour < 18;
                 current.finalDurationMs = null;
                 current.lastEnergyUpdateAt = null;
                 current.meterStartKwh = null;
+                current.manualFlowState = null;
                 changed = true;
               } else if (rule.repeatReadyNotification === true && rule.readyReminderSeconds > 0 && now >= (current.readyReminderAt || 0)) {
                 current.readyReminderAt = now + rule.readyReminderSeconds * 1000;
                 changed = true;
-                await this._withTimeout(this._createApplianceTimelineNotification(rule, device, 'reminder', power, current), 3000, 'appliance_reminder_flow', { applianceId: rule.id }, null);
+                await this._withTimeout(this._createApplianceTimelineNotification(rule, device || statusDevice, 'reminder', power, current), 3000, 'appliance_reminder_flow', { applianceId: rule.id }, null);
               }
             }
 
             if (current.status !== 'ready') {
-              if (power >= rule.startThreshold) {
+              if (statusSaysRunning || (hasPower && power >= rule.startThreshold)) {
                 current.aboveSince = current.aboveSince || now;
-                if ((now - current.aboveSince) >= rule.startDelaySeconds * 1000) {
+                const startDelayMs = statusSaysRunning ? 0 : rule.startDelaySeconds * 1000;
+                if ((now - current.aboveSince) >= startDelayMs) {
                   current.status = 'running';
                   current.startedAt = now;
                   current.runStartedAt = current.aboveSince || now;
                   current.durationMs = Math.max(0, now - current.runStartedAt);
                   current.energyKwh = 0;
-                  current.meterStartKwh = Number.isFinite(Number(device.meterPower)) ? Number(device.meterPower) : null;
+                  current.meterStartKwh = hasPower && typeof device.meterPower === 'number' && Number.isFinite(device.meterPower)
+                    ? device.meterPower
+                    : null;
                   current.lastEnergyUpdateAt = now;
                   current.belowSince = null;
                   current.readyReminderAt = null;
                   changed = true;
-                  await this._withTimeout(this._createApplianceTimelineNotification(rule, device, 'started', power, current), 3000, 'appliance_started_flow', { applianceId: rule.id }, null);
+                  await this._withTimeout(this._createApplianceTimelineNotification(rule, device || statusDevice, 'started', power, current), 3000, 'appliance_started_flow', { applianceId: rule.id }, null);
                 }
               } else {
                 current.aboveSince = null;
               }
             }
           } else {
-            if (power <= rule.readyThreshold) {
+            const directReadyConfigured = !!statusDevice && !!rule.statusCapabilityId && rule.statusReadyValue !== '';
+            const readyDetected = current.manualFlowState === 'running' ? false : (statusSaysReady || (!directReadyConfigured && hasPower && power <= rule.readyThreshold));
+            if (readyDetected) {
               current.belowSince = current.belowSince || now;
-              if ((now - current.belowSince) >= rule.readyDelaySeconds * 1000) {
+              const readyDelayMs = statusSaysReady ? 0 : rule.readyDelaySeconds * 1000;
+              if ((now - current.belowSince) >= readyDelayMs) {
                 current.status = 'ready';
                 current.readyAt = now;
                 current.finalEnergyKwh = Math.max(0, Number(current.energyKwh || 0));
@@ -3069,7 +4063,7 @@ const isDay = hour >= 7 && hour < 18;
                   ? now + rule.readyReminderSeconds * 1000
                   : null;
                 changed = true;
-                await this._withTimeout(this._createApplianceTimelineNotification(rule, device, 'ready', power, current), 3000, 'appliance_ready_flow', { applianceId: rule.id }, null);
+                await this._withTimeout(this._createApplianceTimelineNotification(rule, device || statusDevice, 'ready', power, current), 3000, 'appliance_ready_flow', { applianceId: rule.id }, null);
                 current.resetAt = rule.resetAfterReadySeconds > 0 ? now + rule.resetAfterReadySeconds * 1000 : null;
               }
             } else {
@@ -3152,7 +4146,7 @@ const isDay = hour >= 7 && hour < 18;
       try {
         const result = await this._withTimeout(
           this._evaluateSingleSubModeAutoRule(rule, context),
-          1200,
+          6000,
           'submode_auto_rule',
           ruleMeta,
           { changed: false, modeChanged: false, timeout: true }
@@ -3885,6 +4879,12 @@ const isDay = hour >= 7 && hour < 18;
       .map((rule) => ({
         id: typeof rule.id === 'string' && rule.id ? rule.id : `spr_${Date.now()}_${Math.random().toString(16).slice(2)}`,
         deviceId: typeof rule.deviceId === 'string' ? rule.deviceId : '',
+      statusDeviceId: typeof rule.statusDeviceId === 'string' ? rule.statusDeviceId : '',
+      statusCapabilityId: typeof rule.statusCapabilityId === 'string' ? rule.statusCapabilityId : '',
+      statusActiveValue: rule.statusActiveValue === undefined || rule.statusActiveValue === null ? '' : String(rule.statusActiveValue),
+      statusReadyValue: rule.statusReadyValue === undefined || rule.statusReadyValue === null ? '' : String(rule.statusReadyValue),
+      remainingTimeDeviceId: typeof rule.remainingTimeDeviceId === 'string' ? rule.remainingTimeDeviceId : '',
+      remainingTimeCapabilityId: typeof rule.remainingTimeCapabilityId === 'string' ? rule.remainingTimeCapabilityId : '',
         operator: rule.operator === 'above' ? 'above' : 'below',
         watt: this._numberInRange(rule.watt, 0, 5000, 0),
       }))
@@ -3966,8 +4966,12 @@ const isDay = hour >= 7 && hour < 18;
       lightHue: this._numberInRange(rule.lightHue, 0, 1, 0),
       lightSaturation: this._numberInRange(rule.lightSaturation, 0, 1, 1),
       timeEnabled: rule.timeEnabled === true,
+      timeStartType: ['fixed', 'sunrise', 'sunset'].includes(rule.timeStartType) ? rule.timeStartType : 'fixed',
+      timeEndType: ['fixed', 'sunrise', 'sunset'].includes(rule.timeEndType) ? rule.timeEndType : 'fixed',
       timeFrom: typeof rule.timeFrom === 'string' ? rule.timeFrom : '18:00',
       timeTo: typeof rule.timeTo === 'string' ? rule.timeTo : '23:59',
+      timeStartOffsetMinutes: this._numberInRange(rule.timeStartOffsetMinutes, -720, 720, 0),
+      timeEndOffsetMinutes: this._numberInRange(rule.timeEndOffsetMinutes, -720, 720, 0),
       onlyIfLightsOff: rule.onlyIfLightsOff === true,
       onlyIfDark: rule.onlyIfDark === true,
       luxDeviceIds: this._sanitizeDeviceIdList(rule.luxDeviceIds),
@@ -4026,6 +5030,12 @@ const isDay = hour >= 7 && hour < 18;
       enabled: rule.enabled !== false,
       type,
       deviceId: typeof rule.deviceId === 'string' ? rule.deviceId : '',
+      statusDeviceId: typeof rule.statusDeviceId === 'string' ? rule.statusDeviceId : '',
+      statusCapabilityId: typeof rule.statusCapabilityId === 'string' ? rule.statusCapabilityId : '',
+      statusActiveValue: rule.statusActiveValue === undefined || rule.statusActiveValue === null ? '' : String(rule.statusActiveValue),
+      statusReadyValue: rule.statusReadyValue === undefined || rule.statusReadyValue === null ? '' : String(rule.statusReadyValue),
+      remainingTimeDeviceId: typeof rule.remainingTimeDeviceId === 'string' ? rule.remainingTimeDeviceId : '',
+      remainingTimeCapabilityId: typeof rule.remainingTimeCapabilityId === 'string' ? rule.remainingTimeCapabilityId : '',
       startThreshold: this._numberInRange(rule.startThreshold, 1, 5000, defaults.startThreshold),
       startDelaySeconds: Math.round(this._numberInRange(rule.startDelaySeconds, 0, 600, defaults.startDelaySeconds)),
       readyThreshold: this._numberInRange(rule.readyThreshold, 0, 1000, defaults.readyThreshold),
@@ -4146,9 +5156,12 @@ const isDay = hour >= 7 && hour < 18;
 
 
   _normalizeDeviceActionSet(set = {}) {
+    // Accept null as an empty action set. This is needed for new AVD OFF profiles
+    // before the user has configured any actions for them.
+    const source = set && typeof set === 'object' ? set : {};
     return {
-      on: this._sanitizeDeviceIdList(set.on),
-      off: this._sanitizeDeviceIdList(set.off),
+      on: this._sanitizeDeviceIdList(source.on),
+      off: this._sanitizeDeviceIdList(source.off),
     };
   }
 
@@ -4227,6 +5240,456 @@ const isDay = hour >= 7 && hour < 18;
       }
     }
     return false;
+  }
+
+
+  _normalizeAVDDeviceRules(input) {
+    const source = input && typeof input === 'object' ? input : {};
+    const output = {};
+    for (const [deviceId, raw] of Object.entries(source)) {
+      if (!deviceId || !raw || typeof raw !== 'object') continue;
+      const item = { enabled: raw.enabled !== false, listRules: {}, booleanRules: {}, buttonRules: {}, groupRules: {} };
+      for (const [capabilityId, values] of Object.entries(raw.listRules || {})) {
+        if (!capabilityId || !values || typeof values !== 'object') continue;
+        item.listRules[capabilityId] = {};
+        for (const [valueId, actions] of Object.entries(values)) {
+          item.listRules[capabilityId][String(valueId)] = this._normalizeDeviceActionSet(actions);
+        }
+      }
+      for (const [capabilityId, states] of Object.entries(raw.booleanRules || {})) {
+        if (!capabilityId || !states || typeof states !== 'object') continue;
+        item.booleanRules[capabilityId] = {
+          // Simple AVD switch mapping: these devices follow the AVD state directly.
+          // ON -> linked devices ON, OFF -> linked devices OFF.
+          linkedDeviceIds: this._sanitizeDeviceIdList(states.linkedDeviceIds),
+          // Optional exclusive group. When one control becomes active, Mode Switch
+          // silently switches the other controls in the same group off.
+          exclusiveGroup: typeof states.exclusiveGroup === 'string' ? states.exclusiveGroup.trim().slice(0, 80) : '',
+          // Advanced mappings stay backwards compatible and can add exceptions.
+          on: this._normalizeDeviceActionSet(states.on),
+          off: this._normalizeDeviceActionSet(states.off),
+        };
+      }
+      for (const [capabilityId, actions] of Object.entries(raw.buttonRules || {})) {
+        if (!capabilityId) continue;
+        // 3.7.8: stateful AVD buttons can have separate actions for ON and OFF.
+        // Backwards compatibility: the old button action-set ({on:[], off:[]})
+        // becomes the new ON profile. Existing users therefore keep their action.
+        const hasStateProfiles = actions && typeof actions === 'object' && (actions.onState || actions.offState);
+        item.buttonRules[capabilityId] = {
+          onState: this._normalizeDeviceActionSet(hasStateProfiles ? actions.onState : actions),
+          offState: this._normalizeDeviceActionSet(hasStateProfiles ? actions.offState : null),
+          exclusiveGroup: typeof actions?.exclusiveGroup === 'string' ? actions.exclusiveGroup.trim().slice(0, 80) : '',
+        };
+      }
+      for (const [groupIdRaw, groupRule] of Object.entries(raw.groupRules || {})) {
+        const groupId = String(groupIdRaw || '').trim().slice(0, 80);
+        if (!groupId) continue;
+        item.groupRules[groupId] = {
+          allOff: this._normalizeDeviceActionSet(groupRule?.allOff || groupRule),
+        };
+      }
+      output[deviceId] = item;
+    }
+    return output;
+  }
+
+  getAVDDeviceRules() {
+    return this._normalizeAVDDeviceRules(this.homey.settings.get(SETTINGS_KEYS.AVD_DEVICE_RULES));
+  }
+
+  async saveAVDDeviceRules(rules) {
+    const normalized = this._normalizeAVDDeviceRules(rules);
+    this.homey.settings.set(SETTINGS_KEYS.AVD_DEVICE_RULES, normalized);
+    await this._rebuildAVDCapabilityListeners();
+    return normalized;
+  }
+
+  _avdTitle(value, fallback = '') {
+    if (typeof value === 'string') return value;
+    if (value && typeof value === 'object') {
+      const lang = this._getHomeyLanguage();
+      return String(value[lang] || value.en || value.nl || Object.values(value)[0] || fallback);
+    }
+    return fallback;
+  }
+
+  _avdCapabilityKind(capabilityId, cap) {
+    const options = cap?.options || {};
+    const values = Array.isArray(options.values) ? options.values : (Array.isArray(cap?.values) ? cap.values : []);
+    const type = String(cap?.type || options.type || '').toLowerCase();
+    const title = String(this._avdTitle(cap?.title || cap?.name, capabilityId)).toLowerCase();
+    const id = String(capabilityId || '').toLowerCase();
+    if (values.length || type === 'enum') return 'list';
+    if (type === 'boolean') {
+      const getable = cap?.getable ?? options.getable;
+      if (getable === false || /(^|[._-])button([._-]|$)|knop|pushbutton/.test(`${id} ${title}`)) return 'button';
+      return 'boolean';
+    }
+    return '';
+  }
+
+  _serializeAVDCapability(capabilityId, cap, capabilityOptions = {}) {
+    // Homey Web API exposes the live value in capabilitiesObj, while type/title/
+    // enum metadata can live in capabilitiesOptions. AVD uses dynamic capabilities,
+    // so merge both sources before deciding whether it is a list/button/boolean.
+    const mergedOptions = { ...(cap?.options || {}), ...(capabilityOptions || {}) };
+    const merged = { ...(cap || {}), ...mergedOptions, options: mergedOptions };
+    const rawValues = Array.isArray(mergedOptions.values)
+      ? mergedOptions.values
+      : (Array.isArray(cap?.values) ? cap.values : []);
+    const values = rawValues.map(v => ({
+      id: String(v?.id ?? v?.value ?? v),
+      name: this._avdTitle(v?.title || v?.name, String(v?.id ?? v?.value ?? v)),
+    }));
+
+    // If Homey does not expose an explicit type for a dynamic AVD capability,
+    // infer the boolean type from its live value. Lists are detected by values.
+    let inferredType = String(cap?.type || mergedOptions.type || '').toLowerCase();
+    if (!inferredType && values.length) inferredType = 'enum';
+    if (!inferredType && typeof cap?.value === 'boolean') inferredType = 'boolean';
+    const forKind = { ...merged, type: inferredType, values };
+
+    return {
+      id: capabilityId,
+      name: this._avdTitle(mergedOptions.title || cap?.title || cap?.name, capabilityId),
+      kind: this._avdCapabilityKind(capabilityId, forKind),
+      type: inferredType,
+      value: cap?.value ?? null,
+      setable: cap?.setable ?? mergedOptions.setable ?? null,
+      getable: cap?.getable ?? mergedOptions.getable ?? null,
+      values,
+    };
+  }
+
+  _isDeviceCapabilitiesDevice(device) {
+    const needle = 'nl.qluster-it.devicecapabilities';
+    const candidates = [
+      device?.driverUri,
+      device?.driverId,
+      device?.uri,
+      device?.appUri,
+      device?.appId,
+    ].filter(Boolean).map(value => String(value).toLowerCase());
+    return candidates.some(value => value.includes(needle));
+  }
+
+  async getAVDDevicesForSettings() {
+    try {
+      const raw = await this._getDevicesSafe();
+      const allDevices = Object.values(raw || {});
+      const appDevices = allDevices.filter(device => this._isDeviceCapabilitiesDevice(device));
+
+      this.log(`[AVD] Homey returned ${allDevices.length} devices; ${appDevices.length} belong to Device Capabilities`);
+
+      const result = appDevices.map(device => {
+        const capsObj = device.capabilitiesObj || {};
+        const capsOptions = device.capabilitiesOptions || {};
+        const ids = Array.isArray(device.capabilities)
+          ? device.capabilities
+          : Object.keys(capsObj);
+        const capabilities = ids
+          .map(id => this._serializeAVDCapability(id, capsObj[id] || {}, capsOptions[id] || {}))
+          .filter(cap => cap.kind);
+
+        this.log(`[AVD] ${device.name || device.id}: ${ids.length} capabilities, ${capabilities.length} supported controls`);
+
+        return {
+          id: String(device.id),
+          name: String(device.name || 'Advanced Virtual Device'),
+          zone: device.zone || null,
+          driverId: device.driverId || null,
+          driverUri: device.driverUri || null,
+          available: device.available !== false,
+          capabilities,
+        };
+      });
+
+      // Do not hide the AVD itself just because Homey exposes incomplete metadata.
+      // It must remain importable, and the UI can then show that no supported
+      // controls were detected. This also makes diagnostics much clearer.
+      return result.sort((a,b) => a.name.localeCompare(b.name, undefined, { sensitivity:'base' }));
+    } catch (error) {
+      this.error('Could not list Advanced Virtual Devices', error);
+      return [];
+    }
+  }
+
+  _configuredAVDCapabilityIds(rule) {
+    const hasActions = actions => Array.isArray(actions?.on) && actions.on.length > 0 || Array.isArray(actions?.off) && actions.off.length > 0;
+    const ids = [];
+    for (const [capabilityId, values] of Object.entries(rule?.listRules || {})) {
+      if (Object.values(values || {}).some(hasActions)) ids.push(capabilityId);
+    }
+    for (const [capabilityId, states] of Object.entries(rule?.booleanRules || {})) {
+      if ((Array.isArray(states?.linkedDeviceIds) && states.linkedDeviceIds.length > 0) || hasActions(states?.on) || hasActions(states?.off) || String(states?.exclusiveGroup || '').trim()) ids.push(capabilityId);
+    }
+    for (const [capabilityId, actions] of Object.entries(rule?.buttonRules || {})) {
+      if (hasActions(actions?.onState) || hasActions(actions?.offState) || hasActions(actions) || String(actions?.exclusiveGroup || '').trim()) ids.push(capabilityId);
+    }
+    return [...new Set(ids)];
+  }
+
+  async _rebuildAVDCapabilityListeners() {
+    for (const listener of this.avdCapabilityListeners.values()) {
+      try { listener.destroy?.(); } catch (_) {}
+    }
+    this.avdCapabilityListeners.clear();
+    this.avdCapabilityState.clear();
+    this.avdGroupAllOffState.clear();
+    const rules = this.getAVDDeviceRules();
+    const deviceIds = Object.keys(rules).filter(id => rules[id]?.enabled !== false);
+    if (!deviceIds.length) return;
+    const raw = await this._getDevicesSafe();
+    for (const deviceId of deviceIds) {
+      const device = raw?.[deviceId] || Object.values(raw || {}).find(d => String(d?.id) === deviceId);
+      if (!device || typeof device.makeCapabilityInstance !== 'function') continue;
+      for (const capabilityId of this._configuredAVDCapabilityIds(rules[deviceId])) {
+        if (!(Array.isArray(device.capabilities) && device.capabilities.includes(capabilityId))) continue;
+        const initialValue = device?.capabilitiesObj?.[capabilityId]?.value ?? device?.capabilityValues?.[capabilityId];
+        this._setAVDCapabilityRuntimeState(deviceId, capabilityId, initialValue);
+        try {
+          const key = `${deviceId}::${capabilityId}`;
+          const instance = device.makeCapabilityInstance(capabilityId, value => {
+            this._handleAVDCapabilityChanged(deviceId, capabilityId, value)
+              .catch(error => this.error(`AVD action failed for ${key}`, error));
+          });
+          this.avdCapabilityListeners.set(key, instance);
+        } catch (error) {
+          this.error(`Could not listen to AVD capability ${deviceId}/${capabilityId}`, error);
+        }
+      }
+      const groupIds = new Set([
+        ...Object.values(rules[deviceId]?.booleanRules || {}).map(rule => String(rule?.exclusiveGroup || '').trim()),
+        ...Object.values(rules[deviceId]?.buttonRules || {}).map(rule => String(rule?.exclusiveGroup || '').trim()),
+      ].filter(Boolean));
+      for (const groupId of groupIds) {
+        const members = this._avdGroupMembers(rules[deviceId], groupId);
+        const states = members.map(capabilityId => this.avdCapabilityState.get(`${deviceId}::${capabilityId}`));
+        if (members.length && states.every(state => state !== undefined)) {
+          this._setAVDGroupAllOffRuntimeState(deviceId, groupId, states.every(state => state === false));
+        }
+      }
+    }
+    this.log(`[AVD] Listening to ${this.avdCapabilityListeners.size} configured capabilities`);
+  }
+
+  _avdCapabilityValueEquals(a, b) {
+    if (typeof a === 'boolean' || typeof b === 'boolean') {
+      const bool = value => value === true || value === 1 || /^(true|1|on|yes)$/i.test(String(value));
+      return bool(a) === bool(b);
+    }
+    return String(a) === String(b);
+  }
+
+  _queueAVDSuppressedEvent(deviceId, capabilityId, value) {
+    const key = `${deviceId}::${capabilityId}`;
+    const now = Date.now();
+    const list = (this.avdSuppressedCapabilityEvents.get(key) || []).filter(item => item.expiresAt > now);
+    list.push({ value, expiresAt: now + 5000 });
+    this.avdSuppressedCapabilityEvents.set(key, list);
+  }
+
+  _consumeAVDSuppressedEvent(deviceId, capabilityId, value) {
+    const key = `${deviceId}::${capabilityId}`;
+    const now = Date.now();
+    const list = (this.avdSuppressedCapabilityEvents.get(key) || []).filter(item => item.expiresAt > now);
+    const index = list.findIndex(item => this._avdCapabilityValueEquals(item.value, value));
+    if (index < 0) {
+      if (list.length) this.avdSuppressedCapabilityEvents.set(key, list);
+      else this.avdSuppressedCapabilityEvents.delete(key);
+      return false;
+    }
+    list.splice(index, 1);
+    if (list.length) this.avdSuppressedCapabilityEvents.set(key, list);
+    else this.avdSuppressedCapabilityEvents.delete(key);
+    return true;
+  }
+
+  _avdControlActivated(value) {
+    // Stateful AVD buttons and Yes/No fields normally emit true when activated.
+    // Stateless button events may not carry a value, so only explicit OFF values
+    // are treated as inactive.
+    if (value === false || value === 0) return false;
+    if (/^(false|0|off|no)$/i.test(String(value))) return false;
+    return true;
+  }
+
+  _avdExplicitBooleanState(value) {
+    if (value === true || value === 1 || /^(true|1|on|yes)$/i.test(String(value))) return true;
+    if (value === false || value === 0 || /^(false|0|off|no)$/i.test(String(value))) return false;
+    return null;
+  }
+
+  _setAVDCapabilityRuntimeState(deviceId, capabilityId, value) {
+    const state = this._avdExplicitBooleanState(value);
+    if (state === null) return null;
+    this.avdCapabilityState.set(`${deviceId}::${capabilityId}`, state);
+    return state;
+  }
+
+  _avdGroupMembers(deviceRule, groupId) {
+    const group = String(groupId || '').trim();
+    if (!group) return [];
+    const members = [];
+    for (const [capabilityId, rule] of Object.entries(deviceRule?.booleanRules || {})) {
+      if (String(rule?.exclusiveGroup || '').trim() === group) members.push(capabilityId);
+    }
+    for (const [capabilityId, rule] of Object.entries(deviceRule?.buttonRules || {})) {
+      if (String(rule?.exclusiveGroup || '').trim() === group) members.push(capabilityId);
+    }
+    return [...new Set(members)];
+  }
+
+  _setAVDGroupAllOffRuntimeState(deviceId, groupId, allOff) {
+    this.avdGroupAllOffState.set(`${deviceId}::${String(groupId || '').trim()}`, allOff === true);
+  }
+
+  _getAVDGroupAllOffRuntimeState(deviceId, groupId) {
+    return this.avdGroupAllOffState.get(`${deviceId}::${String(groupId || '').trim()}`);
+  }
+
+  async _evaluateAVDGroupAllOff(deviceId, groupId, deviceRule, source = 'event') {
+    const group = String(groupId || '').trim();
+    if (!group) return false;
+    const members = this._avdGroupMembers(deviceRule, group);
+    if (!members.length) return false;
+    const states = members.map(capabilityId => this.avdCapabilityState.get(`${deviceId}::${capabilityId}`));
+    // A stateless AVD push button has no reliable OFF state. Do not guess that a
+    // group is fully off until every member has reported an explicit boolean state.
+    if (states.some(state => state === undefined)) return false;
+    const allOff = states.every(state => state === false);
+    const previousAllOff = this._getAVDGroupAllOffRuntimeState(deviceId, group);
+    this._setAVDGroupAllOffRuntimeState(deviceId, group, allOff);
+    if (!allOff || previousAllOff === true) return false;
+
+    const actions = this._normalizeDeviceActionSet(deviceRule?.groupRules?.[group]?.allOff);
+    const hasActions = actions.on.length > 0 || actions.off.length > 0;
+    this.log(`[AVD] Exclusive group ${group} on ${deviceId} is now fully OFF`);
+    this._markDiagnostics('avd_group_all_off', { deviceId, group, source, actions: hasActions });
+    if (!hasActions) return true;
+    await this._applyModeSwitchActionSet(actions, `AVD:${deviceId}:group:${group}:all-off`);
+    return true;
+  }
+
+  async _setAVDCapabilityValueSilently(deviceId, capabilityId, value) {
+    let previous;
+    try {
+      const raw = await this._getDevicesSafe();
+      const device = raw?.[deviceId] || Object.values(raw || {}).find(d => String(d?.id) === String(deviceId));
+      previous = device?.capabilitiesObj?.[capabilityId]?.value;
+      if (previous === undefined) previous = device?.capabilityValues?.[capabilityId];
+      if (previous !== undefined && this._avdCapabilityValueEquals(previous, value)) return false;
+    } catch (_) {}
+
+    this._queueAVDSuppressedEvent(deviceId, capabilityId, value);
+    try {
+      await this._setDeviceCapabilityValue(deviceId, capabilityId, value);
+      this._setAVDCapabilityRuntimeState(deviceId, capabilityId, value);
+      return true;
+    } catch (error) {
+      // Remove the queued suppression if the write itself failed.
+      this._consumeAVDSuppressedEvent(deviceId, capabilityId, value);
+      throw error;
+    }
+  }
+
+  async _deactivateAVDExclusiveGroup(deviceId, activeCapabilityId, groupId, deviceRule) {
+    const group = String(groupId || '').trim();
+    if (!group) return;
+    const members = [];
+    for (const [capabilityId, rule] of Object.entries(deviceRule?.booleanRules || {})) {
+      if (capabilityId !== activeCapabilityId && String(rule?.exclusiveGroup || '').trim() === group) members.push(capabilityId);
+    }
+    for (const [capabilityId, rule] of Object.entries(deviceRule?.buttonRules || {})) {
+      if (capabilityId !== activeCapabilityId && String(rule?.exclusiveGroup || '').trim() === group) members.push(capabilityId);
+    }
+    for (const capabilityId of [...new Set(members)]) {
+      try {
+        const changed = await this._setAVDCapabilityValueSilently(deviceId, capabilityId, false);
+        if (changed) this.log(`[AVD] Silently switched ${deviceId}/${capabilityId} OFF for exclusive group ${group}`);
+      } catch (error) {
+        // Some AVD button capabilities are stateless and cannot be written. Keep
+        // the active button working and log the unsupported sibling instead.
+        this.error(`[AVD] Could not silently switch ${deviceId}/${capabilityId} OFF`, error);
+      }
+    }
+  }
+
+  async _handleAVDCapabilityChanged(deviceId, capabilityId, value) {
+    const explicitState = this._setAVDCapabilityRuntimeState(deviceId, capabilityId, value);
+    if (this._consumeAVDSuppressedEvent(deviceId, capabilityId, value)) {
+      this.log(`[AVD] Ignored internally synchronized event ${deviceId}/${capabilityId}=${String(value)}`);
+      this._markDiagnostics('avd_sync_suppressed', { deviceId, capabilityId, value: String(value) });
+      return;
+    }
+    const rules = this.getAVDDeviceRules();
+    const deviceRule = rules[deviceId];
+    if (!deviceRule || deviceRule.enabled === false) return;
+    let actions = null;
+    let source = `AVD:${deviceId}:${capabilityId}`;
+    if (deviceRule.listRules?.[capabilityId]) {
+      actions = deviceRule.listRules[capabilityId][String(value)];
+      source += `:${String(value)}`;
+    } else if (deviceRule.booleanRules?.[capabilityId]) {
+      const state = explicitState === true ? 'on' : 'off';
+      const booleanRule = deviceRule.booleanRules[capabilityId];
+      const group = String(booleanRule.exclusiveGroup || '').trim();
+      const linked = this._sanitizeDeviceIdList(booleanRule.linkedDeviceIds);
+      const advanced = this._normalizeDeviceActionSet(booleanRule[state]);
+      // A linked device follows the AVD switch by default. Advanced actions are
+      // merged on top so existing configurations and exceptions keep working.
+      actions = {
+        on: [...new Set([...(state === 'on' ? linked : []), ...advanced.on])],
+        off: [...new Set([...(state === 'off' ? linked : []), ...advanced.off])],
+      };
+      source += `:${state}`;
+      if (state === 'on' && group) {
+        this._setAVDGroupAllOffRuntimeState(deviceId, group, false);
+        await this._deactivateAVDExclusiveGroup(deviceId, capabilityId, group, deviceRule);
+      }
+    } else if (deviceRule.buttonRules?.[capabilityId]) {
+      const buttonRule = deviceRule.buttonRules[capabilityId];
+      const group = String(buttonRule.exclusiveGroup || '').trim();
+
+      // AVD can expose a button as a real stateful Yes/No control. In that case
+      // Mode Switch supports a separate action profile for ON and OFF.
+      // Stateless push buttons have no explicit state and keep behaving as an ON/press.
+      const state = explicitState === false ? 'off' : 'on';
+      actions = this._normalizeDeviceActionSet(state === 'off' ? buttonRule.offState : buttonRule.onState);
+      source += `:${state}`;
+
+      if (state === 'on' && group) {
+        this._setAVDGroupAllOffRuntimeState(deviceId, group, false);
+        await this._deactivateAVDExclusiveGroup(deviceId, capabilityId, group, deviceRule);
+      }
+
+      // IMPORTANT: OFF values written by _deactivateAVDExclusiveGroup never arrive
+      // here because the suppression check at the top of this handler consumes them.
+      // Therefore sibling OFF actions cannot cascade when Mode Switch itself makes
+      // an exclusive group switch.
+    }
+    if (!actions) return;
+    const guardKey = `${source}:${JSON.stringify(value)}`;
+    const now = Date.now();
+    const previous = this.avdEventGuard.get(guardKey) || 0;
+    if (now - previous < 350) return;
+    this.avdEventGuard.set(guardKey, now);
+    if (this.avdEventGuard.size > 100) {
+      for (const [key, at] of this.avdEventGuard) if (now - at > 10000) this.avdEventGuard.delete(key);
+    }
+    await this._applyModeSwitchActionSet(actions, source);
+    this._markDiagnostics('avd_actions', { deviceId, capabilityId, value: String(value), source });
+    const booleanRule = deviceRule.booleanRules?.[capabilityId];
+    const booleanGroup = String(booleanRule?.exclusiveGroup || '').trim();
+    if (booleanRule && explicitState === false && booleanGroup) {
+      await this._evaluateAVDGroupAllOff(deviceId, booleanGroup, deviceRule, 'boolean-off');
+    }
+    const buttonRule = deviceRule.buttonRules?.[capabilityId];
+    const buttonGroup = String(buttonRule?.exclusiveGroup || '').trim();
+    if (buttonRule && explicitState === false && buttonGroup) {
+      await this._evaluateAVDGroupAllOff(deviceId, buttonGroup, deviceRule, 'button-off');
+    }
   }
 
   getModeSwitchDeviceRules() {

@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "com.modeswitch",
-  "version": "3.2.1",
+  "version": "3.5.5",
   "compatibility": ">=12.3.0",
   "sdk": 3,
   "platforms": [
@@ -212,6 +212,40 @@
     "post_reset_contact_counter": {
       "method": "POST",
       "path": "/contact_counter/reset"
+    },
+    "put_group_watch_rules": {
+      "method": "PUT",
+      "path": "/group_watch_rules"
+    },
+    "get_group_watch_status": {
+      "method": "GET",
+      "path": "/group_watch_status"
+    },
+    "get_local_config_info": {
+      "method": "GET",
+      "path": "/local_config_info"
+    },
+    "post_set_local_config_origin": {
+      "method": "POST",
+      "path": "/local_config_origin"
+    },
+    "post_regenerate_local_config_token": {
+      "method": "POST",
+      "path": "/local_config_token/regenerate"
+    },
+    "get_local_config_bootstrap": {
+      "method": "GET",
+      "path": "/local_config_bootstrap",
+      "public": true
+    },
+    "post_local_config_api": {
+      "method": "POST",
+      "path": "/local_config_api",
+      "public": true
+    },
+    "put_avd_device_rules": {
+      "method": "PUT",
+      "path": "/avd_device_rules"
     }
   },
   "runtime": "nodejs",
@@ -927,6 +961,333 @@
       },
       {
         "title": {
+          "en": "Circuit appears down",
+          "nl": "Groep lijkt uitgevallen",
+          "de": "Stromkreis scheint ausgefallen",
+          "fr": "Circuit semble coupé",
+          "es": "El circuito parece caído",
+          "it": "Il circuito sembra interrotto",
+          "sv": "Gruppen verkar ha gått ner",
+          "no": "Kursen ser ut til å ha falt ut"
+        },
+        "titleFormatted": {
+          "en": "Circuit appears down",
+          "nl": "Groep lijkt uitgevallen",
+          "de": "Stromkreis scheint ausgefallen",
+          "fr": "Circuit semble coupé",
+          "es": "El circuito parece caído",
+          "it": "Il circuito sembra interrotto",
+          "sv": "Gruppen verkar ha gått ner",
+          "no": "Kursen ser ut til å ha falt ut"
+        },
+        "tokens": [
+          {
+            "name": "group",
+            "type": "string",
+            "title": {
+              "en": "Circuit",
+              "nl": "Groep",
+              "de": "Stromkreis",
+              "fr": "Circuit",
+              "es": "Circuito",
+              "it": "Circuito",
+              "sv": "Grupp",
+              "no": "Kurs"
+            }
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "title": {
+              "en": "Status",
+              "nl": "Status",
+              "de": "Status",
+              "fr": "État",
+              "es": "Estado",
+              "it": "Stato",
+              "sv": "Status",
+              "no": "Status"
+            }
+          },
+          {
+            "name": "affected_count",
+            "type": "number",
+            "title": {
+              "en": "Affected devices",
+              "nl": "Apparaten met probleem",
+              "de": "Betroffene Geräte",
+              "fr": "Appareils concernés",
+              "es": "Dispositivos afectados",
+              "it": "Dispositivi interessati",
+              "sv": "Berörda enheter",
+              "no": "Berørte enheter"
+            }
+          },
+          {
+            "name": "total_devices",
+            "type": "number",
+            "title": {
+              "en": "Total devices",
+              "nl": "Totaal apparaten",
+              "de": "Geräte gesamt",
+              "fr": "Total appareils",
+              "es": "Total dispositivos",
+              "it": "Dispositivi totali",
+              "sv": "Totalt antal enheter",
+              "no": "Totalt antall enheter"
+            }
+          },
+          {
+            "name": "affected_devices",
+            "type": "string",
+            "title": {
+              "en": "Affected device names",
+              "nl": "Apparaten met probleem",
+              "de": "Betroffene Gerätenamen",
+              "fr": "Appareils concernés",
+              "es": "Dispositivos afectados",
+              "it": "Dispositivi interessati",
+              "sv": "Berörda enheter",
+              "no": "Berørte enheter"
+            }
+          },
+          {
+            "name": "duration_seconds",
+            "type": "number",
+            "title": {
+              "en": "Duration (seconds)",
+              "nl": "Duur (seconden)",
+              "de": "Dauer (Sekunden)",
+              "fr": "Durée (secondes)",
+              "es": "Duración (segundos)",
+              "it": "Durata (secondi)",
+              "sv": "Varaktighet (sekunder)",
+              "no": "Varighet (sekunder)"
+            }
+          }
+        ],
+        "id": "group_watch_outage"
+      },
+      {
+        "title": {
+          "en": "Circuit recovered",
+          "nl": "Groep hersteld",
+          "de": "Stromkreis wiederhergestellt",
+          "fr": "Circuit rétabli",
+          "es": "Circuito recuperado",
+          "it": "Circuito ripristinato",
+          "sv": "Gruppen återställd",
+          "no": "Kursen er gjenopprettet"
+        },
+        "titleFormatted": {
+          "en": "Circuit recovered",
+          "nl": "Groep hersteld",
+          "de": "Stromkreis wiederhergestellt",
+          "fr": "Circuit rétabli",
+          "es": "Circuito recuperado",
+          "it": "Circuito ripristinato",
+          "sv": "Gruppen återställd",
+          "no": "Kursen er gjenopprettet"
+        },
+        "tokens": [
+          {
+            "name": "group",
+            "type": "string",
+            "title": {
+              "en": "Circuit",
+              "nl": "Groep",
+              "de": "Stromkreis",
+              "fr": "Circuit",
+              "es": "Circuito",
+              "it": "Circuito",
+              "sv": "Grupp",
+              "no": "Kurs"
+            }
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "title": {
+              "en": "Status",
+              "nl": "Status",
+              "de": "Status",
+              "fr": "État",
+              "es": "Estado",
+              "it": "Stato",
+              "sv": "Status",
+              "no": "Status"
+            }
+          },
+          {
+            "name": "affected_count",
+            "type": "number",
+            "title": {
+              "en": "Affected devices",
+              "nl": "Apparaten met probleem",
+              "de": "Betroffene Geräte",
+              "fr": "Appareils concernés",
+              "es": "Dispositivos afectados",
+              "it": "Dispositivi interessati",
+              "sv": "Berörda enheter",
+              "no": "Berørte enheter"
+            }
+          },
+          {
+            "name": "total_devices",
+            "type": "number",
+            "title": {
+              "en": "Total devices",
+              "nl": "Totaal apparaten",
+              "de": "Geräte gesamt",
+              "fr": "Total appareils",
+              "es": "Total dispositivos",
+              "it": "Dispositivi totali",
+              "sv": "Totalt antal enheter",
+              "no": "Totalt antall enheter"
+            }
+          },
+          {
+            "name": "affected_devices",
+            "type": "string",
+            "title": {
+              "en": "Affected device names",
+              "nl": "Apparaten met probleem",
+              "de": "Betroffene Gerätenamen",
+              "fr": "Appareils concernés",
+              "es": "Dispositivos afectados",
+              "it": "Dispositivi interessati",
+              "sv": "Berörda enheter",
+              "no": "Berørte enheter"
+            }
+          },
+          {
+            "name": "duration_seconds",
+            "type": "number",
+            "title": {
+              "en": "Duration (seconds)",
+              "nl": "Duur (seconden)",
+              "de": "Dauer (Sekunden)",
+              "fr": "Durée (secondes)",
+              "es": "Duración (segundos)",
+              "it": "Durata (secondi)",
+              "sv": "Varaktighet (sekunder)",
+              "no": "Varighet (sekunder)"
+            }
+          }
+        ],
+        "id": "group_watch_recovered"
+      },
+      {
+        "title": {
+          "en": "Circuit may be down",
+          "nl": "Groep mogelijk uitgevallen",
+          "de": "Stromkreis möglicherweise ausgefallen",
+          "fr": "Circuit peut être coupé",
+          "es": "El circuito puede haberse caído",
+          "it": "Il circuito potrebbe essere interrotto",
+          "sv": "Gruppen kan ha gått ner",
+          "no": "Kursen kan ha falt ut"
+        },
+        "titleFormatted": {
+          "en": "Circuit may be down",
+          "nl": "Groep mogelijk uitgevallen",
+          "de": "Stromkreis möglicherweise ausgefallen",
+          "fr": "Circuit peut être coupé",
+          "es": "El circuito puede haberse caído",
+          "it": "Il circuito potrebbe essere interrotto",
+          "sv": "Gruppen kan ha gått ner",
+          "no": "Kursen kan ha falt ut"
+        },
+        "tokens": [
+          {
+            "name": "group",
+            "type": "string",
+            "title": {
+              "en": "Circuit",
+              "nl": "Groep",
+              "de": "Stromkreis",
+              "fr": "Circuit",
+              "es": "Circuito",
+              "it": "Circuito",
+              "sv": "Grupp",
+              "no": "Kurs"
+            }
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "title": {
+              "en": "Status",
+              "nl": "Status",
+              "de": "Status",
+              "fr": "État",
+              "es": "Estado",
+              "it": "Stato",
+              "sv": "Status",
+              "no": "Status"
+            }
+          },
+          {
+            "name": "affected_count",
+            "type": "number",
+            "title": {
+              "en": "Affected devices",
+              "nl": "Apparaten met probleem",
+              "de": "Betroffene Geräte",
+              "fr": "Appareils concernés",
+              "es": "Dispositivos afectados",
+              "it": "Dispositivi interessati",
+              "sv": "Berörda enheter",
+              "no": "Berørte enheter"
+            }
+          },
+          {
+            "name": "total_devices",
+            "type": "number",
+            "title": {
+              "en": "Total devices",
+              "nl": "Totaal apparaten",
+              "de": "Geräte gesamt",
+              "fr": "Total appareils",
+              "es": "Total dispositivos",
+              "it": "Dispositivi totali",
+              "sv": "Totalt antal enheter",
+              "no": "Totalt antall enheter"
+            }
+          },
+          {
+            "name": "affected_devices",
+            "type": "string",
+            "title": {
+              "en": "Affected device names",
+              "nl": "Apparaten met probleem",
+              "de": "Betroffene Gerätenamen",
+              "fr": "Appareils concernés",
+              "es": "Dispositivos afectados",
+              "it": "Dispositivi interessati",
+              "sv": "Berörda enheter",
+              "no": "Berørte enheter"
+            }
+          },
+          {
+            "name": "duration_seconds",
+            "type": "number",
+            "title": {
+              "en": "Duration (seconds)",
+              "nl": "Duur (seconden)",
+              "de": "Dauer (Sekunden)",
+              "fr": "Durée (secondes)",
+              "es": "Duración (segundos)",
+              "it": "Durata (secondi)",
+              "sv": "Varaktighet (sekunder)",
+              "no": "Varighet (sekunder)"
+            }
+          }
+        ],
+        "id": "group_watch_suspect"
+      },
+      {
+        "title": {
           "en": "List/mode changed",
           "nl": "Knop/modus gewijzigd",
           "de": "Liste/Modus geändert",
@@ -1002,6 +1363,111 @@
           }
         ],
         "id": "list_mode_changed"
+      },
+      {
+        "title": {
+          "en": "Main mode becomes active [[mode]]",
+          "nl": "Hoofdmodus wordt actief [[mode]]",
+          "de": "Hauptmodus wird aktiv [[mode]]",
+          "fr": "Le mode principal devient actif [[mode]]",
+          "es": "El modo principal se activa [[mode]]",
+          "no": "Hovedmodus blir aktiv [[mode]]",
+          "nb": "Hovedmodus blir aktiv [[mode]]",
+          "sv": "Huvudläge blir aktivt [[mode]]",
+          "it": "La modalità principale diventa attiva [[mode]]"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_controller",
+            "title": {
+              "en": "Mode Controller",
+              "nl": "Moduscontroller",
+              "de": "Modus-Controller",
+              "fr": "Contrôleur de mode",
+              "es": "Controlador de modo",
+              "no": "Moduskontroller",
+              "nb": "Moduskontroller",
+              "sv": "Lägeskontroller",
+              "it": "Controller modalità"
+            }
+          },
+          {
+            "type": "autocomplete",
+            "name": "mode",
+            "title": {
+              "en": "Main mode",
+              "nl": "Hoofdmodus",
+              "de": "Hauptmodus",
+              "fr": "Mode principal",
+              "es": "Modo principal",
+              "no": "Hovedmodus",
+              "nb": "Hovedmodus",
+              "sv": "Huvudläge",
+              "it": "Modalità principale"
+            }
+          }
+        ],
+        "tokens": [
+          {
+            "name": "main_mode",
+            "type": "string",
+            "title": {
+              "en": "Main mode",
+              "nl": "Hoofdmodus",
+              "de": "Hauptmodus",
+              "fr": "Mode principal",
+              "es": "Modo principal",
+              "no": "Hovedmodus",
+              "nb": "Hovedmodus",
+              "sv": "Huvudläge",
+              "it": "Modalità principale"
+            }
+          },
+          {
+            "name": "previous_main_mode",
+            "type": "string",
+            "title": {
+              "en": "Previous main mode",
+              "nl": "Vorige hoofdmodus",
+              "de": "Vorheriger Hauptmodus",
+              "fr": "Mode principal précédent",
+              "es": "Modo principal anterior",
+              "no": "Forrige hovedmodus",
+              "nb": "Forrige hovedmodus",
+              "sv": "Föregående huvudläge",
+              "it": "Modalità principale precedente"
+            }
+          },
+          {
+            "name": "source",
+            "type": "string",
+            "title": {
+              "en": "Source",
+              "nl": "Bron",
+              "de": "Quelle",
+              "fr": "Source",
+              "es": "Origen",
+              "no": "Kilde",
+              "nb": "Kilde",
+              "sv": "Källa",
+              "it": "Origine"
+            }
+          }
+        ],
+        "titleFormatted": {
+          "en": "Main mode becomes active [[mode]]",
+          "nl": "Hoofdmodus wordt actief [[mode]]",
+          "de": "Hauptmodus wird aktiv [[mode]]",
+          "fr": "Le mode principal devient actif [[mode]]",
+          "es": "El modo principal se activa [[mode]]",
+          "no": "Hovedmodus blir aktiv [[mode]]",
+          "nb": "Hovedmodus blir aktiv [[mode]]",
+          "sv": "Huvudläge blir aktivt [[mode]]",
+          "it": "La modalità principale diventa attiva [[mode]]"
+        },
+        "id": "main_mode_activated"
       },
       {
         "title": {
@@ -1498,6 +1964,305 @@
       },
       {
         "title": {
+          "en": "Circuit [[group]] !{{has a problem|has no problem}}",
+          "nl": "Groep [[group]] !{{heeft een probleem|heeft geen probleem}}",
+          "de": "Stromkreis [[group]] !{{hat ein Problem|hat kein Problem}}",
+          "fr": "Circuit [[group]] !{{a un problème|n’a pas de problème}}",
+          "es": "Circuito [[group]] !{{tiene un problema|no tiene un problema}}",
+          "it": "Circuito [[group]] !{{ha un problema|non ha problemi}}",
+          "sv": "Grupp [[group]] !{{har ett problem|har inget problem}}",
+          "no": "Kurs [[group]] !{{har et problem|har ikke et problem}}"
+        },
+        "titleFormatted": {
+          "en": "Circuit [[group]] !{{has a problem|has no problem}}",
+          "nl": "Groep [[group]] !{{heeft een probleem|heeft geen probleem}}",
+          "de": "Stromkreis [[group]] !{{hat ein Problem|hat kein Problem}}",
+          "fr": "Circuit [[group]] !{{a un problème|n’a pas de problème}}",
+          "es": "Circuito [[group]] !{{tiene un problema|no tiene un problema}}",
+          "it": "Circuito [[group]] !{{ha un problema|non ha problemi}}",
+          "sv": "Grupp [[group]] !{{har ett problem|har inget problem}}",
+          "no": "Kurs [[group]] !{{har et problem|har ikke et problem}}"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "group",
+            "title": {
+              "en": "Circuit",
+              "nl": "Groep",
+              "de": "Stromkreis",
+              "fr": "Circuit",
+              "es": "Circuito",
+              "it": "Circuito",
+              "sv": "Grupp",
+              "no": "Kurs"
+            }
+          }
+        ],
+        "id": "group_watch_has_problem"
+      },
+      {
+        "title": {
+          "en": "Circuit [[group]] !{{is OK|is not OK}}",
+          "nl": "Groep [[group]] !{{is in orde|is niet in orde}}",
+          "de": "Stromkreis [[group]] !{{ist in Ordnung|ist nicht in Ordnung}}",
+          "fr": "Circuit [[group]] !{{est en ordre|n’est pas en ordre}}",
+          "es": "Circuito [[group]] !{{está correcto|no está correcto}}",
+          "it": "Circuito [[group]] !{{è OK|non è OK}}",
+          "sv": "Grupp [[group]] !{{är OK|är inte OK}}",
+          "no": "Kurs [[group]] !{{er OK|er ikke OK}}"
+        },
+        "titleFormatted": {
+          "en": "Circuit [[group]] !{{is OK|is not OK}}",
+          "nl": "Groep [[group]] !{{is in orde|is niet in orde}}",
+          "de": "Stromkreis [[group]] !{{ist in Ordnung|ist nicht in Ordnung}}",
+          "fr": "Circuit [[group]] !{{est en ordre|n’est pas en ordre}}",
+          "es": "Circuito [[group]] !{{está correcto|no está correcto}}",
+          "it": "Circuito [[group]] !{{è OK|non è OK}}",
+          "sv": "Grupp [[group]] !{{är OK|är inte OK}}",
+          "no": "Kurs [[group]] !{{er OK|er ikke OK}}"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "group",
+            "title": {
+              "en": "Circuit",
+              "nl": "Groep",
+              "de": "Stromkreis",
+              "fr": "Circuit",
+              "es": "Circuito",
+              "it": "Circuito",
+              "sv": "Grupp",
+              "no": "Kurs"
+            }
+          }
+        ],
+        "id": "group_watch_is_ok"
+      },
+      {
+        "title": {
+          "en": "Main mode (including submodes) !{{is|is not}} [[mode]]",
+          "nl": "Hoofdmodus (inclusief submodi) !{{is|is niet}} [[mode]]",
+          "de": "Hauptmodus (einschließlich Untermodi) !{{ist|ist nicht}} [[mode]]",
+          "fr": "Le mode principal (sous-modes inclus) !{{est|n’est pas}} [[mode]]",
+          "es": "El modo principal (incluidos submodos) !{{es|no es}} [[mode]]",
+          "no": "Hovedmodus (inkludert undermoduser) !{{er|er ikke}} [[mode]]",
+          "nb": "Hovedmodus (inkludert undermoduser) !{{er|er ikke}} [[mode]]",
+          "sv": "Huvudläge (inklusive underlägen) !{{är|är inte}} [[mode]]",
+          "it": "La modalità principale (incluse le sottomodalità) !{{è|non è}} [[mode]]"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_controller",
+            "title": {
+              "en": "Mode Controller",
+              "nl": "Moduscontroller",
+              "de": "Modus-Controller",
+              "fr": "Contrôleur de mode",
+              "es": "Controlador de modo",
+              "no": "Moduskontroller",
+              "nb": "Moduskontroller",
+              "sv": "Lägeskontroller",
+              "it": "Controller modalità"
+            }
+          },
+          {
+            "type": "autocomplete",
+            "name": "mode",
+            "title": {
+              "en": "Main mode",
+              "nl": "Hoofdmodus",
+              "de": "Hauptmodus",
+              "fr": "Mode principal",
+              "es": "Modo principal",
+              "no": "Hovedmodus",
+              "nb": "Hovedmodus",
+              "sv": "Huvudläge",
+              "it": "Modalità principale"
+            }
+          }
+        ],
+        "titleFormatted": {
+          "en": "Main mode (including submodes) !{{is|is not}} [[mode]]",
+          "nl": "Hoofdmodus (inclusief submodi) !{{is|is niet}} [[mode]]",
+          "de": "Hauptmodus (einschließlich Untermodi) !{{ist|ist nicht}} [[mode]]",
+          "fr": "Le mode principal (sous-modes inclus) !{{est|n’est pas}} [[mode]]",
+          "es": "El modo principal (incluidos submodos) !{{es|no es}} [[mode]]",
+          "no": "Hovedmodus (inkludert undermoduser) !{{er|er ikke}} [[mode]]",
+          "nb": "Hovedmodus (inkludert undermoduser) !{{er|er ikke}} [[mode]]",
+          "sv": "Huvudläge (inklusive underlägen) !{{är|är inte}} [[mode]]",
+          "it": "La modalità principale (incluse le sottomodalità) !{{è|non è}} [[mode]]"
+        },
+        "id": "is_main_mode"
+      },
+      {
+        "title": {
+          "en": "!{{Main mode|NOT: Main mode}} [[main_comparison]] [[main_mode]] and submode [[comparison]] [[sub_mode]]",
+          "nl": "!{{Hoofdmodus|NIET: Hoofdmodus}} [[main_comparison]] [[main_mode]] en submodus [[comparison]] [[sub_mode]]",
+          "de": "!{{Hauptmodus|NICHT: Hauptmodus}} [[main_comparison]] [[main_mode]] und Untermodus [[comparison]] [[sub_mode]]",
+          "fr": "!{{Mode principal|NON : Mode principal}} [[main_comparison]] [[main_mode]] et sous-mode [[comparison]] [[sub_mode]]",
+          "es": "!{{Modo principal|NO: Modo principal}} [[main_comparison]] [[main_mode]] y submodo [[comparison]] [[sub_mode]]",
+          "it": "!{{Modalità principale|NON: Modalità principale}} [[main_comparison]] [[main_mode]] e sottomodalità [[comparison]] [[sub_mode]]",
+          "sv": "!{{Huvudläge|INTE: Huvudläge}} [[main_comparison]] [[main_mode]] och underläge [[comparison]] [[sub_mode]]",
+          "no": "!{{Hovedmodus|IKKE: Hovedmodus}} [[main_comparison]] [[main_mode]] og undermodus [[comparison]] [[sub_mode]]",
+          "nb": "!{{Hovedmodus|IKKE: Hovedmodus}} [[main_comparison]] [[main_mode]] og undermodus [[comparison]] [[sub_mode]]"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_controller",
+            "title": {
+              "en": "Mode Controller",
+              "nl": "Moduscontroller",
+              "de": "Modus-Controller",
+              "fr": "Contrôleur de mode",
+              "es": "Controlador de modo",
+              "it": "Controller modalità",
+              "sv": "Lägeskontroller",
+              "no": "Moduskontroller",
+              "nb": "Moduskontroller"
+            }
+          },
+          {
+            "type": "dropdown",
+            "name": "main_comparison",
+            "title": {
+              "en": "Main mode comparison",
+              "nl": "Vergelijking hoofdmodus",
+              "de": "Vergleich Hauptmodus",
+              "fr": "Comparaison du mode principal",
+              "es": "Comparación del modo principal",
+              "it": "Confronto modalità principale",
+              "sv": "Jämförelse huvudläge",
+              "no": "Sammenligning hovedmodus",
+              "nb": "Sammenligning hovedmodus"
+            },
+            "values": [
+              {
+                "id": "is",
+                "label": {
+                  "en": "is",
+                  "nl": "is",
+                  "de": "ist",
+                  "fr": "est",
+                  "es": "es",
+                  "it": "è",
+                  "sv": "är",
+                  "no": "er",
+                  "nb": "er"
+                }
+              },
+              {
+                "id": "is_not",
+                "label": {
+                  "en": "is not",
+                  "nl": "is niet",
+                  "de": "ist nicht",
+                  "fr": "n’est pas",
+                  "es": "no es",
+                  "it": "non è",
+                  "sv": "är inte",
+                  "no": "er ikke",
+                  "nb": "er ikke"
+                }
+              }
+            ]
+          },
+          {
+            "type": "autocomplete",
+            "name": "main_mode",
+            "title": {
+              "en": "Main mode",
+              "nl": "Hoofdmodus",
+              "de": "Hauptmodus",
+              "fr": "Mode principal",
+              "es": "Modo principal",
+              "it": "Modalità principale",
+              "sv": "Huvudläge",
+              "no": "Hovedmodus",
+              "nb": "Hovedmodus"
+            }
+          },
+          {
+            "type": "dropdown",
+            "name": "comparison",
+            "title": {
+              "en": "Comparison",
+              "nl": "Vergelijking",
+              "de": "Vergleich",
+              "fr": "Comparaison",
+              "es": "Comparación",
+              "it": "Confronto",
+              "sv": "Jämförelse",
+              "no": "Sammenligning",
+              "nb": "Sammenligning"
+            },
+            "values": [
+              {
+                "id": "is",
+                "label": {
+                  "en": "is",
+                  "nl": "is",
+                  "de": "ist",
+                  "fr": "est",
+                  "es": "es",
+                  "it": "è",
+                  "sv": "är",
+                  "no": "er",
+                  "nb": "er"
+                }
+              },
+              {
+                "id": "is_not",
+                "label": {
+                  "en": "is not",
+                  "nl": "is niet",
+                  "de": "ist nicht",
+                  "fr": "n’est pas",
+                  "es": "no es",
+                  "it": "non è",
+                  "sv": "är inte",
+                  "no": "er ikke",
+                  "nb": "er ikke"
+                }
+              }
+            ]
+          },
+          {
+            "type": "autocomplete",
+            "name": "sub_mode",
+            "title": {
+              "en": "Submode",
+              "nl": "Submodus",
+              "de": "Untermodus",
+              "fr": "Sous-mode",
+              "es": "Submodo",
+              "it": "Sottomodalità",
+              "sv": "Underläge",
+              "no": "Undermodus",
+              "nb": "Undermodus"
+            }
+          }
+        ],
+        "titleFormatted": {
+          "en": "!{{Main mode|NOT: Main mode}} [[main_comparison]] [[main_mode]] and submode [[comparison]] [[sub_mode]]",
+          "nl": "!{{Hoofdmodus|NIET: Hoofdmodus}} [[main_comparison]] [[main_mode]] en submodus [[comparison]] [[sub_mode]]",
+          "de": "!{{Hauptmodus|NICHT: Hauptmodus}} [[main_comparison]] [[main_mode]] und Untermodus [[comparison]] [[sub_mode]]",
+          "fr": "!{{Mode principal|NON : Mode principal}} [[main_comparison]] [[main_mode]] et sous-mode [[comparison]] [[sub_mode]]",
+          "es": "!{{Modo principal|NO: Modo principal}} [[main_comparison]] [[main_mode]] y submodo [[comparison]] [[sub_mode]]",
+          "it": "!{{Modalità principale|NON: Modalità principale}} [[main_comparison]] [[main_mode]] e sottomodalità [[comparison]] [[sub_mode]]",
+          "sv": "!{{Huvudläge|INTE: Huvudläge}} [[main_comparison]] [[main_mode]] och underläge [[comparison]] [[sub_mode]]",
+          "no": "!{{Hovedmodus|IKKE: Hovedmodus}} [[main_comparison]] [[main_mode]] og undermodus [[comparison]] [[sub_mode]]",
+          "nb": "!{{Hovedmodus|IKKE: Hovedmodus}} [[main_comparison]] [[main_mode]] og undermodus [[comparison]] [[sub_mode]]"
+        },
+        "id": "is_main_sub_mode"
+      },
+      {
+        "title": {
           "en": "Current mode !{{is|is not}} [[mode]]",
           "nl": "Huidige modus !{{is|is niet}} [[mode]]",
           "de": "Aktueller Modus !{{ist|ist nicht}} [[mode]]",
@@ -1845,6 +2610,64 @@
       },
       {
         "title": {
+          "en": "Activate main mode [[mode]]",
+          "nl": "Activeer hoofdmodus [[mode]]",
+          "de": "Hauptmodus [[mode]] aktivieren",
+          "fr": "Activer le mode principal [[mode]]",
+          "es": "Activar modo principal [[mode]]",
+          "no": "Aktiver hovedmodus [[mode]]",
+          "nb": "Aktiver hovedmodus [[mode]]",
+          "sv": "Aktivera huvudläge [[mode]]",
+          "it": "Attiva modalità principale [[mode]]"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=mode_controller",
+            "title": {
+              "en": "Mode Controller",
+              "nl": "Moduscontroller",
+              "de": "Modus-Controller",
+              "fr": "Contrôleur de mode",
+              "es": "Controlador de modo",
+              "no": "Moduskontroller",
+              "nb": "Moduskontroller",
+              "sv": "Lägeskontroller",
+              "it": "Controller modalità"
+            }
+          },
+          {
+            "type": "autocomplete",
+            "name": "mode",
+            "title": {
+              "en": "Main mode",
+              "nl": "Hoofdmodus",
+              "de": "Hauptmodus",
+              "fr": "Mode principal",
+              "es": "Modo principal",
+              "no": "Hovedmodus",
+              "nb": "Hovedmodus",
+              "sv": "Huvudläge",
+              "it": "Modalità principale"
+            }
+          }
+        ],
+        "titleFormatted": {
+          "en": "Activate main mode [[mode]]",
+          "nl": "Activeer hoofdmodus [[mode]]",
+          "de": "Hauptmodus [[mode]] aktivieren",
+          "fr": "Activer le mode principal [[mode]]",
+          "es": "Activar modo principal [[mode]]",
+          "no": "Aktiver hovedmodus [[mode]]",
+          "nb": "Aktiver hovedmodus [[mode]]",
+          "sv": "Aktivera huvudläge [[mode]]",
+          "it": "Attiva modalità principale [[mode]]"
+        },
+        "id": "set_main_mode"
+      },
+      {
+        "title": {
           "en": "Set mode to [[mode]]",
           "nl": "Zet modus op [[mode]]",
           "de": "Modus auf [[mode]] setzen",
@@ -1954,6 +2777,84 @@
           "it": "Imposta pulsante [[button]] su [[state]]"
         },
         "id": "set_switch"
+      },
+      {
+        "title": {
+          "en": "Start appliance",
+          "nl": "Start apparaat",
+          "de": "Gerät starten",
+          "fr": "Démarrer appareil",
+          "es": "Iniciar dispositivo",
+          "it": "Avvia dispositivo",
+          "sv": "Starta apparat",
+          "no": "Start apparat"
+        },
+        "titleFormatted": {
+          "en": "Start appliance [[appliance]]",
+          "nl": "Start apparaat [[appliance]]",
+          "de": "Gerät [[appliance]] starten",
+          "fr": "Démarrer l’appareil [[appliance]]",
+          "es": "Iniciar dispositivo [[appliance]]",
+          "it": "Avvia dispositivo [[appliance]]",
+          "sv": "Starta apparaten [[appliance]]",
+          "no": "Start apparat [[appliance]]"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "appliance",
+            "title": {
+              "en": "Appliance",
+              "nl": "Apparaat",
+              "de": "Gerät",
+              "fr": "Appareil",
+              "es": "Dispositivo",
+              "it": "Dispositivo",
+              "sv": "Apparat",
+              "no": "Apparat"
+            }
+          }
+        ],
+        "id": "start_appliance"
+      },
+      {
+        "title": {
+          "en": "Stop appliance",
+          "nl": "Stop apparaat",
+          "de": "Gerät stoppen",
+          "fr": "Arrêter appareil",
+          "es": "Detener dispositivo",
+          "it": "Arresta dispositivo",
+          "sv": "Stoppa apparat",
+          "no": "Stopp apparat"
+        },
+        "titleFormatted": {
+          "en": "Stop appliance [[appliance]]",
+          "nl": "Stop apparaat [[appliance]]",
+          "de": "Gerät [[appliance]] stoppen",
+          "fr": "Arrêter l’appareil [[appliance]]",
+          "es": "Detener dispositivo [[appliance]]",
+          "it": "Arresta dispositivo [[appliance]]",
+          "sv": "Stoppa apparaten [[appliance]]",
+          "no": "Stopp apparat [[appliance]]"
+        },
+        "args": [
+          {
+            "type": "autocomplete",
+            "name": "appliance",
+            "title": {
+              "en": "Appliance",
+              "nl": "Apparaat",
+              "de": "Gerät",
+              "fr": "Appareil",
+              "es": "Dispositivo",
+              "it": "Dispositivo",
+              "sv": "Apparat",
+              "no": "Apparat"
+            }
+          }
+        ],
+        "id": "stop_appliance"
       },
       {
         "title": {
@@ -2346,14 +3247,14 @@
           "type": "checkbox",
           "title": {
             "en": "Show sub modes",
-            "nl": "Submodussen tonen",
+            "nl": "Submodi tonen",
             "de": "Untermodi anzeigen",
             "fr": "Afficher les sous-modes",
             "es": "Mostrar submodos"
           },
           "hint": {
             "en": "Show the sub modes belonging to the selected main mode.",
-            "nl": "Toon de submodussen die bij de gekozen hoofdmodus horen.",
+            "nl": "Toon de submodi die bij de gekozen hoofdmodus horen.",
             "de": "Zeigt die Untermodi an, die zum ausgewählten Hauptmodus gehören.",
             "fr": "Affiche les sous-modes appartenant au mode principal sélectionné.",
             "es": "Muestra los submodos pertenecientes al modo principal seleccionado."
@@ -2372,7 +3273,7 @@
           },
           "hint": {
             "en": "Show the selected on/off buttons below the modes.",
-            "nl": "Toon de gekozen aan/uit-knoppen onder de modussen.",
+            "nl": "Toon de gekozen aan/uit-knoppen onder de modi.",
             "de": "Zeigt die ausgewählten Ein/Aus-Schaltflächen unter den Modi an.",
             "fr": "Affiche les boutons marche/arrêt sélectionnés sous les modes.",
             "es": "Muestra los botones de encendido/apagado seleccionados debajo de los modos."
@@ -2535,16 +3436,53 @@
             "nl": "Live weerachtergrond",
             "de": "Live-Wetterhintergrund",
             "fr": "Arrière-plan météo en direct",
-            "es": "Fondo meteorológico en vivo"
+            "es": "Fondo meteorológico en vivo",
+            "it": "Sfondo meteo live",
+            "sv": "Liveväderbakgrund",
+            "no": "Live værbakgrunn",
+            "nb": "Live værbakgrunn"
           },
           "hint": {
             "en": "Use Homey's location and weather data as the widget background.",
             "nl": "Gebruik de locatie- en weergegevens van Homey als achtergrond van de widget.",
             "de": "Verwendet die Standort- und Wetterdaten von Homey als Widget-Hintergrund.",
             "fr": "Utilise les données de localisation et météo de Homey comme arrière-plan du widget.",
-            "es": "Utiliza los datos de ubicación y meteorología de Homey como fondo del widget."
+            "es": "Utiliza los datos de ubicación y meteorología de Homey como fondo del widget.",
+            "it": "Usa la posizione e i dati meteo di Homey come sfondo del widget.",
+            "sv": "Använd Homeys plats- och väderdata som widgetbakgrund.",
+            "no": "Bruk Homeys posisjons- og værdata som widgetbakgrunn.",
+            "nb": "Bruk Homeys posisjons- og værdata som widgetbakgrunn."
           },
           "value": true
+        },
+        {
+          "id": "weatherRefreshHours",
+          "type": "number",
+          "title": {
+            "en": "Refresh weather every (hours)",
+            "nl": "Weer verversen elke (uren)",
+            "de": "Wetter aktualisieren alle (Stunden)",
+            "fr": "Actualiser la météo toutes les (heures)",
+            "es": "Actualizar el tiempo cada (horas)",
+            "it": "Aggiorna meteo ogni (ore)",
+            "sv": "Uppdatera vädret var (timme)",
+            "no": "Oppdater været hver (time)",
+            "nb": "Oppdater været hver (time)"
+          },
+          "hint": {
+            "en": "Only used when Live weather background is enabled. Default: 5 hours.",
+            "nl": "Alleen gebruikt als Live weerachtergrond is ingeschakeld. Standaard: 5 uur.",
+            "de": "Wird nur verwendet, wenn der Live-Wetterhintergrund aktiviert ist. Standard: 5 Stunden.",
+            "fr": "Utilisé uniquement lorsque l’arrière-plan météo en direct est activé. Valeur par défaut : 5 heures.",
+            "es": "Solo se utiliza cuando el fondo meteorológico en vivo está activado. Predeterminado: 5 horas.",
+            "it": "Usato solo quando lo sfondo meteo live è attivo. Predefinito: 5 ore.",
+            "sv": "Används bara när liveväderbakgrund är aktiverad. Standard: 5 timmar.",
+            "no": "Brukes bare når live værbakgrunn er aktivert. Standard: 5 timer.",
+            "nb": "Brukes bare når live værbakgrunn er aktivert. Standard: 5 timer."
+          },
+          "value": 5,
+          "min": 1,
+          "max": 24
         },
         {
           "id": "weatherBackgroundIntensity",
@@ -2554,14 +3492,22 @@
             "nl": "Intensiteit weerachtergrond",
             "de": "Intensität des Wetterhintergrunds",
             "fr": "Intensité de l’arrière-plan météo",
-            "es": "Intensidad del fondo meteorológico"
+            "es": "Intensidad del fondo meteorológico",
+            "it": "Intensità sfondo meteo",
+            "sv": "Intensitet för väderbakgrund",
+            "no": "Intensitet for værbakgrunn",
+            "nb": "Intensitet for værbakgrunn"
           },
           "hint": {
             "en": "0 is subtle and 100 is strong.",
             "nl": "0 is subtiel en 100 is sterk.",
             "de": "0 ist dezent und 100 ist stark.",
             "fr": "0 correspond à un effet discret et 100 à un effet puissant.",
-            "es": "0 es sutil y 100 es intenso."
+            "es": "0 es sutil y 100 es intenso.",
+            "it": "0 è discreto e 100 è intenso.",
+            "sv": "0 är subtilt och 100 är starkt.",
+            "no": "0 er diskret og 100 er sterkt.",
+            "nb": "0 er diskret og 100 er sterkt."
           },
           "value": 80,
           "min": 0,
@@ -2639,79 +3585,6 @@
         "setMode": {
           "method": "POST",
           "path": "/mode"
-        }
-      }
-    },
-    "settings_panel": {
-      "name": {
-        "en": "Settings",
-        "nl": "Instellingen",
-        "de": "Einstellungen",
-        "fr": "Paramètres",
-        "es": "Configuración"
-      },
-      "height": 900,
-      "transparent": true,
-      "id": "settings_panel",
-      "settings": [
-        {
-          "id": "widgetHeight",
-          "type": "number",
-          "title": {
-            "en": "Widget height",
-            "nl": "Widget hoogte",
-            "de": "Widget-Höhe",
-            "fr": "Hauteur du widget",
-            "es": "Altura del widget"
-          },
-          "hint": {
-            "en": "Height in pixels (520-900). This widget is designed without scrolling.",
-            "nl": "Hoogte in pixels (520-900). Deze widget is ontworpen zonder scrollen.",
-            "de": "Höhe in Pixeln (520-900). Dieses Widget ist ohne Scrollen ausgelegt.",
-            "fr": "Hauteur en pixels (520-900). Ce widget est conçu sans défilement.",
-            "es": "Altura en píxeles (520-900). Este widget está diseñado sin desplazamiento."
-          },
-          "value": 900,
-          "min": 520,
-          "max": 900
-        }
-      ],
-      "api": {
-        "getDashboard": {
-          "method": "GET",
-          "path": "/"
-        },
-        "getConfig": {
-          "method": "GET",
-          "path": "/config"
-        },
-        "getEnvironment": {
-          "method": "GET",
-          "path": "/environment"
-        },
-        "saveSubModes": {
-          "method": "PUT",
-          "path": "/sub_modes"
-        },
-        "saveZoneRules": {
-          "method": "PUT",
-          "path": "/zone_rules"
-        },
-        "saveTemperatureRules": {
-          "method": "PUT",
-          "path": "/temperature_rules"
-        },
-        "saveApplianceRules": {
-          "method": "PUT",
-          "path": "/appliance_rules"
-        },
-        "saveScheduleRules": {
-          "method": "PUT",
-          "path": "/schedule_rules"
-        },
-        "saveAutoMode": {
-          "method": "PUT",
-          "path": "/auto_mode"
         }
       }
     }

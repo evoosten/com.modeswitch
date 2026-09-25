@@ -101,16 +101,26 @@ async function buildStatus(homey, input = {}) {
       durationSeconds: typeof state.finalDurationMs === 'number' ? Math.max(0, Math.round(state.finalDurationMs / 1000)) : (typeof state.durationMs === 'number' ? Math.max(0, Math.round(state.durationMs / 1000)) : null),
       runStartedAt: state.runStartedAt || null,
       runningSince: state.runStartedAt ? new Date(state.runStartedAt).toISOString() : (state.startedAt ? new Date(state.startedAt).toISOString() : null),
+      remainingTime: state.remainingTime || null,
+      remainingTimeRaw: state.remainingTimeRaw ?? null,
+      statusSourceValue: state.statusSourceValue ?? null,
       updatedAt: state.updatedAt || null, readyAt: state.readyAt || null, startedAt: state.startedAt || null,
     });
   }
 
+  const liveWeatherBackground = input && (input.liveWeatherBackground === true || input.liveWeatherBackground === 'true' || input.liveWeatherBackground === 1 || input.liveWeatherBackground === '1');
+  const refreshRaw = Number(input && input.weatherRefreshHours);
+  const weatherRefreshHours = Number.isFinite(refreshRaw) ? Math.max(1, Math.min(24, refreshRaw)) : 5;
+  const environment = await (app && typeof app.getEnvironment === 'function'
+    ? app.getEnvironment({ includeWeather: liveWeatherBackground, weatherRefreshHours })
+    : {});
+
   return {
-    widgetVersion: '3.0.1', language: locale,
+    widgetVersion: '3.0.2', language: locale,
     modes: modeData.modes, subModes: modeData.subModes, currentMode: modeData.currentMode, switches: modeData.switches || [], source: modeData.source,
     appliances,
     displaySettings: callSafe(app && typeof app.getDisplaySettings === 'function' ? app.getDisplaySettings.bind(app) : null, {}) || {},
-    environment: await callSafe(app && typeof app.getEnvironment === 'function' ? app.getEnvironment.bind(app) : null, {}) || {},
+    environment: environment || {},
     updatedAt: Date.now(),
   };
 }

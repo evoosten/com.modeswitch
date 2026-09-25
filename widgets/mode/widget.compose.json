@@ -51,14 +51,14 @@
       "type": "checkbox",
       "title": {
         "en": "Show sub modes",
-        "nl": "Submodussen tonen",
+        "nl": "Submodi tonen",
         "de": "Untermodi anzeigen",
         "fr": "Afficher les sous-modes",
         "es": "Mostrar submodos"
       },
       "hint": {
         "en": "Show the sub modes belonging to the selected main mode.",
-        "nl": "Toon de submodussen die bij de gekozen hoofdmodus horen.",
+        "nl": "Toon de submodi die bij de gekozen hoofdmodus horen.",
         "de": "Zeigt die Untermodi an, die zum ausgewählten Hauptmodus gehören.",
         "fr": "Affiche les sous-modes appartenant au mode principal sélectionné.",
         "es": "Muestra los submodos pertenecientes al modo principal seleccionado."
@@ -77,7 +77,7 @@
       },
       "hint": {
         "en": "Show the selected on/off buttons below the modes.",
-        "nl": "Toon de gekozen aan/uit-knoppen onder de modussen.",
+        "nl": "Toon de gekozen aan/uit-knoppen onder de modi.",
         "de": "Zeigt die ausgewählten Ein/Aus-Schaltflächen unter den Modi an.",
         "fr": "Affiche les boutons marche/arrêt sélectionnés sous les modes.",
         "es": "Muestra los botones de encendido/apagado seleccionados debajo de los modos."
@@ -240,16 +240,53 @@
         "nl": "Live weerachtergrond",
         "de": "Live-Wetterhintergrund",
         "fr": "Arrière-plan météo en direct",
-        "es": "Fondo meteorológico en vivo"
+        "es": "Fondo meteorológico en vivo",
+        "it": "Sfondo meteo live",
+        "sv": "Liveväderbakgrund",
+        "no": "Live værbakgrunn",
+        "nb": "Live værbakgrunn"
       },
       "hint": {
         "en": "Use Homey's location and weather data as the widget background.",
         "nl": "Gebruik de locatie- en weergegevens van Homey als achtergrond van de widget.",
         "de": "Verwendet die Standort- und Wetterdaten von Homey als Widget-Hintergrund.",
         "fr": "Utilise les données de localisation et météo de Homey comme arrière-plan du widget.",
-        "es": "Utiliza los datos de ubicación y meteorología de Homey como fondo del widget."
+        "es": "Utiliza los datos de ubicación y meteorología de Homey como fondo del widget.",
+        "it": "Usa la posizione e i dati meteo di Homey come sfondo del widget.",
+        "sv": "Använd Homeys plats- och väderdata som widgetbakgrund.",
+        "no": "Bruk Homeys posisjons- og værdata som widgetbakgrunn.",
+        "nb": "Bruk Homeys posisjons- og værdata som widgetbakgrunn."
       },
       "value": true
+    },
+    {
+      "id": "weatherRefreshHours",
+      "type": "number",
+      "title": {
+        "en": "Refresh weather every (hours)",
+        "nl": "Weer verversen elke (uren)",
+        "de": "Wetter aktualisieren alle (Stunden)",
+        "fr": "Actualiser la météo toutes les (heures)",
+        "es": "Actualizar el tiempo cada (horas)",
+        "it": "Aggiorna meteo ogni (ore)",
+        "sv": "Uppdatera vädret var (timme)",
+        "no": "Oppdater været hver (time)",
+        "nb": "Oppdater været hver (time)"
+      },
+      "hint": {
+        "en": "Only used when Live weather background is enabled. Default: 5 hours.",
+        "nl": "Alleen gebruikt als Live weerachtergrond is ingeschakeld. Standaard: 5 uur.",
+        "de": "Wird nur verwendet, wenn der Live-Wetterhintergrund aktiviert ist. Standard: 5 Stunden.",
+        "fr": "Utilisé uniquement lorsque l’arrière-plan météo en direct est activé. Valeur par défaut : 5 heures.",
+        "es": "Solo se utiliza cuando el fondo meteorológico en vivo está activado. Predeterminado: 5 horas.",
+        "it": "Usato solo quando lo sfondo meteo live è attivo. Predefinito: 5 ore.",
+        "sv": "Används bara när liveväderbakgrund är aktiverad. Standard: 5 timmar.",
+        "no": "Brukes bare når live værbakgrunn er aktivert. Standard: 5 timer.",
+        "nb": "Brukes bare når live værbakgrunn er aktivert. Standard: 5 timer."
+      },
+      "value": 5,
+      "min": 1,
+      "max": 24
     },
     {
       "id": "weatherBackgroundIntensity",
@@ -259,14 +296,22 @@
         "nl": "Intensiteit weerachtergrond",
         "de": "Intensität des Wetterhintergrunds",
         "fr": "Intensité de l’arrière-plan météo",
-        "es": "Intensidad del fondo meteorológico"
+        "es": "Intensidad del fondo meteorológico",
+        "it": "Intensità sfondo meteo",
+        "sv": "Intensitet för väderbakgrund",
+        "no": "Intensitet for værbakgrunn",
+        "nb": "Intensitet for værbakgrunn"
       },
       "hint": {
         "en": "0 is subtle and 100 is strong.",
         "nl": "0 is subtiel en 100 is sterk.",
         "de": "0 ist dezent und 100 ist stark.",
         "fr": "0 correspond à un effet discret et 100 à un effet puissant.",
-        "es": "0 es sutil y 100 es intenso."
+        "es": "0 es sutil y 100 es intenso.",
+        "it": "0 è discreto e 100 è intenso.",
+        "sv": "0 är subtilt och 100 är starkt.",
+        "no": "0 er diskret og 100 er sterkt.",
+        "nb": "0 er diskret og 100 er sterkt."
       },
       "value": 80,
       "min": 0,

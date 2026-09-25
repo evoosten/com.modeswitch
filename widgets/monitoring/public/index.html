@@ -405,6 +405,7 @@ devices.forEach(function(device){
   if(typeof device.lastPower==='number')metaParts.push(device.lastPower+' W');var energyText=formatEnergyKwh(device.energyKwh);if(energyText)metaParts.push(energyText);
   var runText=runningDurationText(device);
   if(runText)metaParts.push(runText);
+  if(device.status==='running'&&device.remainingTime)metaParts.push(tr('Nog','Remaining','Noch','Restant','Restante')+': '+device.remainingTime);
   if(metaParts.length){var meta=document.createElement('div');meta.className='meta';meta.textContent=metaParts.join(' · ');left.appendChild(meta)}
   var state=document.createElement('div');state.className='state '+(device.status==='running'?'running':device.status==='ready'?'ready':'idle');state.textContent=statusLabel(device.status);
   var right=document.createElement('div');right.className='device-right';right.appendChild(state);var arrow=document.createElement('span');arrow.className='device-arrow';arrow.textContent='›';right.appendChild(arrow);

@@ -32,6 +32,8 @@ module.exports = {
       temperatureRules: homey.app.getTemperatureRules(),
       applianceRules: homey.app.getApplianceRules(),
       applianceState: homey.app.getApplianceState(),
+      groupWatchRules: homey.app.getGroupWatchRules ? homey.app.getGroupWatchRules() : [],
+      groupWatchState: homey.app.getGroupWatchState ? homey.app.getGroupWatchState() : {},
       activityRules: homey.app.getActivityRules(),
       activityState: homey.app.getActivityState(),
       activityHistory: homey.app.getActivityHistory(),
@@ -40,6 +42,8 @@ module.exports = {
       displaySettings: homey.app.getDisplaySettings(),
       modeSwitchDevices: homey.app.getModeSwitchDevicesForSettings ? homey.app.getModeSwitchDevicesForSettings() : [],
       modeSwitchDeviceRules: homey.app.getModeSwitchDeviceRules ? homey.app.getModeSwitchDeviceRules() : {},
+      avdDevices: homey.app.getAVDDevicesForSettings ? await homey.app.getAVDDevicesForSettings() : [],
+      avdDeviceRules: homey.app.getAVDDeviceRules ? homey.app.getAVDDeviceRules() : {},
       keypadMappings: homey.app.getKeypadMappings ? homey.app.getKeypadMappings() : [],
     };
   },
@@ -91,6 +95,15 @@ module.exports = {
   async put_temperature_rules({ homey, body }) {
     const temperatureRules = await homey.app.saveTemperatureRules(body?.temperatureRules || []);
     return { ok: true, temperatureRules };
+  },
+
+  async put_group_watch_rules({ homey, body }) {
+    const groupWatchRules = await homey.app.saveGroupWatchRules(body?.groupWatchRules || []);
+    return { ok: true, groupWatchRules, groupWatchState: homey.app.getGroupWatchState() };
+  },
+
+  async get_group_watch_status({ homey }) {
+    return { ok: true, groupWatchState: homey.app.getGroupWatchState ? homey.app.getGroupWatchState() : {} };
   },
 
   async put_appliance_rules({ homey, body }) {
@@ -149,6 +162,11 @@ module.exports = {
     return { ok: true, keypadMappings };
   },
 
+  async put_avd_device_rules({ homey, body }) {
+    const avdDeviceRules = await homey.app.saveAVDDeviceRules(body?.avdDeviceRules || {});
+    return { ok: true, avdDeviceRules };
+  },
+
   async put_mode_switch_device_rules({ homey, body }) {
     const modeSwitchDeviceRules = await homey.app.saveModeSwitchDeviceRules(body?.modeSwitchDeviceRules || {});
     return { ok: true, modeSwitchDeviceRules };
@@ -201,7 +219,7 @@ module.exports = {
     if (!body || !body.sections || typeof body.sections !== 'object') {
       throw new Error('Missing import sections');
     }
-    const allowed = ['subModes', 'rules', 'zoneRules', 'temperatureRules', 'applianceRules', 'activityRules', 'scheduleRules', 'autoMode', 'displaySettings', 'modeSwitchDeviceRules', 'keypadMappings'];
+    const allowed = ['subModes', 'rules', 'zoneRules', 'temperatureRules', 'applianceRules', 'groupWatchRules', 'activityRules', 'scheduleRules', 'autoMode', 'displaySettings', 'modeSwitchDeviceRules', 'avdDeviceRules', 'keypadMappings'];
     const ids = Array.isArray(body.ids)
       ? body.ids.filter(id => allowed.includes(id) && Object.prototype.hasOwnProperty.call(body.sections, id))
       : [];
@@ -230,6 +248,10 @@ module.exports = {
       result.applianceRules = await homey.app.saveApplianceRules(Array.isArray(sections.applianceRules) ? sections.applianceRules : []);
       result.imported.push('applianceRules');
     }
+    if (ids.includes('groupWatchRules')) {
+      result.groupWatchRules = await homey.app.saveGroupWatchRules(Array.isArray(sections.groupWatchRules) ? sections.groupWatchRules : []);
+      result.imported.push('groupWatchRules');
+    }
     if (ids.includes('activityRules')) {
       result.activityRules = await homey.app.saveActivityRules(Array.isArray(sections.activityRules) ? sections.activityRules : []);
       result.imported.push('activityRules');
@@ -249,6 +271,10 @@ module.exports = {
     if (ids.includes('keypadMappings')) {
       result.keypadMappings = await homey.app.saveKeypadMappings(Array.isArray(sections.keypadMappings) ? sections.keypadMappings : []);
       result.imported.push('keypadMappings');
+    }
+    if (ids.includes('avdDeviceRules')) {
+      result.avdDeviceRules = await homey.app.saveAVDDeviceRules(sections.avdDeviceRules && typeof sections.avdDeviceRules === 'object' ? sections.avdDeviceRules : {});
+      result.imported.push('avdDeviceRules');
     }
     if (ids.includes('modeSwitchDeviceRules')) {
       result.modeSwitchDeviceRules = await homey.app.saveModeSwitchDeviceRules(sections.modeSwitchDeviceRules && typeof sections.modeSwitchDeviceRules === 'object' ? sections.modeSwitchDeviceRules : {});
@@ -275,7 +301,7 @@ module.exports = {
       .split(',')
       .map(s => s.trim())
       .filter(Boolean);
-    const allowed = ['subModes', 'rules', 'zoneRules', 'temperatureRules', 'applianceRules', 'activityRules', 'scheduleRules', 'autoMode', 'displaySettings', 'modeSwitchDeviceRules', 'keypadMappings'];
+    const allowed = ['subModes', 'rules', 'zoneRules', 'temperatureRules', 'applianceRules', 'groupWatchRules', 'activityRules', 'scheduleRules', 'autoMode', 'displaySettings', 'modeSwitchDeviceRules', 'avdDeviceRules', 'keypadMappings'];
     const sectionsToExport = requested.length ? requested.filter(id => allowed.includes(id)) : allowed;
     const sections = {};
     if (sectionsToExport.includes('subModes')) sections.subModes = homey.app.getSubModes();
@@ -283,11 +309,13 @@ module.exports = {
     if (sectionsToExport.includes('zoneRules')) sections.zoneRules = homey.app.getZoneRules();
     if (sectionsToExport.includes('temperatureRules')) sections.temperatureRules = homey.app.getTemperatureRules();
     if (sectionsToExport.includes('applianceRules')) sections.applianceRules = homey.app.getApplianceRules();
+    if (sectionsToExport.includes('groupWatchRules')) sections.groupWatchRules = homey.app.getGroupWatchRules ? homey.app.getGroupWatchRules() : [];
     if (sectionsToExport.includes('activityRules')) sections.activityRules = homey.app.getActivityRules();
     if (sectionsToExport.includes('scheduleRules')) sections.scheduleRules = homey.app.getScheduleRules();
     if (sectionsToExport.includes('autoMode')) sections.autoMode = homey.app.getAutoModeSettings();
     if (sectionsToExport.includes('displaySettings')) sections.displaySettings = homey.app.getDisplaySettings();
-    if (sectionsToExport.includes('modeSwitchDeviceRules')) sections.modeSwitchDeviceRules = homey.app.getModeSwitchDeviceRules ? homey.app.getModeSwitchDeviceRules() : {}; 
+    if (sectionsToExport.includes('modeSwitchDeviceRules')) sections.modeSwitchDeviceRules = homey.app.getModeSwitchDeviceRules ? homey.app.getModeSwitchDeviceRules() : {};
+    if (sectionsToExport.includes('avdDeviceRules')) sections.avdDeviceRules = homey.app.getAVDDeviceRules ? homey.app.getAVDDeviceRules() : {}; 
     const payload = {
       meta: { app: 'com.eevoosten.modeswitch', name: 'Mode Switch', version: '2.6.30', exportedAt: new Date().toISOString() },
       sections,
@@ -319,3 +347,126 @@ module.exports.get_dashboard_attention = async ({ homey }) => {
   return dashboard.attention;
 };
 module.exports.get_dashboard_history = async ({ homey }) => homey.app.dashboardService.getHistory();
+
+
+// Local configuration web UI (3.5.1)
+const crypto = require('crypto');
+
+function _getOrCreateLocalConfigToken(homey) {
+  let token = String(homey.settings.get('local_config_token') || '');
+  if (!/^[a-f0-9]{64}$/i.test(token)) {
+    token = crypto.randomBytes(32).toString('hex');
+    homey.settings.set('local_config_token', token);
+  }
+  return token;
+}
+
+function _validateLocalConfigToken(homey, token) {
+  const expected = _getOrCreateLocalConfigToken(homey);
+  const supplied = String(token || '');
+  if (supplied.length !== expected.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(supplied), Buffer.from(expected));
+  } catch (_) {
+    return false;
+  }
+}
+
+
+function _normalizeLocalConfigOrigin(value) {
+  let raw = String(value || '').trim();
+  if (!raw) return '';
+  if (!/^https?:\/\//i.test(raw)) raw = 'http://' + raw;
+  try {
+    const parsed = new URL(raw);
+    const host = String(parsed.hostname || '').toLowerCase();
+    if (!host || host === '127.0.0.1' || host === 'localhost' || host === '::1') return '';
+    return parsed.origin;
+  } catch (_) {
+    return '';
+  }
+}
+
+function _getStoredLocalConfigOrigin(homey) {
+  return _normalizeLocalConfigOrigin(homey.settings.get('local_config_origin'));
+}
+
+function _localConfigLanguage(homey) {
+  try {
+    const lang = homey.app && typeof homey.app._getHomeyLanguage === 'function'
+      ? homey.app._getHomeyLanguage()
+      : (homey.i18n && typeof homey.i18n.getLanguage === 'function' ? homey.i18n.getLanguage() : 'en');
+    const value = String(lang || 'en').toLowerCase().split('-')[0];
+    return value === 'nb' ? 'no' : (['nl','en','de','fr','es','no','sv','it'].includes(value) ? value : 'en');
+  } catch (_) {
+    return 'en';
+  }
+}
+
+module.exports.get_local_config_info = async ({ homey }) => {
+  const info = homey.app && typeof homey.app.getLocalConfigServerInfo === 'function'
+    ? homey.app.getLocalConfigServerInfo()
+    : { running: false, port: null, address: '', url: '', urls: [] };
+  return {
+    ok: true,
+    language: _localConfigLanguage(homey),
+    running: info.running === true,
+    port: info.port || null,
+    address: info.address || '',
+    url: info.url || '',
+    urls: Array.isArray(info.urls) ? info.urls : [],
+    tokenConfigured: true,
+  };
+};
+
+// Kept for backwards compatibility with 3.5.6 settings pages. The local
+// configuration server now discovers the Homey LAN address automatically.
+module.exports.post_set_local_config_origin = async ({ homey }) => {
+  const info = homey.app && typeof homey.app.getLocalConfigServerInfo === 'function'
+    ? homey.app.getLocalConfigServerInfo()
+    : { running: false, port: null, address: '', url: '', urls: [] };
+  return { ok: true, ...info };
+};
+
+module.exports.post_regenerate_local_config_token = async ({ homey }) => {
+  if (homey.app && typeof homey.app.regenerateLocalConfigToken === 'function') {
+    const info = homey.app.regenerateLocalConfigToken();
+    return { ok: true, ...info };
+  }
+  const token = crypto.randomBytes(32).toString('hex');
+  homey.settings.set('local_config_token', token);
+  return { ok: true, url: '', urls: [] };
+};
+
+module.exports.get_local_config_bootstrap = async ({ homey, query }) => {
+  if (!_validateLocalConfigToken(homey, query && query.key)) {
+    const err = new Error('Invalid local configuration key');
+    err.statusCode = 403;
+    throw err;
+  }
+  return { ok: true, language: _localConfigLanguage(homey), version: homey.manifest && homey.manifest.version };
+};
+
+module.exports.post_local_config_api = async ({ homey, body }) => {
+  if (!_validateLocalConfigToken(homey, body && body.key)) {
+    const err = new Error('Invalid local configuration key');
+    err.statusCode = 403;
+    throw err;
+  }
+  const method = String(body && body.method || 'GET').toUpperCase();
+  const requestPath = String(body && body.path || '/');
+  const denied = new Set(['/local_config_info','/local_config_token/regenerate','/local_config_bootstrap','/local_config_api','/export']);
+  if (denied.has(requestPath)) throw new Error('Route is not available from local configuration');
+
+  const manifestApi = (homey.manifest && homey.manifest.api) || {};
+  const entry = Object.entries(manifestApi).find(([name, route]) => {
+    if (!route || route.path !== requestPath) return false;
+    const methods = Array.isArray(route.method) ? route.method : [route.method];
+    return methods.map(String).map(v => v.toUpperCase()).includes(method) && !name.startsWith('get_local_config') && !name.startsWith('post_local_config');
+  });
+  if (!entry) throw new Error('Unsupported configuration API route: ' + method + ' ' + requestPath);
+  const [handlerName] = entry;
+  const handler = module.exports[handlerName];
+  if (typeof handler !== 'function') throw new Error('Configuration handler not found: ' + handlerName);
+  return handler({ homey, body: body ? body.body : null, query: {}, params: {} });
+};
