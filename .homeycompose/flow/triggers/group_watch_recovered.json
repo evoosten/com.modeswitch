@@ -1,0 +1,108 @@
+{
+  "title": {
+    "en": "Circuit recovered",
+    "nl": "Groep hersteld",
+    "de": "Stromkreis wiederhergestellt",
+    "fr": "Circuit rétabli",
+    "es": "Circuito recuperado",
+    "it": "Circuito ripristinato",
+    "sv": "Gruppen återställd",
+    "no": "Kursen er gjenopprettet"
+  },
+  "titleFormatted": {
+    "en": "Circuit recovered",
+    "nl": "Groep hersteld",
+    "de": "Stromkreis wiederhergestellt",
+    "fr": "Circuit rétabli",
+    "es": "Circuito recuperado",
+    "it": "Circuito ripristinato",
+    "sv": "Gruppen återställd",
+    "no": "Kursen er gjenopprettet"
+  },
+  "tokens": [
+    {
+      "name": "group",
+      "type": "string",
+      "title": {
+        "en": "Circuit",
+        "nl": "Groep",
+        "de": "Stromkreis",
+        "fr": "Circuit",
+        "es": "Circuito",
+        "it": "Circuito",
+        "sv": "Grupp",
+        "no": "Kurs"
+      }
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "title": {
+        "en": "Status",
+        "nl": "Status",
+        "de": "Status",
+        "fr": "État",
+        "es": "Estado",
+        "it": "Stato",
+        "sv": "Status",
+        "no": "Status"
+      }
+    },
+    {
+      "name": "affected_count",
+      "type": "number",
+      "title": {
+        "en": "Affected devices",
+        "nl": "Apparaten met probleem",
+        "de": "Betroffene Geräte",
+        "fr": "Appareils concernés",
+        "es": "Dispositivos afectados",
+        "it": "Dispositivi interessati",
+        "sv": "Berörda enheter",
+        "no": "Berørte enheter"
+      }
+    },
+    {
+      "name": "total_devices",
+      "type": "number",
+      "title": {
+        "en": "Total devices",
+        "nl": "Totaal apparaten",
+        "de": "Geräte gesamt",
+        "fr": "Total appareils",
+        "es": "Total dispositivos",
+        "it": "Dispositivi totali",
+        "sv": "Totalt antal enheter",
+        "no": "Totalt antall enheter"
+      }
+    },
+    {
+      "name": "affected_devices",
+      "type": "string",
+      "title": {
+        "en": "Affected device names",
+        "nl": "Apparaten met probleem",
+        "de": "Betroffene Gerätenamen",
+        "fr": "Appareils concernés",
+        "es": "Dispositivos afectados",
+        "it": "Dispositivi interessati",
+        "sv": "Berörda enheter",
+        "no": "Berørte enheter"
+      }
+    },
+    {
+      "name": "duration_seconds",
+      "type": "number",
+      "title": {
+        "en": "Duration (seconds)",
+        "nl": "Duur (seconden)",
+        "de": "Dauer (Sekunden)",
+        "fr": "Durée (secondes)",
+        "es": "Duración (segundos)",
+        "it": "Durata (secondi)",
+        "sv": "Varaktighet (sekunder)",
+        "no": "Varighet (sekunder)"
+      }
+    }
+  ]
+}

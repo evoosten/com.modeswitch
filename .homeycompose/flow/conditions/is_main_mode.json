@@ -1,0 +1,44 @@
+{
+  "title": {
+    "en": "Main mode (including submodes) !{{is|is not}} [[mode]]",
+    "nl": "Hoofdmodus (inclusief submodi) !{{is|is niet}} [[mode]]",
+    "de": "Hauptmodus (einschließlich Untermodi) !{{ist|ist nicht}} [[mode]]",
+    "fr": "Le mode principal (sous-modes inclus) !{{est|n’est pas}} [[mode]]",
+    "es": "El modo principal (incluidos submodos) !{{es|no es}} [[mode]]",
+    "no": "Hovedmodus (inkludert undermoduser) !{{er|er ikke}} [[mode]]",
+    "nb": "Hovedmodus (inkludert undermoduser) !{{er|er ikke}} [[mode]]",
+    "sv": "Huvudläge (inklusive underlägen) !{{är|är inte}} [[mode]]",
+    "it": "La modalità principale (incluse le sottomodalità) !{{è|non è}} [[mode]]"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_controller",
+      "title": {
+        "en": "Mode Controller", "nl": "Moduscontroller", "de": "Modus-Controller",
+        "fr": "Contrôleur de mode", "es": "Controlador de modo", "no": "Moduskontroller",
+        "nb": "Moduskontroller", "sv": "Lägeskontroller", "it": "Controller modalità"
+      }
+    },
+    {
+      "type": "autocomplete",
+      "name": "mode",
+      "title": {
+        "en": "Main mode", "nl": "Hoofdmodus", "de": "Hauptmodus", "fr": "Mode principal",
+        "es": "Modo principal", "no": "Hovedmodus", "nb": "Hovedmodus", "sv": "Huvudläge", "it": "Modalità principale"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Main mode (including submodes) !{{is|is not}} [[mode]]",
+    "nl": "Hoofdmodus (inclusief submodi) !{{is|is niet}} [[mode]]",
+    "de": "Hauptmodus (einschließlich Untermodi) !{{ist|ist nicht}} [[mode]]",
+    "fr": "Le mode principal (sous-modes inclus) !{{est|n’est pas}} [[mode]]",
+    "es": "El modo principal (incluidos submodos) !{{es|no es}} [[mode]]",
+    "no": "Hovedmodus (inkludert undermoduser) !{{er|er ikke}} [[mode]]",
+    "nb": "Hovedmodus (inkludert undermoduser) !{{er|er ikke}} [[mode]]",
+    "sv": "Huvudläge (inklusive underlägen) !{{är|är inte}} [[mode]]",
+    "it": "La modalità principale (incluse le sottomodalità) !{{è|non è}} [[mode]]"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Start appliance",
+    "nl": "Start apparaat",
+    "de": "Gerät starten",
+    "fr": "Démarrer appareil",
+    "es": "Iniciar dispositivo",
+    "it": "Avvia dispositivo",
+    "sv": "Starta apparat",
+    "no": "Start apparat"
+  },
+  "titleFormatted": {
+    "en": "Start appliance [[appliance]]",
+    "nl": "Start apparaat [[appliance]]",
+    "de": "Gerät [[appliance]] starten",
+    "fr": "Démarrer l’appareil [[appliance]]",
+    "es": "Iniciar dispositivo [[appliance]]",
+    "it": "Avvia dispositivo [[appliance]]",
+    "sv": "Starta apparaten [[appliance]]",
+    "no": "Start apparat [[appliance]]"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "appliance",
+      "title": {
+        "en": "Appliance",
+        "nl": "Apparaat",
+        "de": "Gerät",
+        "fr": "Appareil",
+        "es": "Dispositivo",
+        "it": "Dispositivo",
+        "sv": "Apparat",
+        "no": "Apparat"
+      }
+    }
+  ]
+}

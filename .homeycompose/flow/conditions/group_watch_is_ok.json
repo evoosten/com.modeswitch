@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Circuit [[group]] !{{is OK|is not OK}}",
+    "nl": "Groep [[group]] !{{is in orde|is niet in orde}}",
+    "de": "Stromkreis [[group]] !{{ist in Ordnung|ist nicht in Ordnung}}",
+    "fr": "Circuit [[group]] !{{est en ordre|n’est pas en ordre}}",
+    "es": "Circuito [[group]] !{{está correcto|no está correcto}}",
+    "it": "Circuito [[group]] !{{è OK|non è OK}}",
+    "sv": "Grupp [[group]] !{{är OK|är inte OK}}",
+    "no": "Kurs [[group]] !{{er OK|er ikke OK}}"
+  },
+  "titleFormatted": {
+    "en": "Circuit [[group]] !{{is OK|is not OK}}",
+    "nl": "Groep [[group]] !{{is in orde|is niet in orde}}",
+    "de": "Stromkreis [[group]] !{{ist in Ordnung|ist nicht in Ordnung}}",
+    "fr": "Circuit [[group]] !{{est en ordre|n’est pas en ordre}}",
+    "es": "Circuito [[group]] !{{está correcto|no está correcto}}",
+    "it": "Circuito [[group]] !{{è OK|non è OK}}",
+    "sv": "Grupp [[group]] !{{är OK|är inte OK}}",
+    "no": "Kurs [[group]] !{{er OK|er ikke OK}}"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "group",
+      "title": {
+        "en": "Circuit",
+        "nl": "Groep",
+        "de": "Stromkreis",
+        "fr": "Circuit",
+        "es": "Circuito",
+        "it": "Circuito",
+        "sv": "Grupp",
+        "no": "Kurs"
+      }
+    }
+  ]
+}

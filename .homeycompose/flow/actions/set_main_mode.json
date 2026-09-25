@@ -1,0 +1,57 @@
+{
+  "title": {
+    "en": "Activate main mode [[mode]]",
+    "nl": "Activeer hoofdmodus [[mode]]",
+    "de": "Hauptmodus [[mode]] aktivieren",
+    "fr": "Activer le mode principal [[mode]]",
+    "es": "Activar modo principal [[mode]]",
+    "no": "Aktiver hovedmodus [[mode]]",
+    "nb": "Aktiver hovedmodus [[mode]]",
+    "sv": "Aktivera huvudläge [[mode]]",
+    "it": "Attiva modalità principale [[mode]]"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_controller",
+      "title": {
+        "en": "Mode Controller",
+        "nl": "Moduscontroller",
+        "de": "Modus-Controller",
+        "fr": "Contrôleur de mode",
+        "es": "Controlador de modo",
+        "no": "Moduskontroller",
+        "nb": "Moduskontroller",
+        "sv": "Lägeskontroller",
+        "it": "Controller modalità"
+      }
+    },
+    {
+      "type": "autocomplete",
+      "name": "mode",
+      "title": {
+        "en": "Main mode",
+        "nl": "Hoofdmodus",
+        "de": "Hauptmodus",
+        "fr": "Mode principal",
+        "es": "Modo principal",
+        "no": "Hovedmodus",
+        "nb": "Hovedmodus",
+        "sv": "Huvudläge",
+        "it": "Modalità principale"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Activate main mode [[mode]]",
+    "nl": "Activeer hoofdmodus [[mode]]",
+    "de": "Hauptmodus [[mode]] aktivieren",
+    "fr": "Activer le mode principal [[mode]]",
+    "es": "Activar modo principal [[mode]]",
+    "no": "Aktiver hovedmodus [[mode]]",
+    "nb": "Aktiver hovedmodus [[mode]]",
+    "sv": "Aktivera huvudläge [[mode]]",
+    "it": "Attiva modalità principale [[mode]]"
+  }
+}

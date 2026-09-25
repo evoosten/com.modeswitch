@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Stop appliance",
+    "nl": "Stop apparaat",
+    "de": "Gerät stoppen",
+    "fr": "Arrêter appareil",
+    "es": "Detener dispositivo",
+    "it": "Arresta dispositivo",
+    "sv": "Stoppa apparat",
+    "no": "Stopp apparat"
+  },
+  "titleFormatted": {
+    "en": "Stop appliance [[appliance]]",
+    "nl": "Stop apparaat [[appliance]]",
+    "de": "Gerät [[appliance]] stoppen",
+    "fr": "Arrêter l’appareil [[appliance]]",
+    "es": "Detener dispositivo [[appliance]]",
+    "it": "Arresta dispositivo [[appliance]]",
+    "sv": "Stoppa apparaten [[appliance]]",
+    "no": "Stopp apparat [[appliance]]"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "appliance",
+      "title": {
+        "en": "Appliance",
+        "nl": "Apparaat",
+        "de": "Gerät",
+        "fr": "Appareil",
+        "es": "Dispositivo",
+        "it": "Dispositivo",
+        "sv": "Apparat",
+        "no": "Apparat"
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "Circuit [[group]] !{{has a problem|has no problem}}",
+    "nl": "Groep [[group]] !{{heeft een probleem|heeft geen probleem}}",
+    "de": "Stromkreis [[group]] !{{hat ein Problem|hat kein Problem}}",
+    "fr": "Circuit [[group]] !{{a un problème|n’a pas de problème}}",
+    "es": "Circuito [[group]] !{{tiene un problema|no tiene un problema}}",
+    "it": "Circuito [[group]] !{{ha un problema|non ha problemi}}",
+    "sv": "Grupp [[group]] !{{har ett problem|har inget problem}}",
+    "no": "Kurs [[group]] !{{har et problem|har ikke et problem}}"
+  },
+  "titleFormatted": {
+    "en": "Circuit [[group]] !{{has a problem|has no problem}}",
+    "nl": "Groep [[group]] !{{heeft een probleem|heeft geen probleem}}",
+    "de": "Stromkreis [[group]] !{{hat ein Problem|hat kein Problem}}",
+    "fr": "Circuit [[group]] !{{a un problème|n’a pas de problème}}",
+    "es": "Circuito [[group]] !{{tiene un problema|no tiene un problema}}",
+    "it": "Circuito [[group]] !{{ha un problema|non ha problemi}}",
+    "sv": "Grupp [[group]] !{{har ett problem|har inget problem}}",
+    "no": "Kurs [[group]] !{{har et problem|har ikke et problem}}"
+  },
+  "args": [
+    {
+      "type": "autocomplete",
+      "name": "group",
+      "title": {
+        "en": "Circuit",
+        "nl": "Groep",
+        "de": "Stromkreis",
+        "fr": "Circuit",
+        "es": "Circuito",
+        "it": "Circuito",
+        "sv": "Grupp",
+        "no": "Kurs"
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "id": "com.modeswitch",
-  "version": "3.2.1",
+  "version": "3.5.5",
   "compatibility": ">=12.3.0",
   "sdk": 3,
   "platforms": [
@@ -211,6 +211,40 @@
     "post_reset_contact_counter": {
       "method": "POST",
       "path": "/contact_counter/reset"
+    },
+    "put_group_watch_rules": {
+      "method": "PUT",
+      "path": "/group_watch_rules"
+    },
+    "get_group_watch_status": {
+      "method": "GET",
+      "path": "/group_watch_status"
+    },
+    "get_local_config_info": {
+      "method": "GET",
+      "path": "/local_config_info"
+    },
+    "post_set_local_config_origin": {
+      "method": "POST",
+      "path": "/local_config_origin"
+    },
+    "post_regenerate_local_config_token": {
+      "method": "POST",
+      "path": "/local_config_token/regenerate"
+    },
+    "get_local_config_bootstrap": {
+      "method": "GET",
+      "path": "/local_config_bootstrap",
+      "public": true
+    },
+    "post_local_config_api": {
+      "method": "POST",
+      "path": "/local_config_api",
+      "public": true
+    },
+    "put_avd_device_rules": {
+      "method": "PUT",
+      "path": "/avd_device_rules"
     }
   },
   "runtime": "nodejs"

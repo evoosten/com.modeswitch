@@ -1,0 +1,104 @@
+{
+  "title": {
+    "en": "Main mode becomes active [[mode]]",
+    "nl": "Hoofdmodus wordt actief [[mode]]",
+    "de": "Hauptmodus wird aktiv [[mode]]",
+    "fr": "Le mode principal devient actif [[mode]]",
+    "es": "El modo principal se activa [[mode]]",
+    "no": "Hovedmodus blir aktiv [[mode]]",
+    "nb": "Hovedmodus blir aktiv [[mode]]",
+    "sv": "Huvudläge blir aktivt [[mode]]",
+    "it": "La modalità principale diventa attiva [[mode]]"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_controller",
+      "title": {
+        "en": "Mode Controller",
+        "nl": "Moduscontroller",
+        "de": "Modus-Controller",
+        "fr": "Contrôleur de mode",
+        "es": "Controlador de modo",
+        "no": "Moduskontroller",
+        "nb": "Moduskontroller",
+        "sv": "Lägeskontroller",
+        "it": "Controller modalità"
+      }
+    },
+    {
+      "type": "autocomplete",
+      "name": "mode",
+      "title": {
+        "en": "Main mode",
+        "nl": "Hoofdmodus",
+        "de": "Hauptmodus",
+        "fr": "Mode principal",
+        "es": "Modo principal",
+        "no": "Hovedmodus",
+        "nb": "Hovedmodus",
+        "sv": "Huvudläge",
+        "it": "Modalità principale"
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "name": "main_mode",
+      "type": "string",
+      "title": {
+        "en": "Main mode",
+        "nl": "Hoofdmodus",
+        "de": "Hauptmodus",
+        "fr": "Mode principal",
+        "es": "Modo principal",
+        "no": "Hovedmodus",
+        "nb": "Hovedmodus",
+        "sv": "Huvudläge",
+        "it": "Modalità principale"
+      }
+    },
+    {
+      "name": "previous_main_mode",
+      "type": "string",
+      "title": {
+        "en": "Previous main mode",
+        "nl": "Vorige hoofdmodus",
+        "de": "Vorheriger Hauptmodus",
+        "fr": "Mode principal précédent",
+        "es": "Modo principal anterior",
+        "no": "Forrige hovedmodus",
+        "nb": "Forrige hovedmodus",
+        "sv": "Föregående huvudläge",
+        "it": "Modalità principale precedente"
+      }
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "title": {
+        "en": "Source",
+        "nl": "Bron",
+        "de": "Quelle",
+        "fr": "Source",
+        "es": "Origen",
+        "no": "Kilde",
+        "nb": "Kilde",
+        "sv": "Källa",
+        "it": "Origine"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "Main mode becomes active [[mode]]",
+    "nl": "Hoofdmodus wordt actief [[mode]]",
+    "de": "Hauptmodus wird aktiv [[mode]]",
+    "fr": "Le mode principal devient actif [[mode]]",
+    "es": "El modo principal se activa [[mode]]",
+    "no": "Hovedmodus blir aktiv [[mode]]",
+    "nb": "Hovedmodus blir aktiv [[mode]]",
+    "sv": "Huvudläge blir aktivt [[mode]]",
+    "it": "La modalità principale diventa attiva [[mode]]"
+  }
+}

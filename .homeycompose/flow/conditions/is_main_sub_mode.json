@@ -1,0 +1,162 @@
+{
+  "title": {
+    "en": "!{{Main mode|NOT: Main mode}} [[main_comparison]] [[main_mode]] and submode [[comparison]] [[sub_mode]]",
+    "nl": "!{{Hoofdmodus|NIET: Hoofdmodus}} [[main_comparison]] [[main_mode]] en submodus [[comparison]] [[sub_mode]]",
+    "de": "!{{Hauptmodus|NICHT: Hauptmodus}} [[main_comparison]] [[main_mode]] und Untermodus [[comparison]] [[sub_mode]]",
+    "fr": "!{{Mode principal|NON : Mode principal}} [[main_comparison]] [[main_mode]] et sous-mode [[comparison]] [[sub_mode]]",
+    "es": "!{{Modo principal|NO: Modo principal}} [[main_comparison]] [[main_mode]] y submodo [[comparison]] [[sub_mode]]",
+    "it": "!{{Modalità principale|NON: Modalità principale}} [[main_comparison]] [[main_mode]] e sottomodalità [[comparison]] [[sub_mode]]",
+    "sv": "!{{Huvudläge|INTE: Huvudläge}} [[main_comparison]] [[main_mode]] och underläge [[comparison]] [[sub_mode]]",
+    "no": "!{{Hovedmodus|IKKE: Hovedmodus}} [[main_comparison]] [[main_mode]] og undermodus [[comparison]] [[sub_mode]]",
+    "nb": "!{{Hovedmodus|IKKE: Hovedmodus}} [[main_comparison]] [[main_mode]] og undermodus [[comparison]] [[sub_mode]]"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=mode_controller",
+      "title": {
+        "en": "Mode Controller",
+        "nl": "Moduscontroller",
+        "de": "Modus-Controller",
+        "fr": "Contrôleur de mode",
+        "es": "Controlador de modo",
+        "it": "Controller modalità",
+        "sv": "Lägeskontroller",
+        "no": "Moduskontroller",
+        "nb": "Moduskontroller"
+      }
+    },
+    {
+      "type": "dropdown",
+      "name": "main_comparison",
+      "title": {
+        "en": "Main mode comparison",
+        "nl": "Vergelijking hoofdmodus",
+        "de": "Vergleich Hauptmodus",
+        "fr": "Comparaison du mode principal",
+        "es": "Comparación del modo principal",
+        "it": "Confronto modalità principale",
+        "sv": "Jämförelse huvudläge",
+        "no": "Sammenligning hovedmodus",
+        "nb": "Sammenligning hovedmodus"
+      },
+      "values": [
+        {
+          "id": "is",
+          "label": {
+            "en": "is",
+            "nl": "is",
+            "de": "ist",
+            "fr": "est",
+            "es": "es",
+            "it": "è",
+            "sv": "är",
+            "no": "er",
+            "nb": "er"
+          }
+        },
+        {
+          "id": "is_not",
+          "label": {
+            "en": "is not",
+            "nl": "is niet",
+            "de": "ist nicht",
+            "fr": "n’est pas",
+            "es": "no es",
+            "it": "non è",
+            "sv": "är inte",
+            "no": "er ikke",
+            "nb": "er ikke"
+          }
+        }
+      ]
+    },
+    {
+      "type": "autocomplete",
+      "name": "main_mode",
+      "title": {
+        "en": "Main mode",
+        "nl": "Hoofdmodus",
+        "de": "Hauptmodus",
+        "fr": "Mode principal",
+        "es": "Modo principal",
+        "it": "Modalità principale",
+        "sv": "Huvudläge",
+        "no": "Hovedmodus",
+        "nb": "Hovedmodus"
+      }
+    },
+    {
+      "type": "dropdown",
+      "name": "comparison",
+      "title": {
+        "en": "Comparison",
+        "nl": "Vergelijking",
+        "de": "Vergleich",
+        "fr": "Comparaison",
+        "es": "Comparación",
+        "it": "Confronto",
+        "sv": "Jämförelse",
+        "no": "Sammenligning",
+        "nb": "Sammenligning"
+      },
+      "values": [
+        {
+          "id": "is",
+          "label": {
+            "en": "is",
+            "nl": "is",
+            "de": "ist",
+            "fr": "est",
+            "es": "es",
+            "it": "è",
+            "sv": "är",
+            "no": "er",
+            "nb": "er"
+          }
+        },
+        {
+          "id": "is_not",
+          "label": {
+            "en": "is not",
+            "nl": "is niet",
+            "de": "ist nicht",
+            "fr": "n’est pas",
+            "es": "no es",
+            "it": "non è",
+            "sv": "är inte",
+            "no": "er ikke",
+            "nb": "er ikke"
+          }
+        }
+      ]
+    },
+    {
+      "type": "autocomplete",
+      "name": "sub_mode",
+      "title": {
+        "en": "Submode",
+        "nl": "Submodus",
+        "de": "Untermodus",
+        "fr": "Sous-mode",
+        "es": "Submodo",
+        "it": "Sottomodalità",
+        "sv": "Underläge",
+        "no": "Undermodus",
+        "nb": "Undermodus"
+      }
+    }
+  ],
+  "titleFormatted": {
+    "en": "!{{Main mode|NOT: Main mode}} [[main_comparison]] [[main_mode]] and submode [[comparison]] [[sub_mode]]",
+    "nl": "!{{Hoofdmodus|NIET: Hoofdmodus}} [[main_comparison]] [[main_mode]] en submodus [[comparison]] [[sub_mode]]",
+    "de": "!{{Hauptmodus|NICHT: Hauptmodus}} [[main_comparison]] [[main_mode]] und Untermodus [[comparison]] [[sub_mode]]",
+    "fr": "!{{Mode principal|NON : Mode principal}} [[main_comparison]] [[main_mode]] et sous-mode [[comparison]] [[sub_mode]]",
+    "es": "!{{Modo principal|NO: Modo principal}} [[main_comparison]] [[main_mode]] y submodo [[comparison]] [[sub_mode]]",
+    "it": "!{{Modalità principale|NON: Modalità principale}} [[main_comparison]] [[main_mode]] e sottomodalità [[comparison]] [[sub_mode]]",
+    "sv": "!{{Huvudläge|INTE: Huvudläge}} [[main_comparison]] [[main_mode]] och underläge [[comparison]] [[sub_mode]]",
+    "no": "!{{Hovedmodus|IKKE: Hovedmodus}} [[main_comparison]] [[main_mode]] og undermodus [[comparison]] [[sub_mode]]",
+    "nb": "!{{Hovedmodus|IKKE: Hovedmodus}} [[main_comparison]] [[main_mode]] og undermodus [[comparison]] [[sub_mode]]"
+  }
+}
